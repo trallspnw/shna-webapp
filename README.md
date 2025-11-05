@@ -1,7 +1,7 @@
 
-# FSHNA Web Application
+# SHNA Web Application
 
-This is a purpose built application for the Friend of the Seminary Hill Natural Area (FSHNA). It is a full stack web application comprising of a full CMS (Payload CMS) and a static frontend. This is intended to meet the needs of small organizations requiring a website with basic content management, payments, emails, and member management. It is designed be be hosted with minimal infrastructure cost. While it's purpose built for FSHNA, many other small organizations have similar needs, so it was built in a way to easily adapt to other organizations.
+This is a purpose built application for the Seminary Hill Natural Area (SHNA). It is a full stack web application comprising of a full CMS (Payload CMS) and a static frontend. This is intended to meet the needs of small organizations requiring a website with basic content management, payments, emails, and member management. It is designed to be hosted with minimal infrastructure cost. While it's purpose built for SHNA, many other small organizations have similar needs, so it was built in a way to easily adapt to other organizations.
 
 ## Requirements
 
