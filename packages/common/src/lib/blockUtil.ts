@@ -30,7 +30,7 @@ import { render as renderEventCardGrid } from '@common/handlers/blocks/eventCard
 import { render as renderSubscriptionForm } from '@common/handlers/blocks/subscriptionForm'
 import { render as renderTwoColumns } from '@common/handlers/blocks/twoColumns'
 import { JSX } from "react";
-import { Fetcher, Fetchers, FetcherTypes } from "../fetchers/fetcher";
+import { ContentFetcher, Fetchers, FetcherTypes } from "../fetchers/fetcher";
 
 /**
  * Maps payload blocks to a renderer and type.
@@ -131,7 +131,7 @@ export function renderBlocks(blocks: BaseBlock[], fetchers: Fetchers, generalGlo
       const render = blockRegistry[blockType].render as (
         block: Extract<BaseBlock, { blockType: typeof blockType }>,
         index: number,
-        fetchers: Record<FetcherTypes, Fetcher<any>>,
+        fetchers: Record<FetcherTypes, ContentFetcher<unknown>>,
         generalGlobals: General,
       ) => JSX.Element
 

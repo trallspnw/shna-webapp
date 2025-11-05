@@ -1,42 +1,40 @@
-import { BaseEventHandler } from '@common/handlers/event'
-import { SiteFetcher } from '@site/lib/siteFetcher'
-import { Event, Page } from '@common/types/payload-types'
-import { RouteContext } from '@common/handlers/baseContent'
+import type { Event, Page } from '@common/types/payload-types'
+import { renderEventPage } from '@common/handlers/event'
+import { generateContentMetadata, RouteContext } from '@common/handlers/baseContent'
+import { createSiteFetcher } from '@site/lib/siteFetcher'
 
-/**
- * Renders event pages statically using the static SiteFetcher.
- */
-class SiteEventHandler extends BaseEventHandler {
-  protected readonly fetcher = new SiteFetcher<Event>(this.COLLECTION)
-    protected readonly allFetchers = {
-    page: new SiteFetcher<Page>('pages'),
-    event: this.fetcher,
-  }
-
-  /**
-   * Gets all of the slugs for events. Needed for static site generation.
-   * @returns The slugs of all the events
-   */
-  async generateStaticParams() {
-    const events = await this.fetcher.getAll()
-    if (!Array.isArray(events) || events.length == 0) {
-      console.warn(`No ${this.COLLECTION} found - skipping static params`)
-      return [{ slug: '__fake__' }];
-    }
-    return events.map((event) => ({ slug: event.slug }))
-  }
+const eventFetcher = createSiteFetcher<Event>('events')
+const fetchers = {
+  page: createSiteFetcher<Page>('pages'),
+  event: eventFetcher,
 }
 
-const handler = new SiteEventHandler()
+export default async function EventRoute(context: RouteContext) {
+  const { slug } = await context.params
 
-export default async function render(context: RouteContext) {
-  return handler.render(context)
+  return renderEventPage({
+    slug,
+    fetcher: eventFetcher,
+    fetchers,
+  })
 }
 
 export async function generateMetadata(context: RouteContext) {
-  return handler.generateMetadata(context)
+  const { slug } = await context.params
+
+  return generateContentMetadata({
+    slug,
+    fetcher: eventFetcher,
+  })
 }
 
 export async function generateStaticParams() {
-  return handler.generateStaticParams()
+  const events = await eventFetcher.getAll()
+
+  if (!Array.isArray(events) || events.length === 0) {
+    console.warn('No events found - skipping static params')
+    return [{ slug: '__fake__' }]
+  }
+
+  return events.map(event => ({ slug: event.slug }))
 }

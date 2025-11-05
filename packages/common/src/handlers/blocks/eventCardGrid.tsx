@@ -1,5 +1,5 @@
 import { EventCardGrid as EventCardGridType } from '@common/types/payload-types'
-import { Fetcher, Fetchers } from '@common/fetchers/fetcher'
+import { ContentFetcher, Fetchers } from '@common/fetchers/fetcher'
 import { Event } from '@common/types/payload-types'
 import { EventCardGrid } from '@common/components/EventCardGrid'
 import { JSX } from 'react'
@@ -9,7 +9,7 @@ import { normalizeMedia } from '../../lib/mediaUtil'
  * Handles rendering of event card grid blocks.
  */
 export async function render(block: EventCardGridType, index: number, fetchers: Fetchers): Promise<JSX.Element> {
-  const eventFetcher = fetchers.event as Fetcher<Event>
+  const eventFetcher = fetchers.event as ContentFetcher<Event>
   const allEvents = await eventFetcher.getAll()
 
   // Seminary HIll events are always Pacific Time - This can be made configuratble in the future.

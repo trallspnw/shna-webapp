@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import type { Fetcher, Fetchers } from '@common/fetchers/fetcher'
 import type { JSX } from 'react'
 import { notFound } from 'next/navigation'
 import { BaseBlock, renderBlocks } from '@common/lib/blockUtil'
@@ -9,13 +8,14 @@ import { getLocalizedValue } from '@common/lib/translation'
 import { Footer, General } from '../types/payload-types'
 import { FooterProps } from '../components/Footer'
 import { normalizeMedia, rewriteMediaUrl } from '../lib/mediaUtil'
+import { ContentFetcher, Fetchers } from '@common/fetchers/fetcher'
 
-export type RouteParams = { 
-  slug: string,
+export type RouteParams = {
+  slug: string
 }
 
-export type RouteContext = { 
-  params: Promise<RouteParams>, 
+export type RouteContext = {
+  params: Promise<RouteParams>
 }
 
 type ContentWithBlocks = {
@@ -24,90 +24,87 @@ type ContentWithBlocks = {
   blocks?: BaseBlock[] | null
 }
 
-/**
- * Handles content rendering for all displayable collections (pages, events). 
- */
-export abstract class BaseContentHandler<T extends ContentWithBlocks> {
-  protected abstract fetcher: Fetcher<T>
-  protected abstract allFetchers: Fetchers
+export interface ContentRenderOptions<T extends ContentWithBlocks> {
+  slug: string
+  fetcher: ContentFetcher<T>
+  fetchers: Fetchers
+  renderBeforeBody?: (content: T, general: General) => JSX.Element | null
+}
 
-  /**
-   * Content to be rendered before blocks. Not content is here by default but this can be overridden.
-   */
-  protected renderBeforeBody(context: RouteContext, content: T, general: General): JSX.Element | null {
-    return null
-  }
+export interface ContentMetadataOptions<T extends ContentWithBlocks> {
+  slug: string
+  fetcher: ContentFetcher<T>
+}
 
-  /**
-   * Main render component function. Looks up the content information and directs to 404 if not found. Loads common 
-   * layout content. Renders a hero if the first block in the content is a hero. Render the before boyd content, and
-   * then non-hero blocks.
-   */
-  async render(context: RouteContext): Promise<JSX.Element> {
-    const content = await this.fetcher.get((await context.params).slug)
-    if (!content) notFound()
+export async function renderContentPage<T extends ContentWithBlocks>({
+  slug,
+  fetcher,
+  fetchers,
+  renderBeforeBody,
+}: ContentRenderOptions<T>): Promise<JSX.Element> {
+  const content = await fetcher.get(slug)
 
-    const navItems = await this.fetcher.getNavItems();
-    const footer = await this.fetcher.getGlobalData<Footer>('footer')
-    const general = await this.fetcher.getGlobalData<General>('general')
-    const blocks = content.blocks || []
-    const [firstBlock, ...remainingBlocks] = content.blocks || []
-    const isHero = firstBlock?.blockType === 'hero'
-    const heroBlock = isHero ? firstBlock : null
-    const bodyBlocks = isHero ? remainingBlocks : blocks
-    const logo = normalizeMedia(general.logo)
+  if (!content) notFound()
 
-    return (
-      <BodyLayout
-        logo={logo}
-        navItems={navItems}
-        hero={heroBlock ? renderBlocks([heroBlock], this.allFetchers, general) : undefined}
-        footer={mapFooterToProps(footer, logo)}
-      >
-        {this.renderBeforeBody(context, content, general)}
-        {renderBlocks(bodyBlocks, this.allFetchers, general)}
-      </BodyLayout>
-    )
-  }
+  const navItems = await fetcher.getNavItems()
+  const footer = await fetcher.getGlobalData<Footer>('footer')
+  const general = await fetcher.getGlobalData<General>('general')
+  const blocks = content.blocks || []
+  const [firstBlock, ...remainingBlocks] = blocks
+  const isHero = firstBlock?.blockType === 'hero'
+  const heroBlock = isHero ? firstBlock : null
+  const bodyBlocks = isHero ? remainingBlocks : blocks
+  const logo = normalizeMedia(general.logo)
 
-  /**
-   * Generates page metadata.
-   */
-  async generateMetadata(context: RouteContext): Promise<Metadata> {
-    const content = await this.fetcher.get((await context.params).slug)
-    const general = await this.fetcher.getGlobalData<General>('general')
+  return (
+    <BodyLayout
+      logo={logo}
+      navItems={navItems}
+      hero={heroBlock ? renderBlocks([heroBlock], fetchers, general) : undefined}
+      footer={mapFooterToProps(footer, logo)}
+    >
+      {renderBeforeBody?.(content, general) ?? null}
+      {renderBlocks(bodyBlocks, fetchers, general)}
+    </BodyLayout>
+  )
+}
 
-    const titlePrefix = content && content.title && content.slug !== 'home' 
-      ? `${getLocalizedValue(content.title, DEFAULT_LANGUAGE)} | ` 
-      : ''
-    const favicon = getLocalizedValue(normalizeMedia(general.icon), DEFAULT_LANGUAGE) ?? undefined
+export async function generateContentMetadata<T extends ContentWithBlocks>({
+  slug,
+  fetcher,
+}: ContentMetadataOptions<T>): Promise<Metadata> {
+  const [content, general] = await Promise.all([
+    fetcher.get(slug),
+    fetcher.getGlobalData<General>('general'),
+  ])
 
-    return { 
-      title: `${titlePrefix}${getLocalizedValue(general.baseTitle, DEFAULT_LANGUAGE)}`,
-      icons: {
-        icon: favicon ? rewriteMediaUrl(favicon.url) : undefined,
-      },
-      // After content is finalized, disoverability should come from collection config.
-      robots: {
+  const titlePrefix = content && content.title && content.slug !== 'home'
+    ? `${getLocalizedValue(content.title, DEFAULT_LANGUAGE)} | `
+    : ''
+  const favicon = getLocalizedValue(normalizeMedia(general.icon), DEFAULT_LANGUAGE) ?? undefined
+
+  return {
+    title: `${titlePrefix}${getLocalizedValue(general.baseTitle, DEFAULT_LANGUAGE)}`,
+    icons: {
+      icon: favicon ? rewriteMediaUrl(favicon.url) : undefined,
+    },
+    // After content is finalized, disoverability should come from collection config.
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
         index: false,
         follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-          noimageindex: true,
-        },
+        noimageindex: true,
       },
-    }
+    },
   }
 }
 
-/**
- * Helper to map footer configuration to footer props.
- */
 function mapFooterToProps(footer: Footer, logo?: LocalizedMedia): FooterProps {
   return {
-    logo: logo,
+    logo,
     slogan: footer.slogan,
     linkGroups: (footer.linkGroups ?? []).map(group => ({
       title: group.groupName,
@@ -119,4 +116,3 @@ function mapFooterToProps(footer: Footer, logo?: LocalizedMedia): FooterProps {
     socialLinks: footer.socialLinks?.map(link => link.url) ?? [],
   }
 }
-

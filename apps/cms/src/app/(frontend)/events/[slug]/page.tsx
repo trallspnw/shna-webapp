@@ -1,25 +1,29 @@
-import { BaseEventHandler } from '@common/handlers/event'
-import { CmsFetcher } from '@cms/lib/cmsFetcher'
-import { Event, Page } from '@common/types/payload-types'
-import { RouteContext } from '@common/handlers/baseContent'
+import type { Event, Page } from '@common/types/payload-types'
+import { renderEventPage } from '@common/handlers/event'
+import { generateContentMetadata, RouteContext } from '@common/handlers/baseContent'
+import { createCmsFetcher } from '@cms/lib/cmsFetcher'
 
-/**
- * Renders event pages dynamically using the dynamic CmsFetcher.
- */
-class CmsEventHandler extends BaseEventHandler {
-  protected readonly fetcher =new CmsFetcher<Event>(this.COLLECTION)
-  protected readonly allFetchers = {
-    page: new CmsFetcher<Page>('pages'),
-    event: this.fetcher,
-  }
+const eventFetcher = createCmsFetcher<Event>('events')
+const fetchers = {
+  page: createCmsFetcher<Page>('pages'),
+  event: eventFetcher,
 }
 
-const handler = new CmsEventHandler()
+export default async function CmsEvent(context: RouteContext) {
+  const { slug } = await context.params
 
-export default async function render(context: RouteContext) {
-  return handler.render(context)
+  return renderEventPage({
+    slug,
+    fetcher: eventFetcher,
+    fetchers,
+  })
 }
 
 export async function generateMetadata(context: RouteContext) {
-  return handler.generateMetadata(context)
+  const { slug } = await context.params
+
+  return generateContentMetadata({
+    slug,
+    fetcher: eventFetcher,
+  })
 }
