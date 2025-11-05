@@ -1,50 +1,48 @@
 import type { JSX } from 'react'
 import { Event, General } from '@common/types/payload-types'
-import { notFound } from 'next/navigation'
-import { BaseContentHandler, RouteContext } from '@common/handlers/baseContent'
 import { EventDetails } from '../components/EventDetails'
 import { SUPPORTED_LANGUAGES } from '../types/language'
 import { normalizeMedia } from '../lib/mediaUtil'
+import { ContentRenderOptions, renderContentPage } from './baseContent'
 
-/**
- * Handles content rendering for the events collection.
- */
-export abstract class BaseEventHandler extends BaseContentHandler<Event> {
-  protected readonly COLLECTION = 'events'
+export function renderEventPage(options: ContentRenderOptions<Event>): Promise<JSX.Element> {
+  return renderContentPage({
+    ...options,
+    renderBeforeBody: (event, general) => renderEventDetails(event, general),
+  })
+}
 
-  /**
-   * Overrides the render before body to render an event hearder.
-   */
-  protected override renderBeforeBody(context: RouteContext, event: Event, general: General): JSX.Element | null {
-    const date = new Date(event.dateTime)
+function renderEventDetails(event: Event, general: General): JSX.Element {
+  const date = new Date(event.dateTime)
 
-    const dateFormatOptions: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }
+  const dateFormatOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }
 
-    const timeFormatOptions: Intl.DateTimeFormatOptions = {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    }
+  const timeFormatOptions: Intl.DateTimeFormatOptions = {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }
 
-    const formattedDate = Object.fromEntries(
-      SUPPORTED_LANGUAGES.map(language => [
-        language,
-        new Intl.DateTimeFormat(language, dateFormatOptions).format(date),
-      ])
-    )
+  const formattedDate = Object.fromEntries(
+    SUPPORTED_LANGUAGES.map(language => [
+      language,
+      new Intl.DateTimeFormat(language, dateFormatOptions).format(date),
+    ]),
+  )
 
-    const formattedTime = Object.fromEntries(
-      SUPPORTED_LANGUAGES.map(language => [
-        language,
-        new Intl.DateTimeFormat(language, timeFormatOptions).format(date),
-      ])
-    )
+  const formattedTime = Object.fromEntries(
+    SUPPORTED_LANGUAGES.map(language => [
+      language,
+      new Intl.DateTimeFormat(language, timeFormatOptions).format(date),
+    ]),
+  )
 
-    return <EventDetails
+  return (
+    <EventDetails
       heading={event.title}
       date={formattedDate}
       time={formattedTime}
@@ -54,13 +52,5 @@ export abstract class BaseEventHandler extends BaseContentHandler<Event> {
       timeLabel={general.eventLabels?.timeLabel}
       locationLabel={general.eventLabels?.locationLabel}
     />
-  }
-
-  async render(context: RouteContext): Promise<JSX.Element> {
-    const event = await this.fetcher.get((await context.params).slug)
-
-    if (!event) notFound()
-    
-    return super.render(context)
-  }
+  )
 }

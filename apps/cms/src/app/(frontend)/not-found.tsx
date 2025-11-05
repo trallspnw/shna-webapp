@@ -1,27 +1,27 @@
-import { BaseNotFoundHandler } from '@common/handlers/not-found'
-import { CmsFetcher } from '@cms/lib/cmsFetcher'
-import { Page } from '@common/types/payload-types'
+import type { Event, Page } from '@common/types/payload-types'
+import { renderContentPage, generateContentMetadata } from '@common/handlers/baseContent'
+import { createCmsFetcher } from '@cms/lib/cmsFetcher'
 
-/**
- * Renders the 404 page dynamically using the dynamic CmsFetcher.
- */
-class CmsNotFoundHandler extends BaseNotFoundHandler {
-  protected readonly fetcher = new CmsFetcher<Page>(this.COLLECTION)
-  protected readonly allFetchers = {
-    page: this.fetcher,
-    event: new CmsFetcher<Event>('events'),
-  }
+const pageFetcher = createCmsFetcher<Page>('pages')
+const fetchers = {
+  page: pageFetcher,
+  event: createCmsFetcher<Event>('events'),
 }
-
-const handler = new CmsNotFoundHandler()
 
 // Prevents missing secret key errors
 export const dynamic = 'force-dynamic'
 
-export default async function render() {
-  return handler.render()
+export default async function CmsNotFoundPage() {
+  return renderContentPage({
+    slug: 'not-found',
+    fetcher: pageFetcher,
+    fetchers,
+  })
 }
 
 export async function generateMetadata() {
-  return handler.generateMetadata()
+  return generateContentMetadata({
+    slug: 'not-found',
+    fetcher: pageFetcher,
+  })
 }

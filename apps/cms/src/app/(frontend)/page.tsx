@@ -1,27 +1,27 @@
-import { BaseHomeHandler } from '@common/handlers/home'
-import { CmsFetcher } from '@cms/lib/cmsFetcher'
-import { Page } from '@common/types/payload-types'
+import type { Event, Page } from '@common/types/payload-types'
+import { renderContentPage, generateContentMetadata } from '@common/handlers/baseContent'
+import { createCmsFetcher } from '@cms/lib/cmsFetcher'
 
-/**
- * Renders the home page dynamically using the dynamic CmsFetcher.
- */
-class CmsHomeHandler extends BaseHomeHandler {
-  protected readonly fetcher = new CmsFetcher<Page>(this.COLLECTION)
-  protected readonly allFetchers = {
-    page: this.fetcher,
-    event: new CmsFetcher<Event>('events'),
-  }
+const pageFetcher = createCmsFetcher<Page>('pages')
+const fetchers = {
+  page: pageFetcher,
+  event: createCmsFetcher<Event>('events'),
 }
-
-const handler = new CmsHomeHandler()
 
 // Prevents missing secret key errors
 export const dynamic = 'force-dynamic'
 
-export default async function render() {
-  return handler.render()
+export default async function CmsHomePage() {
+  return renderContentPage({
+    slug: 'home',
+    fetcher: pageFetcher,
+    fetchers,
+  })
 }
 
 export async function generateMetadata() {
-  return handler.generateMetadata()
+  return generateContentMetadata({
+    slug: 'home',
+    fetcher: pageFetcher,
+  })
 }
