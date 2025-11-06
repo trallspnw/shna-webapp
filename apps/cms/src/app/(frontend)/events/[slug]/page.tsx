@@ -1,11 +1,11 @@
 import type { Event, Page } from '@common/types/payload-types'
 import { renderEventPage } from '@common/handlers/event'
 import { generateContentMetadata, RouteContext } from '@common/handlers/baseContent'
-import { createCmsFetcher } from '@cms/lib/cmsFetcher'
+import { createPayloadRestFetcher } from '@common/fetchers/fetcher'
 
-const eventFetcher = createCmsFetcher<Event>('events')
+const eventFetcher = createPayloadRestFetcher<Event>('events')
 const fetchers = {
-  page: createCmsFetcher<Page>('pages'),
+  page: createPayloadRestFetcher<Page>('pages'),
   event: eventFetcher,
 }
 

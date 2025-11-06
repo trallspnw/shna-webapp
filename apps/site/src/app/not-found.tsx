@@ -1,11 +1,11 @@
 import type { Event, Page } from '@common/types/payload-types'
 import { renderContentPage, generateContentMetadata } from '@common/handlers/baseContent'
-import { createSiteFetcher } from '@site/lib/siteFetcher'
+import { createPayloadRestFetcher } from '@common/fetchers/fetcher'
 
-const pageFetcher = createSiteFetcher<Page>('pages')
+const pageFetcher = createPayloadRestFetcher<Page>('pages')
 const fetchers = {
   page: pageFetcher,
-  event: createSiteFetcher<Event>('events'),
+  event: createPayloadRestFetcher<Event>('events'),
 }
 
 export default async function NotFoundPage() {

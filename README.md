@@ -19,7 +19,7 @@ This is a purpose built application for the Seminary Hill Natural Area (SHNA). I
 * Start the database in docker with `pnpm db`.
 * [Optional] Restore the database from a prod backup if needed. This can be done with `pg_dump` and `pg_restore`.
 * [Optional] If working with payments, start Stripe webhook forwarding with `pnpm stripe:forward`. Note the webhook secret and add it to `.env`.
-* Start the CMS application with `pnpm csm:dotenv`.
+* Start the CMS application with `pnpm cms:dotenv`.
 * Confirm the backend is available at `http://localhost:3000`. Go to `/admin` and add the first admin account if needed.
 * The CMS backend uses a live server. Code changes will render without rebuild or refresh.
 * Build the static frontend with `pnpm site:dotenv`.

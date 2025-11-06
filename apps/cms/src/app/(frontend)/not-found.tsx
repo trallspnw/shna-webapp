@@ -1,11 +1,11 @@
 import type { Event, Page } from '@common/types/payload-types'
 import { renderContentPage, generateContentMetadata } from '@common/handlers/baseContent'
-import { createCmsFetcher } from '@cms/lib/cmsFetcher'
+import { createPayloadRestFetcher } from '@common/fetchers/fetcher'
 
-const pageFetcher = createCmsFetcher<Page>('pages')
+const pageFetcher = createPayloadRestFetcher<Page>('pages')
 const fetchers = {
   page: pageFetcher,
-  event: createCmsFetcher<Event>('events'),
+  event: createPayloadRestFetcher<Event>('events'),
 }
 
 // Prevents missing secret key errors
