@@ -1,5 +1,5 @@
 import { Block } from "payload";
-import { LocalizedTextField } from "../fields/localizedTextField";
+import { createLocalizedTextField } from "../fields/localizedTextField";
 
 /**
  * A block for displaying an order summary with localized text.
@@ -12,13 +12,13 @@ export const OrderSummary: Block = {
     plural: 'Order Summaries',
   },
   fields: [
-    LocalizedTextField('heading', 'Heading', true),
-    LocalizedTextField('paidStatus', 'Paid Status', true),
-    LocalizedTextField('unpaidStatus', 'Unpaid Status', true),
-    LocalizedTextField('totalPaidLabel', 'Total Paid Label', true),
-    LocalizedTextField('loadingText', 'Loading Text', true),
-    LocalizedTextField('orderNotFoundText', 'Order Not Found Text', true),
-    LocalizedTextField('returnButtonText', 'Return Button Text', true),
-    LocalizedTextField('retryButtonText', 'Retry Button Text'),
+    createLocalizedTextField('heading', 'Heading', true),
+    createLocalizedTextField('paidStatus', 'Paid Status', true),
+    createLocalizedTextField('unpaidStatus', 'Unpaid Status', true),
+    createLocalizedTextField('totalPaidLabel', 'Total Paid Label', true),
+    createLocalizedTextField('loadingText', 'Loading Text', true),
+    createLocalizedTextField('orderNotFoundText', 'Order Not Found Text', true),
+    createLocalizedTextField('returnButtonText', 'Return Button Text', true),
+    createLocalizedTextField('retryButtonText', 'Retry Button Text'),
   ],
 }

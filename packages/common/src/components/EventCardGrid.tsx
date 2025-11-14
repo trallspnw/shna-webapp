@@ -7,7 +7,7 @@ import { EventCard } from './EventCard'
 import classes from './EventCardGrid.module.scss'
 import { DEFAULT_LANGUAGE, LocalizedMedia, LocalizedText } from '../types/language'
 import { useLanguage } from '../hooks/useLanguage'
-import { getLocalizedValue } from '../lib/translation'
+import { resolveLocalizedText, resolveLocalizedValue } from '../lib/translation'
 import { Heading } from './Heading'
 
 type EventDetails = {
@@ -54,9 +54,9 @@ export function EventCardGrid({ heading, events, rows, showMoreLabel }: EventCar
         {visibleEvents.map((event, index) => (
           <EventCard
             key={index}
-            name={getLocalizedValue(event.name, language) ?? ''}
+            name={resolveLocalizedText(event.name, language)}
             href={event.href}
-            imageSrc={getLocalizedValue(event.media, language)?.url ?? ''}
+            imageSrc={resolveLocalizedValue(event.media, language)?.src ?? ''}
             date={event.dateTime}
             locale={language}
           />
@@ -70,7 +70,7 @@ export function EventCardGrid({ heading, events, rows, showMoreLabel }: EventCar
               variant='subtle'
               onClick={() => setVisibleRows((r) => r + 2)}
             >
-              {getLocalizedValue(showMoreLabel, language)}
+              {resolveLocalizedText(showMoreLabel, language)}
             </Button>
           )}
         </div>

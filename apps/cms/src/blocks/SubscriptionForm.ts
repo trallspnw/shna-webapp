@@ -1,5 +1,5 @@
 import { Block } from 'payload'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * Subscription form with localized text.
@@ -12,19 +12,19 @@ export const SubscriptionForm: Block = {
     plural: 'Subscription Forms',
   },
   fields: [
-    LocalizedTextField('submitButtonText', 'Submit Button Text', true),
+    createLocalizedTextField('submitButtonText', 'Submit Button Text', true),
     {
       type: 'row',
       fields: [
-        LocalizedTextField('successHeading', 'Success Heading', true),
-        LocalizedTextField('successMessage', 'Success Message', true),
+        createLocalizedTextField('successHeading', 'Success Heading', true),
+        createLocalizedTextField('successMessage', 'Success Message', true),
       ],
     },
     {
       type: 'row',
       fields: [
-        LocalizedTextField('failureHeading', 'Failure Heading', true),
-        LocalizedTextField('failureMessage', 'Failure Message', true),
+        createLocalizedTextField('failureHeading', 'Failure Heading', true),
+        createLocalizedTextField('failureMessage', 'Failure Message', true),
       ],
     },
   ],

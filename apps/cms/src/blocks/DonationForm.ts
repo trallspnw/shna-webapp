@@ -1,5 +1,5 @@
 import { Block } from 'payload'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * Donation form block with localized text.
@@ -12,11 +12,11 @@ export const DonationForm: Block = {
     plural: 'Donation Forms',
   },
   fields: [
-    LocalizedTextField('submitButtonText', 'Submit Button Text', true),
-    LocalizedTextField('amountLabel', 'Amount Label'),
-    LocalizedTextField('amountPlaceholder', 'Amount Placeholder'),
-    LocalizedTextField('amountValidationError', 'Amount Input Error'),
-    LocalizedTextField('itemName', 'Item Name'),
-    LocalizedTextField('serverFailureMessage', 'Server Failure Message'),
+    createLocalizedTextField('submitButtonText', 'Submit Button Text', true),
+    createLocalizedTextField('amountLabel', 'Amount Label'),
+    createLocalizedTextField('amountPlaceholder', 'Amount Placeholder'),
+    createLocalizedTextField('amountValidationError', 'Amount Input Error'),
+    createLocalizedTextField('itemName', 'Item Name'),
+    createLocalizedTextField('serverFailureMessage', 'Server Failure Message'),
   ],
 }

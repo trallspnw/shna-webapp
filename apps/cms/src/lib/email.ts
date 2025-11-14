@@ -2,7 +2,7 @@ import { getPayload, Payload } from "payload";
 import configPromise from '@payload-config'
 import { person } from "../../generated/prisma";
 import { DEFAULT_LANGUAGE, Language } from "@/packages/common/src/types/language";
-import { getLocalizedValue } from "@/packages/common/src/lib/translation";
+import { resolveLocalizedText } from "@/packages/common/src/lib/translation";
 import { renderEmailBlocks } from '@common/lib/emailBlockUtil'
 import React from "react";
 import { renderToHtml } from "./emailRenderer";
@@ -24,7 +24,7 @@ export async function sendEmails(persons: person[], slug: string, params: Record
 
   for (const person of persons) {
     const language = person.language as Language || DEFAULT_LANGUAGE
-    const subject = getLocalizedValue(email.subject, language)
+    const subject = resolveLocalizedText(email.subject, language)
 
     // Payload doesn't accept email body as JSX. Content must be rendered as HTML.
     const html = await renderToHtml(React.createElement(

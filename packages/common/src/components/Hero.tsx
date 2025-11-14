@@ -3,12 +3,12 @@
 'use client'
 
 import { useLanguage } from '@common/hooks/useLanguage'
-import { getLocalizedValue } from '@common/lib/translation'
+import { resolveLocalizedText, resolveLocalizedValue } from '@common/lib/translation'
 import { LocalizedMedia, LocalizedText } from '@common/types/language'
 import clsx from 'clsx'
 import { Overlay, Title, Text, Container } from '@mantine/core'
-import classes from './Hero.module.scss';
-import { rewriteMediaUrl } from '@common/lib/mediaUtil'
+import classes from './Hero.module.scss'
+import { toPublicMediaUrl } from '@common/lib/mediaUtil'
 import { Action } from './Action'
 import { Action as ActionType } from '@common/types/payload-types'
 
@@ -25,26 +25,26 @@ type HeroProps = {
  */
 export function Hero({ heading, subheading, media, actions = [], className }: HeroProps) {
   const [language] = useLanguage()
-  const localizedMedia = getLocalizedValue(media, language)!
+  const localizedMedia = resolveLocalizedValue(media, language)
 
   return (
     <div className={classes.container}>
       <div
         className={clsx(classes.wrapper, className)}
         style={{
-          backgroundImage: `url(${rewriteMediaUrl(localizedMedia.url)})`
+          backgroundImage: localizedMedia ? `url(${toPublicMediaUrl(localizedMedia.src)})` : undefined
         }}
       >
         <Overlay color="#000" opacity={0.65} zIndex={1} />
 
         <div className={classes.inner}>
           <Title className={classes.title}>
-            {getLocalizedValue(heading, language)}
+            {resolveLocalizedText(heading, language)}
           </Title>
 
           <Container>
             <Text size="lg" className={classes.description}>
-              {getLocalizedValue(subheading, language)}
+              {resolveLocalizedText(subheading, language)}
             </Text>
           </Container>
 
@@ -66,4 +66,3 @@ export function Hero({ heading, subheading, media, actions = [], className }: He
     </div>
   );
 }
-

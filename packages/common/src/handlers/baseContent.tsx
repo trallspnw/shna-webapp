@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation'
 import { BaseBlock, renderBlocks } from '@common/lib/blockUtil'
 import { BodyLayout } from '@common/components/BodyLayout'
 import { DEFAULT_LANGUAGE, LocalizedMedia, LocalizedText } from '@common/types/language'
-import { getLocalizedValue } from '@common/lib/translation'
+import { resolveLocalizedText, resolveLocalizedValue } from '@common/lib/translation'
 import { Footer, General } from '../types/payload-types'
 import { FooterProps } from '../components/Footer'
-import { normalizeMedia, rewriteMediaUrl } from '../lib/mediaUtil'
+import { createLocalizedMedia, toPublicMediaUrl } from '../lib/mediaUtil'
 import { ContentFetcher, Fetchers } from '@common/fetchers/fetcher'
 
 export type RouteParams = {
@@ -54,7 +54,7 @@ export async function renderContentPage<T extends ContentWithBlocks>({
   const isHero = firstBlock?.blockType === 'hero'
   const heroBlock = isHero ? firstBlock : null
   const bodyBlocks = isHero ? remainingBlocks : blocks
-  const logo = normalizeMedia(general.logo)
+  const logo = createLocalizedMedia(general.logo)
 
   return (
     <BodyLayout
@@ -79,14 +79,14 @@ export async function generateContentMetadata<T extends ContentWithBlocks>({
   ])
 
   const titlePrefix = content && content.title && content.slug !== 'home'
-    ? `${getLocalizedValue(content.title, DEFAULT_LANGUAGE)} | `
+    ? `${resolveLocalizedText(content.title, DEFAULT_LANGUAGE)} | `
     : ''
-  const favicon = getLocalizedValue(normalizeMedia(general.icon), DEFAULT_LANGUAGE) ?? undefined
+  const favicon = resolveLocalizedValue(createLocalizedMedia(general.icon), DEFAULT_LANGUAGE)
 
   return {
-    title: `${titlePrefix}${getLocalizedValue(general.baseTitle, DEFAULT_LANGUAGE)}`,
+    title: `${titlePrefix}${resolveLocalizedText(general.baseTitle, DEFAULT_LANGUAGE)}`,
     icons: {
-      icon: favicon ? rewriteMediaUrl(favicon.url) : undefined,
+      icon: favicon ? toPublicMediaUrl(favicon.src) : undefined,
     },
     // After content is finalized, disoverability should come from collection config.
     robots: {

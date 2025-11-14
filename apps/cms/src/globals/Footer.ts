@@ -1,5 +1,5 @@
 import { GlobalConfig } from 'payload'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * The confil model for the footer.
@@ -11,7 +11,7 @@ export const FooterGlobal: GlobalConfig = {
     read: () => true,
   },
   fields: [
-    LocalizedTextField(
+    createLocalizedTextField(
       'slogan', 
       'Slogan', 
       false,
@@ -20,7 +20,7 @@ export const FooterGlobal: GlobalConfig = {
       name: 'linkGroups',
       type: 'array',
       fields: [
-        LocalizedTextField(
+        createLocalizedTextField(
           'groupName', 
           'Group Name', 
           true, 
@@ -39,7 +39,7 @@ export const FooterGlobal: GlobalConfig = {
               },
               required: true,
             },
-            LocalizedTextField(
+            createLocalizedTextField(
               'label', 
               'Link Label', 
               true,

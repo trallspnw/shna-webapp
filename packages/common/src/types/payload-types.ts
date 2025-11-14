@@ -70,6 +70,7 @@ export interface Config {
     heading: Heading;
     hero: Hero;
     paragraph: Paragraph;
+    richText: RichTextBlock;
     media: MediaBlock;
     membershipStatusForm: MembershipStatusForm;
     subscriptionForm: SubscriptionForm;
@@ -272,6 +273,47 @@ export interface Paragraph {
   id?: string | null;
   blockName?: string | null;
   blockType: 'paragraph';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  content: {
+    en: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    es?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richText';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -486,6 +528,7 @@ export interface TwoColumns {
           }
         | Action
         | Paragraph
+        | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
         | SubscriptionForm
@@ -519,6 +562,7 @@ export interface TwoColumns {
           }
         | Action
         | Paragraph
+        | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
         | SubscriptionForm
@@ -562,6 +606,7 @@ export interface Align {
           }
         | Action
         | Paragraph
+        | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
         | SubscriptionForm
@@ -608,6 +653,7 @@ export interface Accordion {
             }
           | Action
           | Paragraph
+          | RichTextBlock
           | MediaBlock
           | MembershipStatusForm
           | SubscriptionForm
@@ -691,6 +737,7 @@ export interface Event {
           }
         | Action
         | Paragraph
+        | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
         | SubscriptionForm
@@ -723,6 +770,7 @@ export interface Event {
                     }
                   | Action
                   | Paragraph
+                  | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
                   | SubscriptionForm
@@ -756,6 +804,7 @@ export interface Event {
                     }
                   | Action
                   | Paragraph
+                  | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
                   | SubscriptionForm
@@ -826,6 +875,7 @@ export interface Page {
           }
         | Action
         | Paragraph
+        | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
         | SubscriptionForm
@@ -858,6 +908,7 @@ export interface Page {
                     }
                   | Action
                   | Paragraph
+                  | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
                   | SubscriptionForm
@@ -891,6 +942,7 @@ export interface Page {
                     }
                   | Action
                   | Paragraph
+                  | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
                   | SubscriptionForm
@@ -1120,6 +1172,7 @@ export interface EventsSelect<T extends boolean = true> {
             };
         action?: T | ActionSelect<T>;
         paragraph?: T | ParagraphSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
         media?: T | MediaBlockSelect<T>;
         membershipStatusForm?: T | MembershipStatusFormSelect<T>;
         subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1161,6 +1214,7 @@ export interface EventsSelect<T extends boolean = true> {
                         };
                     action?: T | ActionSelect<T>;
                     paragraph?: T | ParagraphSelect<T>;
+                    richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
                     subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1200,6 +1254,7 @@ export interface EventsSelect<T extends boolean = true> {
                         };
                     action?: T | ActionSelect<T>;
                     paragraph?: T | ParagraphSelect<T>;
+                    richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
                     subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1278,6 +1333,20 @@ export interface ActionSelect<T extends boolean = true> {
  */
 export interface ParagraphSelect<T extends boolean = true> {
   text?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock_select".
+ */
+export interface RichTextBlockSelect<T extends boolean = true> {
+  content?:
     | T
     | {
         en?: T;
@@ -1564,6 +1633,7 @@ export interface AlignSelect<T extends boolean = true> {
             };
         action?: T | ActionSelect<T>;
         paragraph?: T | ParagraphSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
         media?: T | MediaBlockSelect<T>;
         membershipStatusForm?: T | MembershipStatusFormSelect<T>;
         subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1619,6 +1689,7 @@ export interface AccordionSelect<T extends boolean = true> {
                   };
               action?: T | ActionSelect<T>;
               paragraph?: T | ParagraphSelect<T>;
+              richText?: T | RichTextBlockSelect<T>;
               media?: T | MediaBlockSelect<T>;
               membershipStatusForm?: T | MembershipStatusFormSelect<T>;
               subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1725,6 +1796,7 @@ export interface PagesSelect<T extends boolean = true> {
             };
         action?: T | ActionSelect<T>;
         paragraph?: T | ParagraphSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
         media?: T | MediaBlockSelect<T>;
         membershipStatusForm?: T | MembershipStatusFormSelect<T>;
         subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1766,6 +1838,7 @@ export interface PagesSelect<T extends boolean = true> {
                         };
                     action?: T | ActionSelect<T>;
                     paragraph?: T | ParagraphSelect<T>;
+                    richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
                     subscriptionForm?: T | SubscriptionFormSelect<T>;
@@ -1805,6 +1878,7 @@ export interface PagesSelect<T extends boolean = true> {
                         };
                     action?: T | ActionSelect<T>;
                     paragraph?: T | ParagraphSelect<T>;
+                    richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
                     subscriptionForm?: T | SubscriptionFormSelect<T>;

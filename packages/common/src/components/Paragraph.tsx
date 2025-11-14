@@ -2,8 +2,8 @@
 
 import { Text as MantineText } from '@mantine/core'
 import { useLanguage } from "../hooks/useLanguage"
-import { LocalizedText } from "../types/language"
-import { getLocalizedValue } from '../lib/translation'
+import { LocalizedText } from '../types/language'
+import { resolveLocalizedText } from '../lib/translation'
 import classes from './Paragraph.module.scss'
 import clsx from 'clsx'
 
@@ -19,7 +19,7 @@ export function Paragraph({ text }: ParagraphProps) {
 
   return (
     <MantineText className={clsx(classes.paragraph)}>
-      {getLocalizedValue(text, language)}
+      {resolveLocalizedText(text, language)}
     </MantineText>
   )
 }

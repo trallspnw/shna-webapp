@@ -1,5 +1,5 @@
 import { CollectionConfig } from 'payload'
-import { LocalizedTextField } from '@cms/fields/localizedTextField'
+import { createLocalizedTextField } from '@cms/fields/localizedTextField'
 import { allBlocks } from '../lib/allBlocks'
 import { DEFAULT_LANGUAGE } from '@/packages/common/src/types/language'
 
@@ -40,12 +40,12 @@ export const Events: CollectionConfig = {
         ],
       },
     },
-    LocalizedTextField(
+    createLocalizedTextField(
       'title',
       'Event Title', 
       true,
     ),
-    LocalizedTextField(
+    createLocalizedTextField(
       'location', 
       'Location', 
       true,

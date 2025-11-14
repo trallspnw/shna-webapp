@@ -1,5 +1,5 @@
 import { GlobalConfig } from 'payload'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * General global configuration model.
@@ -11,7 +11,7 @@ export const GeneralGlobal: GlobalConfig = {
     read: () => true,
   },
   fields: [
-    LocalizedTextField('baseTitle', 'Base Title', true),
+    createLocalizedTextField('baseTitle', 'Base Title', true),
     {
       name: 'logo',
       type: 'relationship',
@@ -36,9 +36,9 @@ export const GeneralGlobal: GlobalConfig = {
       name: 'eventLabels',
       label: 'Event Labels',
       fields: [
-        LocalizedTextField('dateLabel', 'Date Label'),
-        LocalizedTextField('timeLabel', 'Time Label'),
-        LocalizedTextField('locationLabel', 'Location Label'),
+        createLocalizedTextField('dateLabel', 'Date Label'),
+        createLocalizedTextField('timeLabel', 'Time Label'),
+        createLocalizedTextField('locationLabel', 'Location Label'),
       ],
     },
     {
@@ -46,9 +46,9 @@ export const GeneralGlobal: GlobalConfig = {
       name: 'name',
       label: 'Name Input',
       fields: [
-        LocalizedTextField('nameLabel', 'Name Label'),
-        LocalizedTextField('namePlaceholder', 'Name Placeholder'),
-        LocalizedTextField('nameValidationError', 'Name Input Error'),
+        createLocalizedTextField('nameLabel', 'Name Label'),
+        createLocalizedTextField('namePlaceholder', 'Name Placeholder'),
+        createLocalizedTextField('nameValidationError', 'Name Input Error'),
       ],
     },
     {
@@ -56,9 +56,9 @@ export const GeneralGlobal: GlobalConfig = {
       name: 'email',
       label: 'Email Input',
       fields: [
-        LocalizedTextField('emailLabel', 'Email Label'),
-        LocalizedTextField('emailPlaceholder', 'Email Placeholder'),
-        LocalizedTextField('emailValidationError', 'Email Input Error'),
+        createLocalizedTextField('emailLabel', 'Email Label'),
+        createLocalizedTextField('emailPlaceholder', 'Email Placeholder'),
+        createLocalizedTextField('emailValidationError', 'Email Input Error'),
       ],
     },
     {
@@ -66,9 +66,9 @@ export const GeneralGlobal: GlobalConfig = {
       name: 'phone',
       label: 'Phone Input',
       fields: [
-        LocalizedTextField('phoneLabel', 'Phone Label'),
-        LocalizedTextField('phonePlaceholder', 'Phone Placeholder'),
-        LocalizedTextField('phoneValidationError', 'Phone Input Error'),
+        createLocalizedTextField('phoneLabel', 'Phone Label'),
+        createLocalizedTextField('phonePlaceholder', 'Phone Placeholder'),
+        createLocalizedTextField('phoneValidationError', 'Phone Input Error'),
       ],
     },
     {
@@ -76,9 +76,9 @@ export const GeneralGlobal: GlobalConfig = {
       name: 'address',
       label: 'Address Input',
       fields: [
-        LocalizedTextField('addressLabel', 'Address Label'),
-        LocalizedTextField('addressPlaceholder', 'Address Placeholder'),
-        LocalizedTextField('addressValidationError', 'Address Input Error'),
+        createLocalizedTextField('addressLabel', 'Address Label'),
+        createLocalizedTextField('addressPlaceholder', 'Address Placeholder'),
+        createLocalizedTextField('addressValidationError', 'Address Input Error'),
       ],
     },
   ],

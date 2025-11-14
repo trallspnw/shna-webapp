@@ -14,6 +14,7 @@ import {
   DonationForm, 
   MembershipDuesForm,
   OrderSummary,
+  RichTextBlock,
 } from "@common/types/payload-types";
 import { render as renderAccordion } from '@common/handlers/blocks/accordion'
 import { render as renderAction } from '@common/handlers/blocks/action'
@@ -29,6 +30,7 @@ import { render as renderParagraph } from '@common/handlers/blocks/paragraph'
 import { render as renderEventCardGrid } from '@common/handlers/blocks/eventCardGrid'
 import { render as renderSubscriptionForm } from '@common/handlers/blocks/subscriptionForm'
 import { render as renderTwoColumns } from '@common/handlers/blocks/twoColumns'
+import { render as renderRichText } from '@common/handlers/blocks/richText'
 import { JSX } from "react";
 import { ContentFetcher, Fetchers, FetcherTypes } from "../fetchers/fetcher";
 
@@ -75,6 +77,10 @@ export const blockRegistry = {
   membershipStatusForm: {
     render: renderMembershipStatusForm,
     type: {} as MembershipStatusForm,
+  },
+  richText: {
+    render: renderRichText,
+    type: {} as RichTextBlock,
   },
   orderSummary: {
     render: renderOrderSummary,

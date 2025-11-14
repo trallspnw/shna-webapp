@@ -14,7 +14,7 @@ import { ActionIcon, Container, Group, Text } from '@mantine/core';
 import classes from './Footer.module.scss';
 import { LocalizedMedia, LocalizedText } from '../types/language';
 import { useLanguage } from '../hooks/useLanguage';
-import { getLocalizedValue } from '../lib/translation';
+import { resolveLocalizedText } from '../lib/translation'
 import clsx from 'clsx';
 import type { JSX } from 'react';
 import { Logo } from './Logo';
@@ -60,7 +60,7 @@ export function Footer({ logo, linkGroups, slogan, socialLinks, className }: Foo
 
   const groups = linkGroups.map((group, lgIndex) => (
     <div className={classes.wrapper} key={`lg-${lgIndex}`}>
-      <Text className={classes.title}>{getLocalizedValue(group.title, language)}</Text>
+      <Text className={classes.title}>{resolveLocalizedText(group.title, language)}</Text>
       {group.links.map((link, lIndex) => (
         <Text<'a'>
           key={`l-${lIndex}`}
@@ -68,7 +68,7 @@ export function Footer({ logo, linkGroups, slogan, socialLinks, className }: Foo
           component="a"
           href={link.href}
         >
-          {getLocalizedValue(link.label, language)}
+          {resolveLocalizedText(link.label, language)}
         </Text>
       ))}
     </div>
@@ -82,7 +82,7 @@ export function Footer({ logo, linkGroups, slogan, socialLinks, className }: Foo
             media={logo} 
           />}
           <Text size="xs" c="dimmed" className={classes.description}>
-            {getLocalizedValue(slogan, language)}
+            {resolveLocalizedText(slogan, language)}
           </Text>
         </div>
         <div className={classes.groups}>{groups}</div>

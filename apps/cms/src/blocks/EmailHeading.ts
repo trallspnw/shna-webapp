@@ -1,5 +1,5 @@
 import { Block } from "payload";
-import { LocalizedTextField } from "@cms/fields/localizedTextField";
+import { createLocalizedTextField } from "@cms/fields/localizedTextField";
 
 /**
  * A heading blocked used in emails.
@@ -12,7 +12,7 @@ export const EmailHeading: Block = {
     plural: 'Email Headings',
   },
   fields: [
-    LocalizedTextField('text', 'Heading Text', true),
+    createLocalizedTextField('text', 'Heading Text', true),
     {
       name: 'level',
       label: 'Heading Level',

@@ -1,14 +1,12 @@
-import { Language, LocalizedMedia } from "../types/language"
-import { Media } from "../types/payload-types"
+import { Language, LocalizedMedia } from '../types/language'
+import { Media } from '../types/payload-types'
 
 const app = process.env.APP_ENV
 
 /**
- * The static site does not fetch media from an API once built. Media is addressed directly from a static media location.
- * @param url A payload CMS generated url string
- * @returns A media URL usable by the current environment
+ * Build a public media URL suitable for the current runtime environment.
  */
-export function rewriteMediaUrl(url: string) {
+export function toPublicMediaUrl(url: string) {
   if (app === 'site') {
     return url.replace(/^\/api\/mediaFiles\/file/, '/mediaFiles')
   }
@@ -16,11 +14,9 @@ export function rewriteMediaUrl(url: string) {
 }
 
 /**
- * Converts layload generated mdia types to LocalizedMedia. This app doesn't use numbers to represent media.
- * @param media Payload generated media
- * @returns LocalizedMedia
+ * Convert Payload's media shape into the app's LocalizedMedia structure.
  */
-export function normalizeMedia(media: number | Media | null | undefined) {
+export function createLocalizedMedia(media: number | Media | null | undefined): LocalizedMedia {
   if (!media || typeof media === 'number') {
     return {}
   }
@@ -34,7 +30,7 @@ export function normalizeMedia(media: number | Media | null | undefined) {
     if (file && typeof file !== 'number') {
       result[language] = {
         file: file,
-        url: file.url ?? '',
+        src: file.url ?? '',
         alt: alt || undefined,
       }
     } else {

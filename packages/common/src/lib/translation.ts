@@ -1,27 +1,36 @@
-import { DEFAULT_LANGUAGE, Language } from "@common/types/language"
+import { DEFAULT_LANGUAGE, type Language, type LocalizedValue } from '@common/types/language'
+
+function isEmptyValue<T>(value: T | null | undefined): boolean {
+  if (value == null) return true
+  if (typeof value === 'string') return value.trim() === ''
+  return false
+}
 
 /**
- * Gets the local content from localizable content. 
- * @param localized The content keys by language
- * @param current The requested langugae
- * @param fallback The fallback value to return if the requested language is not available. Defaults to the default 
- *    language if not provided.
- * @returns The content in the requested language or a fallback value.
+ * Resolve a localized value for the requested language, falling back to the default language,
+ * and finally to an optional explicit fallback.
  */
-export function getLocalizedValue<T>(
-  localized: Partial<Record<Language, T>> | undefined,
-  current: Language,
-  fallback?: T
-): T {
-  const currentValue = localized?.[current]
+export function resolveLocalizedValue<T>(
+  localized: LocalizedValue<T> | undefined,
+  language: Language,
+  fallback?: T,
+): T | undefined {
+  const current = localized?.[language]
+  if (!isEmptyValue(current)) return current ?? undefined
+
   const defaultValue = localized?.[DEFAULT_LANGUAGE]
+  if (!isEmptyValue(defaultValue)) return defaultValue ?? undefined
 
-  const isEmpty = <T>(val: T | undefined | null): boolean =>
-    val == null || (typeof val === 'string' && val.trim() === '');
+  return fallback
+}
 
-  if (!isEmpty(currentValue)) return currentValue as T
-  if (!isEmpty(defaultValue)) return defaultValue as T
-  if (fallback !== undefined) return fallback
-
-  return '' as T
+/**
+ * Convenience helper for resolving localized text while always returning a string.
+ */
+export function resolveLocalizedText(
+  localized: LocalizedValue<string> | undefined,
+  language: Language,
+  fallback = '',
+): string {
+  return resolveLocalizedValue(localized, language, fallback) ?? fallback
 }

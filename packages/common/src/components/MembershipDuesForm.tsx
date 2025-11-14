@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from "react"
-import { useLanguage } from "../hooks/useLanguage"
-import { LocalizedText } from "../types/language"
-import { Button, Group, Modal, Text, Textarea, TextInput } from "@mantine/core"
-import { getLocalizedValue } from "../lib/translation"
+import { useState } from 'react'
+import { useLanguage } from '../hooks/useLanguage'
+import { LocalizedText } from '../types/language'
+import { Button, Group, Modal, Text, Textarea, TextInput } from '@mantine/core'
+import { resolveLocalizedText } from '../lib/translation'
 import classes from './MembershipDuesForm.module.scss'
-import { isValidEmail, isValidUsPhone } from "../lib/validation"
+import { isValidEmail, isValidUsPhone } from '../lib/validation'
 
 type DonationFormProps = {
   backendUrl: string,
@@ -57,14 +57,14 @@ export function MembershipDuesForm(props: DonationFormProps) {
     let isValid = true
 
     if (!isValidEmail(email)) {
-      setEmailError(getLocalizedValue(props.emailValidationError, language, 'Invalid email'))
+      setEmailError(resolveLocalizedText(props.emailValidationError, language, 'Invalid email'))
       isValid = false
     } else {
       setEmailError(null)
     }
 
     if (phone && !isValidUsPhone(phoneNormalized)) {
-      setPhoneError(getLocalizedValue(props.phoneValidationError, language, 'Invalid phone'))
+      setPhoneError(resolveLocalizedText(props.phoneValidationError, language, 'Invalid phone'))
       isValid = false
     } else {
       setPhoneError(null)
@@ -81,7 +81,7 @@ export function MembershipDuesForm(props: DonationFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          itemName: getLocalizedValue(props.itemName, language),
+          itemName: resolveLocalizedText(props.itemName, language),
           email, 
           name, 
           phone, 
@@ -96,9 +96,9 @@ export function MembershipDuesForm(props: DonationFormProps) {
 
       if (!result.ok) {
         if (data.error === 'ACTIVE_MEMBERSHIP') {
-          setModalMessage(getLocalizedValue(props.existingMembershipMessage, language) ?? 'Active membership')
+          setModalMessage(resolveLocalizedText(props.existingMembershipMessage, language, 'Active membership'))
         } else {
-          setModalMessage(getLocalizedValue(props.serverFailureMessage, language) ?? 'Server error')
+          setModalMessage(resolveLocalizedText(props.serverFailureMessage, language, 'Server error'))
         }
 
         setModalOpen(true)
@@ -125,8 +125,8 @@ export function MembershipDuesForm(props: DonationFormProps) {
       <form onSubmit={handleSubmit} className={classes.form}>
         <Group gap="xs" wrap="wrap" align="end" justify="flex-end">
           <TextInput
-            label={getLocalizedValue(props.nameLabel, language, 'Name')}
-            placeholder={getLocalizedValue(props.namePlaceholder, language) ?? undefined}
+            label={resolveLocalizedText(props.nameLabel, language, 'Name')}
+            placeholder={resolveLocalizedText(props.namePlaceholder, language) ?? undefined}
             value={name}
             onChange={(e) => {
               setName(e.currentTarget.value)
@@ -137,8 +137,8 @@ export function MembershipDuesForm(props: DonationFormProps) {
           />
 
           <TextInput
-            label={getLocalizedValue(props.emailLabel, language, 'Email')}
-            placeholder={getLocalizedValue(props.emailPlaceholder, language) ?? undefined}
+            label={resolveLocalizedText(props.emailLabel, language, 'Email')}
+            placeholder={resolveLocalizedText(props.emailPlaceholder, language) ?? undefined}
             value={email}
             onChange={(e) => {
               setEmail(e.currentTarget.value)
@@ -151,8 +151,8 @@ export function MembershipDuesForm(props: DonationFormProps) {
           />
 
           <TextInput
-            label={getLocalizedValue(props.phoneLabel, language, 'Phone')}
-            placeholder={getLocalizedValue(props.phonePlaceholder, language) ?? undefined}
+            label={resolveLocalizedText(props.phoneLabel, language, 'Phone')}
+            placeholder={resolveLocalizedText(props.phonePlaceholder, language) ?? undefined}
             value={phone}
             onChange={(e) => {
               setPhone(e.currentTarget.value)
@@ -165,8 +165,8 @@ export function MembershipDuesForm(props: DonationFormProps) {
           />
 
           <Textarea
-            label={getLocalizedValue(props.addressLabel, language, 'Address')}
-            placeholder={getLocalizedValue(props.addressPlaceholder, language) ?? undefined}
+            label={resolveLocalizedText(props.addressLabel, language, 'Address')}
+            placeholder={resolveLocalizedText(props.addressPlaceholder, language) ?? undefined}
             autosize={true}
             minRows={3}
             value={address}
@@ -179,7 +179,7 @@ export function MembershipDuesForm(props: DonationFormProps) {
           
           <span className={classes.checkoutRow}>
             <Text fw="700">
-              {getLocalizedValue(props.priceLabel, language)}:{'\u00A0'}
+              {resolveLocalizedText(props.priceLabel, language)}:{'\u00A0'}
               {new Intl.NumberFormat(language, {
                 style: 'currency',
                 currency: 'USD',
@@ -191,7 +191,7 @@ export function MembershipDuesForm(props: DonationFormProps) {
               className={classes.button}
               loading={loading}
             >
-              {getLocalizedValue(props.submitButtonText, language)}
+              {resolveLocalizedText(props.submitButtonText, language)}
             </Button>
           </span>
         </Group>

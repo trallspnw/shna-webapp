@@ -1,7 +1,7 @@
 import { JSX } from "react"
 import { EmailHeading as EmailHeadingType } from '@common/types/payload-types' 
 import { Language } from "../../../types/language"
-import { getLocalizedValue } from "../../../lib/translation"
+import { resolveLocalizedText } from '../../../lib/translation'
 
 /**
  * Handles rendering of email heading blocks.
@@ -17,7 +17,7 @@ export function render(
 
   return (
     <Tag key={index}>
-      {getLocalizedValue(block.text, language)}
+      {resolveLocalizedText(block.text, language)}
     </Tag>
   )
 }

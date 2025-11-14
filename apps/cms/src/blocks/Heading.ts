@@ -1,5 +1,5 @@
 import { Block } from "payload";
-import { LocalizedTextField } from "@cms/fields/localizedTextField";
+import { createLocalizedTextField } from "@cms/fields/localizedTextField";
 
 /**
  * A heading block with localized text and configurable level.
@@ -12,7 +12,7 @@ export const Heading: Block = {
     plural: 'Headings',
   },
   fields: [
-    LocalizedTextField('text', 'Heading Text', true),
+    createLocalizedTextField('text', 'Heading Text', true),
     {
       name: 'level',
       label: 'Heading Level',

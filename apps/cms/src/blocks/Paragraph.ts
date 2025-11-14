@@ -1,5 +1,5 @@
 import { Block } from "payload";
-import { LocalizedTextField } from "@cms/fields/localizedTextField";
+import { createLocalizedTextField } from "@cms/fields/localizedTextField";
 
 /**
  * A block for displaying a localized paragraph.
@@ -12,6 +12,6 @@ export const Paragraph: Block = {
     plural: 'Paragraphs',
   },
   fields: [
-    LocalizedTextField('text', 'Paragraph Text', true),
+    createLocalizedTextField('text', 'Paragraph Text', true),
   ],
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLanguage } from '../hooks/useLanguage'
-import { getLocalizedValue } from '../lib/translation'
+import { resolveLocalizedText } from '../lib/translation'
 import { LocalizedText } from '../types/language'
 import { Alert, Button, Group, List, Loader, Paper, Stack, Text, Title } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
@@ -83,7 +83,7 @@ export function OrderSummary({
       >
         <Group gap='xs' align='center'>
           <Loader size='sm' />
-          <Text>{getLocalizedValue(loadingText, language)}</Text>
+          <Text>{resolveLocalizedText(loadingText, language)}</Text>
         </Group>
       </Alert>
     )
@@ -96,7 +96,7 @@ export function OrderSummary({
       color='red' 
       variant='light'
     >
-      {getLocalizedValue(orderNotFoundText, language)}
+      {resolveLocalizedText(orderNotFoundText, language)}
     </Alert>
     )
     
@@ -110,7 +110,7 @@ export function OrderSummary({
         variant='light'
         fw={700}
       >
-        {getLocalizedValue(paidStatus, language)}
+        {resolveLocalizedText(paidStatus, language)}
       </Alert>
     ) : (
       <Alert 
@@ -119,7 +119,7 @@ export function OrderSummary({
         variant='light'
         fw={700}
       >
-        {getLocalizedValue(unpaidStatus, language)}
+        {resolveLocalizedText(unpaidStatus, language)}
       </Alert>
     )
 
@@ -131,7 +131,7 @@ export function OrderSummary({
           </List.Item>
         </List>
         <Text fw={700}>
-          {getLocalizedValue(totalPaidLabel, language)}:{'\u00A0'}
+          {resolveLocalizedText(totalPaidLabel, language)}:{'\u00A0'}
           {new Intl.NumberFormat(language, {
             style: 'currency',
             currency: 'USD',
@@ -146,7 +146,7 @@ export function OrderSummary({
     <>
       <Paper shadow='md' p='lg' withBorder>
         <Stack gap='md'>
-          <Title order={4}>{getLocalizedValue(heading, language)}</Title>
+          <Title order={4}>{resolveLocalizedText(heading, language)}</Title>
           {innerDetails}
         </Stack>
       </Paper>
@@ -157,7 +157,7 @@ export function OrderSummary({
             href={session.metadata.entryUrl}
             variant={session.payment_status === 'paid' ? 'filled' : 'outline'}
           >
-            {getLocalizedValue(returnButtonText, language)}
+            {resolveLocalizedText(returnButtonText, language)}
           </Button>
         )}
         {retryButtonText && session?.url && (
@@ -166,7 +166,7 @@ export function OrderSummary({
             href={session.url}
             variant='filled'
           >
-            {getLocalizedValue(retryButtonText, language)}
+            {resolveLocalizedText(retryButtonText, language)}
           </Button>
         )}
       </Group>

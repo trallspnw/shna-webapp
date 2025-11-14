@@ -1,5 +1,5 @@
 import { Block } from 'payload'
-import { LocalizedTextField } from '@cms/fields/localizedTextField'
+import { createLocalizedTextField } from '@cms/fields/localizedTextField'
 import { customActions } from '@common/lib/customActions'
 
 /**
@@ -13,7 +13,7 @@ export const Action: Block = {
     plural: 'Actions',
   },
   fields: [
-    LocalizedTextField('label', 'Label', true),
+    createLocalizedTextField('label', 'Label', true),
     {
       name: 'style',
       type: 'radio',

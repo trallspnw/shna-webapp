@@ -1,5 +1,5 @@
 import { CollectionConfig } from "payload";
-import { LocalizedTextField } from "../fields/localizedTextField";
+import { createLocalizedTextField } from "../fields/localizedTextField";
 import { emailBlocks } from "../lib/emailBlocks";
 
 /**
@@ -26,7 +26,7 @@ export const Emails: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    LocalizedTextField('subject', 'Subject', true),
+    createLocalizedTextField('subject', 'Subject', true),
     {
       name: 'blocks',
       type: 'blocks',

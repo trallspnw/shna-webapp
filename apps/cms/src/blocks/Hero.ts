@@ -1,5 +1,5 @@
 import { Block } from 'payload'
-import { LocalizedTextField } from '@cms/fields/localizedTextField'
+import { createLocalizedTextField } from '@cms/fields/localizedTextField'
 import { Action } from './Action'
 
 /**
@@ -12,8 +12,8 @@ export const Hero: Block = {
     plural: 'Heroes',
   },
   fields: [
-    LocalizedTextField('heading', 'Primary Heading', true),
-    LocalizedTextField('subheading', 'Subheading'),
+    createLocalizedTextField('heading', 'Primary Heading', true),
+    createLocalizedTextField('subheading', 'Subheading'),
     {
       name: 'backgroundMedia',
       type: 'relationship',
