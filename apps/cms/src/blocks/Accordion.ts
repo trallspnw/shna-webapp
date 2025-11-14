@@ -1,6 +1,6 @@
 import { Block } from 'payload'
 import { commonBlocks } from '../lib/commonBlocks'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * An Accordion block which can be added to pages. Contains other common blocks.
@@ -19,7 +19,7 @@ export const Accordion: Block = {
       label: 'Accordion Items',
       required: true,
       fields: [
-        LocalizedTextField('title', 'Title', true),
+        createLocalizedTextField('title', 'Title', true),
         {
           name: 'content',
           type: 'blocks',

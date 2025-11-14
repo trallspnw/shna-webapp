@@ -1,10 +1,10 @@
-import { useState } from "react"
-import { useLanguage } from "../hooks/useLanguage"
-import { LocalizedText } from "../types/language"
-import { getLocalizedValue } from "../lib/translation"
-import { Button, Group, Loader, Modal, Stack, TextInput, Text } from "@mantine/core"
+import { useState } from 'react'
+import { useLanguage } from '../hooks/useLanguage'
+import { LocalizedText } from '../types/language'
+import { resolveLocalizedText } from '../lib/translation'
+import { Button, Group, Loader, Modal, Stack, TextInput, Text } from '@mantine/core'
 import classes from './EmailForm.module.scss'
-import { isValidEmail } from "../lib/validation"
+import { isValidEmail } from '../lib/validation'
 
 type EmailFormProps = {
   emailLabel?: LocalizedText
@@ -46,7 +46,7 @@ export function EmailForm({
       
       // Emails should be validated on the backend, but validation is here to prevent extra processing.
       if (!isValidEmail(email)) {
-        setEmailError(getLocalizedValue(emailValidationError, language, 'Invalid email'))
+        setEmailError(resolveLocalizedText(emailValidationError, language, 'Invalid email'))
         setLoading(false)
         return
       }
@@ -65,20 +65,20 @@ export function EmailForm({
     }
 
   const heading = isSuccess
-    ? getLocalizedValue(successHeading, language)
-    : getLocalizedValue(failureHeading, language)
+    ? resolveLocalizedText(successHeading, language)
+    : resolveLocalizedText(failureHeading, language)
 
   const message = isSuccess
-    ? getLocalizedValue(successMessage, language)
-    : getLocalizedValue(failureMessage, language)
+    ? resolveLocalizedText(successMessage, language)
+    : resolveLocalizedText(failureMessage, language)
 
     return (
     <>
       <form onSubmit={handleSubmit} className={classes.form}>
         <Group gap="xs" wrap="wrap" align="end" justify='flex-end'>
           <TextInput
-            label={getLocalizedValue(emailLabel, language, 'Email')}
-            placeholder={getLocalizedValue(emailPlaceholder, language) ?? undefined}
+            label={resolveLocalizedText(emailLabel, language, 'Email')}
+            placeholder={resolveLocalizedText(emailPlaceholder, language) ?? undefined}
             value={email}
             onChange={(e) => {
               setEmail(e.currentTarget.value)
@@ -95,7 +95,7 @@ export function EmailForm({
             className={classes.button}
             loading={loading}
           >
-            {getLocalizedValue(submitButtonText, language)}
+            {resolveLocalizedText(submitButtonText, language)}
           </Button>
         </Group>
       </form>

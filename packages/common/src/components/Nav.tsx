@@ -2,7 +2,7 @@
 
 import { Burger, Container, Group, Button, Drawer, Stack } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { getLocalizedValue } from '@common/lib/translation'
+import { resolveLocalizedText } from '@common/lib/translation'
 import { useLanguage } from '../hooks/useLanguage'
 import { usePathname } from 'next/navigation'
 import { LanguageSelector } from './LanguageSelector'
@@ -61,7 +61,7 @@ export function Nav({ logo, pages }: NavProps) {
         },
       )}
     >
-      {getLocalizedValue(label, language)}
+      {resolveLocalizedText(label, language)}
     </Button>
   ))
 

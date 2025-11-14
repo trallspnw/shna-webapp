@@ -3,7 +3,7 @@
 import { Title } from '@mantine/core'
 import { useLanguage } from '../hooks/useLanguage'
 import { LocalizedText } from '../types/language'
-import { getLocalizedValue } from '../lib/translation'
+import { resolveLocalizedText } from '../lib/translation'
 import classes from './Heading.module.scss'
 import clsx from 'clsx'
 
@@ -24,7 +24,7 @@ export function Heading({ text, level = '2' }: HeadingProps) {
       order={order}
       className={clsx(classes.heading)}
     >
-      {getLocalizedValue(text, language)}
+      {resolveLocalizedText(text, language)}
     </Title>
   )
 }

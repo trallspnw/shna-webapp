@@ -1,5 +1,5 @@
 import { Block } from 'payload'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * A block to show a grid of events. Options allow for showing future or past events, a specific number of rows, and 
@@ -13,7 +13,7 @@ export const EventCardGrid: Block = {
     plural: 'Event Card Grids',
   },
   fields: [
-    LocalizedTextField(
+    createLocalizedTextField(
       'heading', 
       'Heading Text', 
       false,
@@ -43,7 +43,7 @@ export const EventCardGrid: Block = {
         },
       ],
     },
-    LocalizedTextField(
+    createLocalizedTextField(
       'showMoreLabel', 
       'Show More Label', 
       false,

@@ -50,6 +50,7 @@ export default buildConfig({
         },
       },
       beforeNavLinks: [
+        './views/RichTextStyles#RichTextStyles',
         './views/links/Links#LinkToDashboard',
         './views/links/Links#LinkToPeople',
         './views/links/Links#LinkToMembers',

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { LocalizedText, SUPPORTED_LANGUAGES } from '../types/language'
 import { EmailForm } from './EmailForm'
-import { getLocalizedValue } from '../lib/translation'
+import { resolveLocalizedText } from '../lib/translation'
 
 type MembershipStatusFormProps = {
   backendUrl: string,
@@ -64,13 +64,13 @@ function buildMessage(props: MembershipStatusFormProps, isActive: boolean, expir
   const message: LocalizedText = {}
 
   for (const language of SUPPORTED_LANGUAGES) {
-    const statusLine = `${getLocalizedValue(props.statusText, language)}:\u00A0` +
+    const statusLine = `${resolveLocalizedText(props.statusText, language)}:\u00A0` +
       `${isActive 
-        ? getLocalizedValue(props.activeText, language) 
-        : getLocalizedValue(props.inactiveText, language)}`
+        ? resolveLocalizedText(props.activeText, language) 
+        : resolveLocalizedText(props.inactiveText, language)}`
 
     const expiresLine = isActive && expires
-      ? `\n${getLocalizedValue(props.expiresText, language)}:\u00A0` +
+      ? `\n${resolveLocalizedText(props.expiresText, language)}:\u00A0` +
         `${new Intl.DateTimeFormat(language, { dateStyle: 'long' }).format(new Date(expires))}`
       : ''
 

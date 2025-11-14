@@ -1,5 +1,5 @@
 import { CollectionConfig } from 'payload'
-import { LocalizedTextField } from '@cms/fields/localizedTextField'
+import { createLocalizedTextField } from '@cms/fields/localizedTextField'
 import { allBlocks } from '../lib/allBlocks'
 import { DEFAULT_LANGUAGE } from '@/packages/common/src/types/language'
 
@@ -48,7 +48,7 @@ export const Pages: CollectionConfig = {
         ],
       },
     },
-    LocalizedTextField(
+    createLocalizedTextField(
       'title', 
       'Page Title', 
       true,
@@ -80,7 +80,7 @@ export const Pages: CollectionConfig = {
           type: 'number',
           label: 'Navigation Order',
         },
-        LocalizedTextField(
+        createLocalizedTextField(
           'navLabel', 
           'Navigation Label',
           true,

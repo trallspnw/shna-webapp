@@ -1,5 +1,5 @@
 import { Block } from 'payload'
-import { LocalizedTextField } from '../fields/localizedTextField'
+import { createLocalizedTextField } from '../fields/localizedTextField'
 
 /**
  * A form block for looking up membership status. Includes localized text.
@@ -12,22 +12,22 @@ export const MembershipStatusForm: Block = {
     plural: 'Membership Status Forms',
   },
   fields: [
-    LocalizedTextField('submitButtonText', 'Submit Button Text', true),
+    createLocalizedTextField('submitButtonText', 'Submit Button Text', true),
     {
       type: 'row',
       fields: [
-        LocalizedTextField('successHeading', 'Success Heading', true),
-        LocalizedTextField('membershipStatus', 'Membership Status', true),
-        LocalizedTextField('active', 'Active', true),
-        LocalizedTextField('inactive', 'Inactive', true),
-        LocalizedTextField('expires', 'Expires', true),
+        createLocalizedTextField('successHeading', 'Success Heading', true),
+        createLocalizedTextField('membershipStatus', 'Membership Status', true),
+        createLocalizedTextField('active', 'Active', true),
+        createLocalizedTextField('inactive', 'Inactive', true),
+        createLocalizedTextField('expires', 'Expires', true),
       ],
     },
     {
       type: 'row',
       fields: [
-        LocalizedTextField('failureHeading', 'Failure Heading', true),
-        LocalizedTextField('failureMessage', 'Failure Message', true),
+        createLocalizedTextField('failureHeading', 'Failure Heading', true),
+        createLocalizedTextField('failureMessage', 'Failure Message', true),
       ],
     },
   ],

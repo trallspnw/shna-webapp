@@ -1,7 +1,7 @@
 import { JSX } from "react"
 import { EmailParagraph as EmailParagraphType } from '@common/types/payload-types' 
 import { Language } from "../../../types/language"
-import { getLocalizedValue } from "../../../lib/translation"
+import { resolveLocalizedText } from '../../../lib/translation'
 
 /**
  * Handles rendering of email paragraph blocks.
@@ -15,7 +15,7 @@ export function render(
 
   return (
     <p key={index}>
-      {getLocalizedValue(block.text, language)}
+      {resolveLocalizedText(block.text, language)}
     </p>
   )
 }

@@ -1,51 +1,67 @@
-import { MediaFile } from "./payload-types";
+import type { SerializedEditorState } from 'lexical'
+import { MediaFile } from './payload-types'
 
 /**
- * Languages const/enum.
+ * Canonical list of supported language codes.
  */
-export const LANGUAGES = {
+export const LANGUAGE_CODES = {
   EN: 'en',
   ES: 'es',
-} as const;
+} as const
 
 /**
- * Language to label mappings.
+ * Language type from codes.
+ */
+export type Language = (typeof LANGUAGE_CODES)[keyof typeof LANGUAGE_CODES]
+
+/**
+ * Friendly labels for each language.
  */
 export const LANGUAGE_LABELS: Record<Language, string> = {
-  [LANGUAGES.EN]: 'English',
-  [LANGUAGES.ES]: 'Spanish',
-};
+  [LANGUAGE_CODES.EN]: 'English',
+  [LANGUAGE_CODES.ES]: 'Spanish',
+}
 
 /**
- * Language list from const.
+ * Ordered list of languages used throughout the app.
  */
-export const SUPPORTED_LANGUAGES: Language[] = Object.values(LANGUAGES);
+export const SUPPORTED_LANGUAGES: Language[] = Object.values(LANGUAGE_CODES)
 
 /**
- * Prevents hard coding 'en'.
+ * Prevents hard-coding the default language.
  */
-export const DEFAULT_LANGUAGE: Language = LANGUAGES.EN;
+export const DEFAULT_LANGUAGE: Language = LANGUAGE_CODES.EN
 
 /**
- * Language type from const.
+ * Generic localized value keyed by language code.
  */
-export type Language = (typeof LANGUAGES)[keyof typeof LANGUAGES];
+export type LocalizedValue<T> = Partial<Record<Language, T | null>>
 
 /**
- * Text resolvable by language.
+ * Localized plain text.
  */
-export type LocalizedText = Partial<Record<Language, string | null>>
+export type LocalizedText = LocalizedValue<string>
+
+/**
+ * Localized rich text content (Lexical serialized editor state).
+ */
+export type LocalizedRichText = LocalizedValue<SerializedEditorState>
 
 /**
  * Media type including file, url and raw alt text. Localized in LocalizedMedia.
  */
-type MediaFileWithAlt = {
+type LocalizedMediaAsset = {
   file: MediaFile
-  url: string
+  src: string
   alt?: string
 }
 
 /**
- * Media and alt text resolvable by language.
+ * Localized media asset (image + alt text).
  */
-export type LocalizedMedia = Partial<Record<Language, MediaFileWithAlt | null>>
+export type LocalizedMedia = LocalizedValue<LocalizedMediaAsset>
+
+/**
+ * Backwards compatibility exports (legacy names).
+ */
+export const LANGUAGES = LANGUAGE_CODES

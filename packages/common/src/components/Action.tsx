@@ -1,7 +1,7 @@
 'use client'
 
 import { Anchor, Button, ButtonVariant } from '@mantine/core'
-import { getLocalizedValue } from '@common/lib/translation'
+import { resolveLocalizedText } from '@common/lib/translation'
 import { useLanguage } from '@common/hooks/useLanguage'
 import { CustomActionKey, customActions } from '@common/lib/customActions'
 import { LocalizedText } from '../types/language'
@@ -29,7 +29,7 @@ type ActionProps = {
  */
 export function Action({ label, style, actionType, size='md', url, customActionKey, className }: ActionProps) {
   const [language] = useLanguage()
-  const resolvedLabel = getLocalizedValue(label, language)
+  const resolvedLabel = resolveLocalizedText(label, language)
   const isButtonStyle = typeof style === 'string' && style in variantMap
   const variant = isButtonStyle
     ? variantMap[style as keyof typeof variantMap]

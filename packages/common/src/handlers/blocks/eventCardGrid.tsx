@@ -3,7 +3,7 @@ import { ContentFetcher, Fetchers } from '@common/fetchers/fetcher'
 import { Event } from '@common/types/payload-types'
 import { EventCardGrid } from '@common/components/EventCardGrid'
 import { JSX } from 'react'
-import { normalizeMedia } from '../../lib/mediaUtil'
+import { createLocalizedMedia } from '../../lib/mediaUtil'
 
 /**
  * Handles rendering of event card grid blocks.
@@ -30,7 +30,7 @@ export async function render(block: EventCardGridType, index: number, fetchers: 
   const eventDetails = sorted.map(event => ({
     name: event.title,
     href: `/events/${event.slug}`,
-    media: normalizeMedia(event.media),
+    media: createLocalizedMedia(event.media),
     dateTime: new Date(event.dateTime),
   }))
 

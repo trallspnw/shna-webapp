@@ -2,10 +2,10 @@
 
 'use client'
 
-import { Card, Group, Text } from '@mantine/core';
-import classes from './EventCard.module.scss';
-import { DEFAULT_LANGUAGE, Language } from '../types/language';
-import { rewriteMediaUrl } from '../lib/mediaUtil';
+import { Card, Group, Text } from '@mantine/core'
+import classes from './EventCard.module.scss'
+import { DEFAULT_LANGUAGE, Language } from '../types/language'
+import { toPublicMediaUrl } from '../lib/mediaUtil'
 
 export type EventCardProps = {
   name: string 
@@ -33,7 +33,7 @@ export function EventCard({ name, href, imageSrc, date, locale }: EventCardProps
         className={classes.image}
         style={{
           backgroundImage:
-            `url(${rewriteMediaUrl(imageSrc)})`,
+            `url(${toPublicMediaUrl(imageSrc)})`,
         }}
       />
       <div className={classes.overlay} />

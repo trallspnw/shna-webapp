@@ -3,6 +3,7 @@ import { Heading } from '../blocks/Heading'
 import { Hero } from '../blocks/Hero'
 import { Action } from '../blocks/Action'
 import { Paragraph } from '../blocks/Paragraph'
+import { RichText } from '../blocks/RichText'
 import { Media } from '../blocks/Media'
 import { EventCardGrid } from '../blocks/EventCardGrid'
 import { MembershipStatusForm } from '../blocks/MembershipStatusForm'
@@ -20,6 +21,7 @@ export const commonBlocks = [
   Hero,
   Action,
   Paragraph,
+  RichText,
   Media,
   MembershipStatusForm,
   SubscriptionForm,

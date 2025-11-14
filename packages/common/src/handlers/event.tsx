@@ -2,7 +2,7 @@ import type { JSX } from 'react'
 import { Event, General } from '@common/types/payload-types'
 import { EventDetails } from '../components/EventDetails'
 import { SUPPORTED_LANGUAGES } from '../types/language'
-import { normalizeMedia } from '../lib/mediaUtil'
+import { createLocalizedMedia } from '../lib/mediaUtil'
 import { ContentRenderOptions, renderContentPage } from './baseContent'
 
 export function renderEventPage(options: ContentRenderOptions<Event>): Promise<JSX.Element> {
@@ -47,7 +47,7 @@ function renderEventDetails(event: Event, general: General): JSX.Element {
       date={formattedDate}
       time={formattedTime}
       location={event.location}
-      media={normalizeMedia(event.media)}
+      media={createLocalizedMedia(event.media)}
       dateLabel={general.eventLabels?.dateLabel}
       timeLabel={general.eventLabels?.timeLabel}
       locationLabel={general.eventLabels?.locationLabel}
