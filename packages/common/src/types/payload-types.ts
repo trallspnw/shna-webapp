@@ -67,9 +67,7 @@ export interface Config {
   };
   blocks: {
     eventCardGrid: EventCardGrid;
-    heading: Heading;
     hero: Hero;
-    paragraph: Paragraph;
     richText: RichTextBlock;
     media: MediaBlock;
     membershipStatusForm: MembershipStatusForm;
@@ -165,23 +163,6 @@ export interface EventCardGrid {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Heading".
- */
-export interface Heading {
-  text: {
-    en: string;
-    es?: string | null;
-  };
-  /**
-   * Choose the heading level (smaller is bigger)
-   */
-  level: '1' | '2' | '3' | '4' | '5' | '6';
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'heading';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "hero".
  */
 export interface Hero {
@@ -260,19 +241,6 @@ export interface Action {
   id?: string | null;
   blockName?: string | null;
   blockType: 'action';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Paragraph".
- */
-export interface Paragraph {
-  text: {
-    en: string;
-    es?: string | null;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'paragraph';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -507,7 +475,6 @@ export interface TwoColumns {
   leftColumn?:
     | (
         | EventCardGrid
-        | Heading
         | {
             heading: {
               en: string;
@@ -527,7 +494,6 @@ export interface TwoColumns {
             blockType: 'hero';
           }
         | Action
-        | Paragraph
         | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
@@ -541,7 +507,6 @@ export interface TwoColumns {
   rightColumn?:
     | (
         | EventCardGrid
-        | Heading
         | {
             heading: {
               en: string;
@@ -561,7 +526,6 @@ export interface TwoColumns {
             blockType: 'hero';
           }
         | Action
-        | Paragraph
         | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
@@ -585,7 +549,6 @@ export interface Align {
   blocks?:
     | (
         | EventCardGrid
-        | Heading
         | {
             heading: {
               en: string;
@@ -605,7 +568,6 @@ export interface Align {
             blockType: 'hero';
           }
         | Action
-        | Paragraph
         | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
@@ -632,7 +594,6 @@ export interface Accordion {
     content?:
       | (
           | EventCardGrid
-          | Heading
           | {
               heading: {
                 en: string;
@@ -652,7 +613,6 @@ export interface Accordion {
               blockType: 'hero';
             }
           | Action
-          | Paragraph
           | RichTextBlock
           | MediaBlock
           | MembershipStatusForm
@@ -716,7 +676,6 @@ export interface Event {
   blocks?:
     | (
         | EventCardGrid
-        | Heading
         | {
             heading: {
               en: string;
@@ -736,7 +695,6 @@ export interface Event {
             blockType: 'hero';
           }
         | Action
-        | Paragraph
         | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
@@ -749,7 +707,6 @@ export interface Event {
             leftColumn?:
               | (
                   | EventCardGrid
-                  | Heading
                   | {
                       heading: {
                         en: string;
@@ -769,7 +726,6 @@ export interface Event {
                       blockType: 'hero';
                     }
                   | Action
-                  | Paragraph
                   | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
@@ -783,7 +739,6 @@ export interface Event {
             rightColumn?:
               | (
                   | EventCardGrid
-                  | Heading
                   | {
                       heading: {
                         en: string;
@@ -803,7 +758,6 @@ export interface Event {
                       blockType: 'hero';
                     }
                   | Action
-                  | Paragraph
                   | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
@@ -854,7 +808,6 @@ export interface Page {
   blocks?:
     | (
         | EventCardGrid
-        | Heading
         | {
             heading: {
               en: string;
@@ -874,7 +827,6 @@ export interface Page {
             blockType: 'hero';
           }
         | Action
-        | Paragraph
         | RichTextBlock
         | MediaBlock
         | MembershipStatusForm
@@ -887,7 +839,6 @@ export interface Page {
             leftColumn?:
               | (
                   | EventCardGrid
-                  | Heading
                   | {
                       heading: {
                         en: string;
@@ -907,7 +858,6 @@ export interface Page {
                       blockType: 'hero';
                     }
                   | Action
-                  | Paragraph
                   | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
@@ -921,7 +871,6 @@ export interface Page {
             rightColumn?:
               | (
                   | EventCardGrid
-                  | Heading
                   | {
                       heading: {
                         en: string;
@@ -941,7 +890,6 @@ export interface Page {
                       blockType: 'hero';
                     }
                   | Action
-                  | Paragraph
                   | RichTextBlock
                   | MediaBlock
                   | MembershipStatusForm
@@ -1145,7 +1093,6 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         eventCardGrid?: T | EventCardGridSelect<T>;
-        heading?: T | HeadingSelect<T>;
         hero?:
           | T
           | {
@@ -1171,7 +1118,6 @@ export interface EventsSelect<T extends boolean = true> {
               blockName?: T;
             };
         action?: T | ActionSelect<T>;
-        paragraph?: T | ParagraphSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
         media?: T | MediaBlockSelect<T>;
         membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1187,7 +1133,6 @@ export interface EventsSelect<T extends boolean = true> {
                 | T
                 | {
                     eventCardGrid?: T | EventCardGridSelect<T>;
-                    heading?: T | HeadingSelect<T>;
                     hero?:
                       | T
                       | {
@@ -1213,7 +1158,6 @@ export interface EventsSelect<T extends boolean = true> {
                           blockName?: T;
                         };
                     action?: T | ActionSelect<T>;
-                    paragraph?: T | ParagraphSelect<T>;
                     richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1227,7 +1171,6 @@ export interface EventsSelect<T extends boolean = true> {
                 | T
                 | {
                     eventCardGrid?: T | EventCardGridSelect<T>;
-                    heading?: T | HeadingSelect<T>;
                     hero?:
                       | T
                       | {
@@ -1253,7 +1196,6 @@ export interface EventsSelect<T extends boolean = true> {
                           blockName?: T;
                         };
                     action?: T | ActionSelect<T>;
-                    paragraph?: T | ParagraphSelect<T>;
                     richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1296,21 +1238,6 @@ export interface EventCardGridSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Heading_select".
- */
-export interface HeadingSelect<T extends boolean = true> {
-  text?:
-    | T
-    | {
-        en?: T;
-        es?: T;
-      };
-  level?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "Action_select".
  */
 export interface ActionSelect<T extends boolean = true> {
@@ -1324,20 +1251,6 @@ export interface ActionSelect<T extends boolean = true> {
   actionType?: T;
   url?: T;
   customActionKey?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Paragraph_select".
- */
-export interface ParagraphSelect<T extends boolean = true> {
-  text?:
-    | T
-    | {
-        en?: T;
-        es?: T;
-      };
   id?: T;
   blockName?: T;
 }
@@ -1606,7 +1519,6 @@ export interface AlignSelect<T extends boolean = true> {
     | T
     | {
         eventCardGrid?: T | EventCardGridSelect<T>;
-        heading?: T | HeadingSelect<T>;
         hero?:
           | T
           | {
@@ -1632,7 +1544,6 @@ export interface AlignSelect<T extends boolean = true> {
               blockName?: T;
             };
         action?: T | ActionSelect<T>;
-        paragraph?: T | ParagraphSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
         media?: T | MediaBlockSelect<T>;
         membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1662,7 +1573,6 @@ export interface AccordionSelect<T extends boolean = true> {
           | T
           | {
               eventCardGrid?: T | EventCardGridSelect<T>;
-              heading?: T | HeadingSelect<T>;
               hero?:
                 | T
                 | {
@@ -1688,7 +1598,6 @@ export interface AccordionSelect<T extends boolean = true> {
                     blockName?: T;
                   };
               action?: T | ActionSelect<T>;
-              paragraph?: T | ParagraphSelect<T>;
               richText?: T | RichTextBlockSelect<T>;
               media?: T | MediaBlockSelect<T>;
               membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1769,7 +1678,6 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         eventCardGrid?: T | EventCardGridSelect<T>;
-        heading?: T | HeadingSelect<T>;
         hero?:
           | T
           | {
@@ -1795,7 +1703,6 @@ export interface PagesSelect<T extends boolean = true> {
               blockName?: T;
             };
         action?: T | ActionSelect<T>;
-        paragraph?: T | ParagraphSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
         media?: T | MediaBlockSelect<T>;
         membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1811,7 +1718,6 @@ export interface PagesSelect<T extends boolean = true> {
                 | T
                 | {
                     eventCardGrid?: T | EventCardGridSelect<T>;
-                    heading?: T | HeadingSelect<T>;
                     hero?:
                       | T
                       | {
@@ -1837,7 +1743,6 @@ export interface PagesSelect<T extends boolean = true> {
                           blockName?: T;
                         };
                     action?: T | ActionSelect<T>;
-                    paragraph?: T | ParagraphSelect<T>;
                     richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
@@ -1851,7 +1756,6 @@ export interface PagesSelect<T extends boolean = true> {
                 | T
                 | {
                     eventCardGrid?: T | EventCardGridSelect<T>;
-                    heading?: T | HeadingSelect<T>;
                     hero?:
                       | T
                       | {
@@ -1877,7 +1781,6 @@ export interface PagesSelect<T extends boolean = true> {
                           blockName?: T;
                         };
                     action?: T | ActionSelect<T>;
-                    paragraph?: T | ParagraphSelect<T>;
                     richText?: T | RichTextBlockSelect<T>;
                     media?: T | MediaBlockSelect<T>;
                     membershipStatusForm?: T | MembershipStatusFormSelect<T>;
