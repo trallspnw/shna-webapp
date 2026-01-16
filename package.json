@@ -1,7 +1,7 @@
 {
-  "name": "my-project",
+  "name": "shna-webapp",
   "version": "1.0.0",
-  "description": "Website template for Payload",
+  "description": "Friends of Seminary Hill Natural Area website and membership system",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -19,7 +19,22 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+
+    "deps:up": "docker compose -f compose.dev.yml up -d",
+    "deps:down": "docker compose -f compose.dev.yml down",
+    "deps:restart": "docker compose -f compose.dev.yml down && docker compose -f compose.dev.yml up -d",
+    "deps:reset": "docker compose -f compose.dev.yml down -v",
+    "deps:logs": "docker compose -f compose.dev.yml logs -f",
+    "deps:ps": "docker compose -f compose.dev.yml ps",
+
+    "codegen": "pnpm generate:types && pnpm generate:importmap",
+
+    "stripe:login": "stripe login",
+    "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/stripe/webhook",
+
+    "dev:full": "pnpm deps:up && pnpm dev",
+    "dev:full:codegen": "pnpm deps:up && pnpm codegen && pnpm dev"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.71.1",

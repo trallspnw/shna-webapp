@@ -1,3 +1,81 @@
+## SHNA Project Guardrails (Read First)
+
+This repo is based on the Payload Website Template, but SHNA has non-negotiable constraints:
+
+1. **Static-first public site**
+   - Do not introduce features that require a Node server at request-time for the public site.
+   - Avoid patterns that force `dynamic = 'force-dynamic'` or disable static export without an explicit SHNA doc update.
+   - No server-only secrets required to render public pages.
+
+2. **Single backend instance**
+   - One Payload instance powers CMS + API. No staging instance.
+
+3. **Demo mode**
+   - Demo uses a **separate DB schema** + **demo subdomain routing**.
+   - Demo data is refreshed via **manual content-only sync**.
+   - Never sync ops data (contacts, memberships, payments).
+   - If demo subdomain is not present, default to production schema.
+
+4. **Bilingual routing**
+   - Routes are prefix-based: `/en/*` and `/es/*`.
+   - Content must support bilingual storage; don’t introduce language state that conflicts with prefix routing.
+
+5. **Emails**
+   - Transactional templates are **Globals**.
+   - Broadcasts/instances are a **Collection**.
+   - Demo emails must include `[DEMO]` in the subject.
+
+Database: Postgres only (@payloadcms/db-postgres). DATABASE_URL must be set. Do not reintroduce Mongo examples.
+
+If any change conflicts with these guardrails, stop and consult `docs/ARCHITECTURE.md`.
+
+## SHNA Project Docs (Canonical)
+
+Use `docs/README.md` as the canonical index for SHNA documentation.
+
+If there is conflict between `AGENTS.md` and `docs/*`, treat `docs/*` as source of truth.
+
+## Documentation-First Development Policy
+
+**Docs are the source of truth.** When implementing changes, bias toward following existing documentation first.
+
+### Canonical hierarchy (source of truth)
+
+1. `docs/*` — canonical for architecture, environments, workflows, runbooks, and decisions.
+2. `README.md` — quickstart + pointers to `docs/*` (must not contradict `docs/*`).
+3. `agents.md` — contributor/AI behavior rules (must not contradict `docs/*`).
+
+If `README.md` conflicts with `docs/*`, treat `docs/*` as correct and update `README.md` to match.
+
+### Default behavior (Doc-first)
+
+- If `docs/*` describes an architectural or workflow approach, implement it as written.
+- If implementation appears to conflict with docs, assume the implementation is wrong or incomplete until proven otherwise.
+- When in doubt, stop and consult `docs/ARCHITECTURE.md` and `docs/DECISIONS.md`.
+
+### Allowed deviation (Only when explicitly instructed)
+
+Deviating from docs is permitted **only** when a maintainer explicitly instructs the change
+(e.g., “ignore docs for this, we’re prototyping” or “we’re changing the architecture”).
+
+When deviating:
+
+1. Clearly state what doc statement is being violated and why.
+2. Implement the change in a way that is easy to revert.
+3. Update the docs in the same PR (preferred), or explicitly open a follow-up doc task.
+4. Add an entry to `docs/DECISIONS.md` if the change is architectural or alters guardrails.
+
+### Keeping docs up to date
+
+If code changes affect behavior described in docs, update docs in the same change:
+
+- Local dev/setup/scripts → `docs/DEVELOPMENT.md`
+- Runtime behavior/hosting/envs/routing/static export → `docs/ARCHITECTURE.md`
+- Operational procedures/incidents/privacy requests → `docs/RUNBOOK.md`
+- Durable choices/tradeoffs/guardrails → `docs/DECISIONS.md`
+
+**Scope rule:** Only update the doc sections impacted by the change; do not rewrite docs opportunistically.
+
 # Payload CMS Development Rules
 
 You are an expert Payload CMS developer. When working with Payload projects, follow these rules:
@@ -9,7 +87,7 @@ You are an expert Payload CMS developer. When working with Payload projects, fol
 3. **Type Generation**: Run `generate:types` script after schema changes
 4. **Transaction Safety**: Always pass `req` to nested operations in hooks
 5. **Access Control**: Understand Local API bypasses access control by default
-6. **Access Control**: Ensure roles exist when modifiyng collection or globals with access controls
+6. **Access Control**: Ensure roles exist when modifying collection or globals with access controls
 
 ### Code Validation
 
@@ -36,31 +114,42 @@ src/
 ### Minimal Config Pattern
 
 ```typescript
-import { buildConfig } from 'payload'
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
+import sharp from 'sharp'
 import { fileURLToPath } from 'url'
+import { buildConfig } from 'payload'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+
+import { Users } from './collections/Users'
+import { Media } from './collections/Media'
+// ...other collections/globals/plugins as needed
+import { defaultLexical } from '@/fields/defaultLexical'
+import { getServerSideURL } from './utilities/getURL'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const DATABASE_URL =
+  process.env.DATABASE_URL ?? (() => { throw new Error('DATABASE_URL is required') })()
+
 export default buildConfig({
   admin: {
-    user: 'users',
+    user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
-  editor: lexicalEditor(),
+  editor: defaultLexical,
+  db: postgresAdapter({
+    pool: { connectionString: DATABASE_URL },
+  }),
+  collections: [Users, Media /* ... */],
+  cors: [getServerSideURL()].filter(Boolean),
   secret: process.env.PAYLOAD_SECRET,
+  sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URL,
-  }),
 })
 ```
 

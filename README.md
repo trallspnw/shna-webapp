@@ -1,3 +1,81 @@
+# Friends of Seminary Hill Natural Area (SHNA) Website
+
+This repository powers the **Friends of Seminary Hill Natural Area** website and membership system.
+
+It is built on top of the **official Payload Website Template**, with additional constraints and conventions to ensure the system is:
+
+- low-maintenance
+- safe for non-technical editors
+- static-first deployment (public site)
+- bilingual (English / Spanish)
+- suitable for a small nonprofit with limited budget and staffing
+
+> **Important:**  
+> This repo intentionally favors clarity and stability over maximum flexibility.  
+> Before making changes, read the project docs linked below.
+
+---
+
+## Project Documentation (Read This First)
+
+All SHNA-specific decisions, constraints, and workflows live in `docs/`. The
+canonical index is `docs/README.md`.
+
+If you are an AI agent or a new contributor:
+👉 **Start with `AGENTS.md`, then `docs/ARCHITECTURE.md`.**
+
+If a change conflicts with these docs, update the docs first or stop and ask.
+
+---
+
+## Key Project Constraints (Non-Negotiable)
+
+- **Static-first public site**
+
+  The public website is intended to be served as static assets (indexed, cacheable, resilient).
+  Do not introduce new server-only runtime dependencies (things that require a Node server at request time) into the public site.
+  Features like live preview / SSR search must be implemented in a way that does not prevent static builds.
+  See `docs/ARCHITECTURE.md` for the exact static build/export strategy.
+
+- **Single dynamic backend**
+
+  One Payload instance (CMS + API). No separate staging instance.
+
+- **Demo mode via schema + subdomain**
+
+  Demo uses a separate database schema and is routed by the demo subdomain.
+  Demo content is duplicated and refreshed via a **manual content-only sync** (never sync ops data like contacts, memberships, payments).
+
+- **Bilingual routing**
+
+  Language is handled via route prefixes (`/en`, `/es`).
+
+- **Emails**
+
+  - Transactional email templates are **Globals**
+  - Email “instances” (e.g. broadcasts) use a **Collection**
+  - Demo emails are sent with a `[DEMO]` subject prefix
+
+- **Low operational overhead**
+
+  This project must coexist with full-time work and family commitments.
+
+---
+
+## About the Template
+
+Everything below this section is the **official Payload Website Template README**.
+
+It documents:
+- how to run the project
+- how Payload is configured
+- how the frontend works
+- how to deploy
+
+These instructions are intentionally preserved and should be followed unless SHNA docs explicitly say otherwise.
+
+---
+
 # Payload Website Template
 
 This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
@@ -34,13 +112,15 @@ If you have not done so already, you need to have standalone copy of this repo o
 Use the `create-payload-app` CLI to clone this template directly to your machine:
 
 ```bash
-pnpx create-payload-app my-project -t website
+pnpx create-payload-app shna-webapp -t website
 ```
 
 ### Development
 
+> Local development requires a running Postgres instance (Docker is fine). See `docs/DEVELOPMENT.md`.
+
 1. First [clone the repo](#clone) if you have not done so already
-1. `cd my-project && cp .env.example .env` to copy the example environment variables
+1. `cd shna-webapp && cp .env.example .env` to copy the example environment variables
 1. `pnpm install && pnpm dev` to install dependencies and start the dev server
 1. open `http://localhost:3000` to open the app in your browser
 
