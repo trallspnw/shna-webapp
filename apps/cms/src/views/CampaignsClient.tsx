@@ -3,7 +3,7 @@
 import { Button, Gutter } from "@payloadcms/ui";
 import { useState } from "react";
 import classes from './CampaignsClient.module.scss'
-import { membership, person, subscription } from "../../generated/prisma";
+import { person, subscription } from "../../generated/prisma";
 
 /**
  * Custom admin view for pulling campaign reports
@@ -11,7 +11,7 @@ import { membership, person, subscription } from "../../generated/prisma";
 export function CampaignsClient() {
   const [searchInput, setSearchInput] = useState('')
   const [persons, setPersons] = useState<person[]>([])
-  const [memberships, setMemberships] = useState<(membership & { person: person })[]>([])
+  const [memberships, setMemberships] = useState<any[]>([])
   const [subscriptions, setSubscriptions] = useState<(subscription & { person: person })[]>([])
   const [loading, setLoading] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
@@ -143,23 +143,25 @@ export function CampaignsClient() {
           <table className={classes.table}>
             <thead>
               <tr>
-                <th>Email</th>
-                <th>Name</th>
+                <th>Type</th>
+                <th>Household</th>
+                <th>Primary Email</th>
+                <th>Primary Name</th>
                 <th>Phone</th>
                 <th>Address</th>
                 <th>Joined</th>
-                <th>Language</th>
               </tr>
             </thead>
             <tbody>
               {memberships.map((membership) => (
                 <tr key={membership.id}>
-                  <td>{membership.person.email}</td>
-                  <td>{membership.person.name}</td>
-                  <td>{membership.person.phone}</td>
-                  <td>{membership.person.address}</td>
+                  <td>{membership.household?.type}</td>
+                  <td>{membership.household?.name}</td>
+                  <td>{membership.household?.primaryContact?.email}</td>
+                  <td>{membership.household?.primaryContact?.name}</td>
+                  <td>{membership.household?.primaryContact?.phone}</td>
+                  <td>{membership.household?.primaryContact?.address}</td>
                   <td>{membership.createdAt ? new Date(membership.createdAt).toLocaleString() : ''}</td>
-                  <td>{membership.person.language}</td>
                 </tr>
               ))}
             </tbody>

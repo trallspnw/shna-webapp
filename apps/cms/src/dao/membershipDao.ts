@@ -1,69 +1,69 @@
-import { PrismaClient } from '@prisma'
+import { HouseholdMemberRole, MembershipType, PrismaClient } from '@prisma'
 
 const prisma = new PrismaClient()
 
+export type HouseholdMemberInput = {
+  name?: string
+  email?: string
+  phone?: string
+  address?: string
+  language?: string
+}
+
+type InitMembershipParams = {
+  membershipType: MembershipType
+  primaryContact: {
+    email: string
+    name: string
+    phone?: string
+    address?: string
+    language?: string
+    ref?: string
+  }
+  householdName?: string
+  members?: HouseholdMemberInput[]
+  maxHouseholdSize?: number
+}
+
 /**
- * Initializes a membership. The person must either not be a member or have a membership expiring within a month. This
- * function savings or updates person information and performs membership status validation. Does not record the
- * membership.
- * @param email The email address of the potential member
- * @param name The name of the potential member
- * @param phone The phone number of the potential member
- * @param address The address of the potential member
- * @param language The perferred language of the potential member
- * @param ref The ref tag identifying the user ingress/campaign (only save on initial creation)
- * @returns The ID of the potentail member (person)
+ * Initializes a membership. Ensures the household does not have an active membership and builds/updates household
+ * membership state (primary contact + optional additional members).
  */
-export async function initMembership(
-  email: string, 
-  name: string, 
-  phone: string | undefined, 
-  address: string | undefined, 
-  language: string, 
-  ref: string,
-) {
+export async function initMembership(params: InitMembershipParams) {
+  const { membershipType, primaryContact, householdName, members = [], maxHouseholdSize } = params
+
+  const totalMembers = 1 + members.length
+  if (membershipType === 'FAMILY' && maxHouseholdSize && totalMembers > maxHouseholdSize) {
+    return {
+      success: false,
+      reason: 'MAX_HOUSEHOLD_SIZE',
+    }
+  }
+
   return await prisma.$transaction(async (client) => {
-    let person = await client.person.findUnique({
-      where: { email },
-      include: { 
+    const primaryPerson = await upsertPerson(client, primaryContact.email, {
+      name: primaryContact.name,
+      phone: primaryContact.phone,
+      address: primaryContact.address,
+      language: primaryContact.language,
+      ref: primaryContact.ref,
+    })
+
+    let household = await client.household.findFirst({
+      where: { primaryContactId: primaryPerson.id },
+      include: {
         memberships: {
-          orderBy: {
-            expiresAt: 'desc'
-          },
+          orderBy: { expiresAt: 'desc' },
           take: 1,
-        }
+        },
       },
     })
 
-    if (!person) {
-      person = await client.person.create({
-        data: {
-          email,
-          name,
-          phone,
-          address,
-          language,
-          ref,
-        },
-        include: { memberships: true }
-      })
-    } else {
-      await client.person.update({
-        where: { email },
-        data: {
-          ...(name !== undefined ? { name } : {}),
-          ...(phone !== undefined ? { phone } : {}),
-          ...(address !== undefined ? { address } : {}),
-          ...(language !== undefined ? { language } : {}),
-        },
-      })
-    }
-
-    // Validate no membership or membership expiring soon
+    // Validate no active membership (more than 1 month remaining)
     const now = new Date()
     const oneMonthFromNow = new Date()
     oneMonthFromNow.setMonth(now.getMonth() + 1)
-    const mostRecentMembership = person.memberships[0]
+    const mostRecentMembership = household?.memberships[0]
     if (mostRecentMembership?.expiresAt && mostRecentMembership.expiresAt > oneMonthFromNow) {
       return {
         success: false,
@@ -71,132 +71,258 @@ export async function initMembership(
       }
     }
 
-    return { 
+    if (!household) {
+      household = await client.household.create({
+        data: {
+          type: membershipType,
+          name: householdName,
+          ref: primaryContact.ref,
+          primaryContactId: primaryPerson.id,
+        },
+      })
+    } else {
+      household = await client.household.update({
+        where: { id: household.id },
+        data: {
+          type: membershipType,
+          name: householdName,
+          ref: primaryContact.ref ?? household.ref,
+        },
+      })
+    }
+
+    // Rebuild household members
+    await client.household_member.deleteMany({
+      where: { householdId: household.id },
+    })
+
+    await client.household_member.create({
+      data: {
+        householdId: household.id,
+        personId: primaryPerson.id,
+        role: HouseholdMemberRole.PRIMARY,
+      },
+    })
+
+    for (const member of members) {
+      const person = await upsertPerson(client, member.email, {
+        name: member.name,
+        phone: member.phone,
+        address: member.address,
+        language: member.language,
+      })
+
+      await client.household_member.create({
+        data: {
+          householdId: household.id,
+          personId: person.id,
+          role: HouseholdMemberRole.MEMBER,
+        },
+      })
+    }
+
+    return {
       success: true,
-      personId: person.id,
+      householdId: household.id,
     }
   })
 }
 
 /**
  * Finalizes a membership. Called after payment confirmation. Creates a new membership record.
- * @param personId The ID of the person to create a membership for
+ * @param householdId The ID of the household to create a membership for
  * @param ref The ref tag associated with the membership
- * @returns Void, used by async system call
  */
-export async function completeMembership(personId: string, ref?: string) {
+export async function completeMembership(householdId: string, ref?: string) {
   return await prisma.$transaction(async (client) => {
-    const person = await client.person.findUnique({
-      where: { id: personId },
-      include: { 
+    const household = await client.household.findUnique({
+      where: { id: householdId },
+      include: {
         memberships: {
-          orderBy: {
-            expiresAt: 'desc'
-          },
+          orderBy: { expiresAt: 'desc' },
           take: 1,
-        }
+        },
       },
     })
 
-    if (!person) {
-      console.error('Tried to complete membership for a non-existing person', personId)
-      throw new Error('Person not found')
+    if (!household) {
+      console.error('Tried to complete membership for a non-existing household', householdId)
+      throw new Error('Household not found')
     }
 
     const now = new Date()
-    const mostRecentMembership = person.memberships[0]
-    const createdAt = mostRecentMembership?.expiresAt > now 
-      ? new Date(mostRecentMembership.expiresAt) 
+    const mostRecentMembership = household.memberships[0]
+    const createdAt = mostRecentMembership?.expiresAt && mostRecentMembership.expiresAt > now
+      ? new Date(mostRecentMembership.expiresAt)
       : now
 
-    const expiresAt = new Date(createdAt);
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    const expiresAt = new Date(createdAt)
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1)
 
     const membership = await client.membership.create({
       data: {
-        personId,
+        householdId,
         createdAt,
         expiresAt,
         ref: ref?.trim() || undefined,
       }
     })
 
-    console.log(`Added new membership! Member: ${membership.id}`)
+    console.log(`Added new membership! Household: ${membership.householdId}`)
   })
 }
 
 /**
- * Gets the newest membership assiated with a specified email address
+ * Gets the newest membership associated with a specified email address
  * @param email The email address to pull membership information for
- * @returns The latest membership record or null if person has no membership records
+ * @returns The latest membership record or null if no membership records
  */
 export async function getLatestMembershipByEmail(email: string) {
   const person = await prisma.person.findUnique({
     where: { email },
-    include: { 
-      memberships: {
-        orderBy: {
-          expiresAt: 'desc'
+    include: {
+      householdMembers: {
+        include: {
+          household: {
+            include: {
+              memberships: {
+                orderBy: { expiresAt: 'desc' },
+                take: 1,
+              },
+            },
+          },
         },
-        take: 1,
-      }
+      },
     },
   })
 
-  return (person && person.memberships.length > 0) ? 
-    person.memberships[0] : null
+  const households = person?.householdMembers?.map((hm) => hm.household) || []
+  const membership = households.flatMap((h) => h.memberships).sort((a, b) => {
+    return (b.expiresAt?.getTime() ?? 0) - (a.expiresAt?.getTime() ?? 0)
+  })[0]
+
+  return membership ?? null
 }
 
 /**
  * Search members by email or name. Supports semi-fuzzy matching via prisma insensitive mode.
  * @param query A query string containing a name or email to match
- * @returns Person and membership info for members matching the query
+ * @returns Household and membership info for members matching the query
  */
 export async function searchMembers(query: string) {
   const now = new Date()
 
-  // Get people who have memberships matching the query
-  const persons = await prisma.person.findMany({
+  const households = await prisma.household.findMany({
     where: {
-      memberships: {
-        some: {}, // has memberships
-      },
-      OR: [
-        { email: { contains: query, mode: 'insensitive' } },
-        { name: { contains: query, mode: 'insensitive' } },
-      ],
-    },
-    include: {
-      memberships: {
-        orderBy: {
-          createdAt: 'asc',
+      members: {
+        some: {
+          person: {
+            OR: [
+              { email: { contains: query, mode: 'insensitive' } },
+              { name: { contains: query, mode: 'insensitive' } },
+            ],
+          },
         },
       },
     },
+    include: {
+      memberships: {
+        orderBy: { createdAt: 'asc' },
+      },
+      members: {
+        include: {
+          person: true,
+        },
+      },
+      primaryContact: true,
+    },
   })
 
-  // Map person and membership information to a joined model
-  return persons.map((person) => {
-    const memberships = person.memberships
+  return households.map((household) => {
+    const memberships = household.memberships
     const startDate = memberships.at(0)?.createdAt
     const expiresAt = memberships.at(-1)?.expiresAt
     const active = expiresAt ? expiresAt > now : false
     const latestRef = memberships.at(-1)?.ref
+    const primary = household.primaryContact
 
     return {
-      id: person.id,
-      email: person.email,
-      name: person.name,
-      phone: person.phone,
-      address: person.address,
-      language: person.language,
+      id: household.id,
+      type: household.type,
+      name: household.name,
+      primaryEmail: primary?.email,
+      primaryName: primary?.name,
+      phone: primary?.phone,
+      address: primary?.address,
       startDate,
       expiresAt,
       active,
       ref: latestRef,
+      members: household.members.map((member) => ({
+        id: member.person.id,
+        name: member.person.name,
+        email: member.person.email,
+        phone: member.person.phone,
+        role: member.role,
+      })),
     }
   }).sort((a, b) => {
-    // Sort by latest expiration first
     return (b.expiresAt?.getTime() ?? 0) - (a.expiresAt?.getTime() ?? 0)
+  })
+}
+
+export async function getHouseholdById(id: string) {
+  return prisma.household.findUnique({
+    where: { id },
+    include: {
+      primaryContact: true,
+      members: {
+        include: {
+          person: true,
+        },
+      },
+    },
+  })
+}
+
+async function upsertPerson(
+  client: PrismaClient,
+  email?: string | null,
+  data?: {
+    name?: string
+    phone?: string
+    address?: string
+    language?: string
+    ref?: string
+  },
+) {
+  if (email) {
+    const existing = await client.person.findUnique({
+      where: { email },
+    })
+
+    if (existing) {
+      return await client.person.update({
+        where: { email },
+        data: {
+          ...(data?.name !== undefined ? { name: data.name } : {}),
+          ...(data?.phone !== undefined ? { phone: data.phone } : {}),
+          ...(data?.address !== undefined ? { address: data.address } : {}),
+          ...(data?.language !== undefined ? { language: data.language } : {}),
+          ...(data?.ref !== undefined ? { ref: data.ref } : {}),
+        },
+      })
+    }
+  }
+
+  return await client.person.create({
+    data: {
+      email: email ?? null,
+      name: data?.name,
+      phone: data?.phone,
+      address: data?.address,
+      language: data?.language,
+      ref: data?.ref,
+    },
   })
 }

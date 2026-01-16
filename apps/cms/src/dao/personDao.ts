@@ -159,11 +159,22 @@ export async function deletePerson(id: string) {
       }
     }
 
-    await client.subscription.deleteMany({
+    // Remove household membership links and dependent households
+    const households = await client.household.findMany({
+      where: { primaryContactId: id },
+    })
+
+    for (const household of households) {
+      await client.membership.deleteMany({ where: { householdId: household.id } })
+      await client.household_member.deleteMany({ where: { householdId: household.id } })
+      await client.household.delete({ where: { id: household.id } })
+    }
+
+    await client.household_member.deleteMany({
       where: { personId: id },
     })
 
-    await client.membership.deleteMany({
+    await client.subscription.deleteMany({
       where: { personId: id },
     })
 

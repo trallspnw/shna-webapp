@@ -1,4 +1,4 @@
-import { completeMembership } from '@/apps/cms/src/dao/membershipDao'
+import { completeMembership, getHouseholdById } from '@/apps/cms/src/dao/membershipDao'
 import { getPersonById } from '@/apps/cms/src/dao/personDao'
 import { sendEmails } from '@/apps/cms/src/lib/email'
 import { DEFAULT_LANGUAGE } from '@/packages/common/src/types/language'
@@ -41,20 +41,24 @@ export async function POST(request: NextRequest) {
 
     const session = event.data.object as Stripe.Checkout.Session
 
+    const householdId = session.metadata?.householdId
     const personId = session.metadata?.personId
     const ref = session.metadata?.ref
     const itemType = session.metadata?.itemType
+    const household = householdId ? await getHouseholdById(householdId) : undefined
     const person = personId ? await getPersonById(personId) : undefined
 
     // For memberships, update membership table and send an memberhip confirmation/receipt
-    if (person && itemType == 'MEMBERSHIP') {
-      await completeMembership(person.id, ref)
+    if (household && itemType == 'MEMBERSHIP') {
+      await completeMembership(household.id, ref)
+      const primary = household.primaryContact
+
       sendEmails(
-        [ person ], 
+        primary ? [ primary ] : [], 
         'membership-receipt', 
         {
           itemName: session.metadata?.itemName ?? 'Membership',
-          amount: new Intl.NumberFormat(person.language ?? DEFAULT_LANGUAGE, {
+          amount: new Intl.NumberFormat(primary?.language ?? DEFAULT_LANGUAGE, {
             style: 'currency',
             currency: 'USD',
             minimumFractionDigits: 2,

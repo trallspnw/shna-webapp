@@ -16,6 +16,19 @@ export function render(
     <MembershipDuesForm
       key={index}
       backendUrl={process.env.BASE_URL || ''}
+      membershipPrices={generalGlobals.membershipPrices || {}}
+      membershipTypeLabel={block.membershipTypeLabel}
+      membershipTypeIndividualLabel={block.membershipTypeIndividualLabel}
+      membershipTypeFamilyLabel={block.membershipTypeFamilyLabel}
+      householdNameLabel={block.householdNameLabel}
+      householdNamePlaceholder={block.householdNamePlaceholder}
+      membersLabel={block.membersLabel}
+      addMemberLabel={block.addMemberLabel}
+      removeMemberLabel={block.removeMemberLabel}
+      primaryMemberLabel={generalGlobals.memberLabels?.primaryMemberLabel}
+      additionalMemberLabel={generalGlobals.memberLabels?.additionalMemberLabel}
+      detailsHeading={generalGlobals.membershipForm?.detailsHeading}
+      memberOptionalHelp={generalGlobals.membershipForm?.memberOptionalHelp}
       emailLabel={generalGlobals.email?.emailLabel}
       emailPlaceholder={generalGlobals.email?.emailPlaceholder}
       emailValidationError={generalGlobals.email?.emailValidationError}
@@ -30,7 +43,7 @@ export function render(
       addressValidationError={generalGlobals.address?.addressValidationError}
       submitButtonText={block.submitButtonText}
       priceLabel={block.priceLabel}
-      membershipPrice={generalGlobals.membershipPrice}
+      maxHouseholdSize={generalGlobals.maxHouseholdSize}
       itemName={block.itemName}
       existingMembershipMessage={block.existingMembershipMessage}
       serverFailureMessage={block.serverFailureMessage}

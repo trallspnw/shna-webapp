@@ -401,6 +401,38 @@ export interface DonationForm {
  * via the `definition` "MembershipDuesForm".
  */
 export interface MembershipDuesForm {
+  membershipTypeLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  membershipTypeIndividualLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  membershipTypeFamilyLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  householdNameLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  householdNamePlaceholder?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  membersLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  addMemberLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
+  removeMemberLabel?: {
+    en?: string | null;
+    es?: string | null;
+  };
   submitButtonText: {
     en: string;
     es?: string | null;
@@ -1420,6 +1452,54 @@ export interface DonationFormSelect<T extends boolean = true> {
  * via the `definition` "MembershipDuesForm_select".
  */
 export interface MembershipDuesFormSelect<T extends boolean = true> {
+  membershipTypeLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  membershipTypeIndividualLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  membershipTypeFamilyLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  householdNameLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  householdNamePlaceholder?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  membersLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  addMemberLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
+  removeMemberLabel?:
+    | T
+    | {
+        en?: T;
+        es?: T;
+      };
   submitButtonText?:
     | T
     | {
@@ -1956,7 +2036,11 @@ export interface General {
   };
   logo: number | Media;
   icon?: (number | null) | Media;
-  membershipPrice: number;
+  membershipPrices: {
+    individual: number;
+    family: number;
+  };
+  maxHouseholdSize: number;
   eventLabels?: {
     dateLabel?: {
       en?: string | null;
@@ -2027,6 +2111,26 @@ export interface General {
       es?: string | null;
     };
   };
+  memberLabels?: {
+    primaryMemberLabel?: {
+      en?: string | null;
+      es?: string | null;
+    };
+    additionalMemberLabel?: {
+      en?: string | null;
+      es?: string | null;
+    };
+  };
+  membershipForm?: {
+    detailsHeading?: {
+      en?: string | null;
+      es?: string | null;
+    };
+    memberOptionalHelp?: {
+      en?: string | null;
+      es?: string | null;
+    };
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2087,7 +2191,13 @@ export interface GeneralSelect<T extends boolean = true> {
       };
   logo?: T;
   icon?: T;
-  membershipPrice?: T;
+  membershipPrices?:
+    | T
+    | {
+        individual?: T;
+        family?: T;
+      };
+  maxHouseholdSize?: T;
   eventLabels?:
     | T
     | {
@@ -2192,6 +2302,38 @@ export interface GeneralSelect<T extends boolean = true> {
               es?: T;
             };
         addressValidationError?:
+          | T
+          | {
+              en?: T;
+              es?: T;
+            };
+      };
+  memberLabels?:
+    | T
+    | {
+        primaryMemberLabel?:
+          | T
+          | {
+              en?: T;
+              es?: T;
+            };
+        additionalMemberLabel?:
+          | T
+          | {
+              en?: T;
+              es?: T;
+            };
+      };
+  membershipForm?:
+    | T
+    | {
+        detailsHeading?:
+          | T
+          | {
+              en?: T;
+              es?: T;
+            };
+        memberOptionalHelp?:
           | T
           | {
               en?: T;

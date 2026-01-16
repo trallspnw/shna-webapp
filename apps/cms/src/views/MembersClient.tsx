@@ -75,28 +75,32 @@ export function MembersClient() {
           <table className={classes.table}>
             <thead>
               <tr>
-                <th>Email</th>
-                <th>Name</th>
+                <th>Type</th>
+                <th>Household Name</th>
+                <th>Primary Email</th>
+                <th>Primary Name</th>
+                <th>Members</th>
                 <th>Phone</th>
                 <th>Address</th>
                 <th>Active</th>
                 <th>Start</th>
                 <th>Expiration</th>
-                <th>Language</th>
                 <th>Ref</th>
               </tr>
             </thead>
             <tbody>
               {members.map((member) => (
                 <tr key={member.id}>
-                  <td>{member.email}</td>
+                  <td>{member.type}</td>
                   <td>{member.name}</td>
+                  <td>{member.primaryEmail}</td>
+                  <td>{member.primaryName}</td>
+                  <td>{member.members?.map((m: any) => m.name || m.email).filter(Boolean).join(', ')}</td>
                   <td>{member.phone}</td>
                   <td>{member.address}</td>
                   <td>{member.active ? 'Yes' : 'No'}</td>
                   <td>{member.startDate ? new Date(member.startDate).toLocaleDateString() : ''}</td>
                   <td>{member.expiresAt ? new Date(member.expiresAt).toLocaleDateString() : ''}</td>
-                  <td>{member.language}</td>
                   <td>{member.ref}</td>
                 </tr>
               ))}

@@ -10,24 +10,25 @@ datasource db {
 
 model person {
   id            String         @id @default(uuid())
-  email         String         @unique
+  email         String?        @unique
   name          String?
   phone         String?
   address       String?
   createdAt     DateTime       @default(now())
   language      String?
   ref           String?
-  memberships   membership[]
+  householdMembers household_member[]
+  primaryHouseholds household[] @relation("householdPrimary")
   subscriptions subscription[]
 }
 
 model membership {
   id        String   @id @default(uuid())
-  personId  String
+  householdId  String
   createdAt DateTime @default(now())
   expiresAt DateTime
   ref       String?
-  person    person   @relation(fields: [personId], references: [id])
+  household household @relation(fields: [householdId], references: [id])
 }
 
 model subscription {
@@ -36,4 +37,37 @@ model subscription {
   createdAt DateTime @default(now())
   ref       String?
   person    person   @relation(fields: [personId], references: [id])
+}
+
+model household {
+  id                String             @id @default(uuid())
+  type              MembershipType
+  name              String?
+  primaryContactId  String
+  createdAt         DateTime           @default(now())
+  ref               String?
+  memberships       membership[]
+  members           household_member[]
+  primaryContact    person             @relation("householdPrimary", fields: [primaryContactId], references: [id])
+}
+
+model household_member {
+  id           String               @id @default(uuid())
+  householdId  String
+  personId     String
+  role         HouseholdMemberRole
+  household    household            @relation(fields: [householdId], references: [id])
+  person       person               @relation(fields: [personId], references: [id])
+
+  @@unique([householdId, personId])
+}
+
+enum MembershipType {
+  INDIVIDUAL
+  FAMILY
+}
+
+enum HouseholdMemberRole {
+  PRIMARY
+  MEMBER
 }

@@ -2,7 +2,8 @@ import { initMembership } from "@/apps/cms/src/dao/membershipDao";
 import { createSession } from "@/apps/cms/src/lib/stripe";
 import { isValidEmail, isValidUsPhone } from "@/packages/common/src/lib/validation";
 import { NextRequest, NextResponse } from "next/server";
-import { getMembershipPrice } from "@/apps/cms/src/lib/globalsUtil";
+import { getMembershipSettings } from "@/apps/cms/src/lib/globalsUtil";
+import { MembershipType } from "@prisma";
 
 /**
  * API route for member sign up.
@@ -12,9 +13,9 @@ import { getMembershipPrice } from "@/apps/cms/src/lib/globalsUtil";
 export async function POST(request: NextRequest) {
   try {
     // Get membership price from payload
-    const amount = await getMembershipPrice()
+    const { membershipPrices, maxHouseholdSize } = await getMembershipSettings()
 
-    const { itemName, email, name, phone, address, entryUrl, language, ref } = await request.json()
+    const { itemName, email, name, phone, address, entryUrl, language, ref, membershipType, householdName, members } = await request.json()
 
     // Normalize input
     const cleaned = {
@@ -24,9 +25,16 @@ export async function POST(request: NextRequest) {
       phone: clean(phone),
       address: clean(address),
       entryUrl: clean(entryUrl),
+      householdName: clean(householdName),
+      membershipType: clean(membershipType),
     }
 
     // Validate input
+    const selectedType = cleaned.membershipType === 'FAMILY' ? MembershipType.FAMILY : MembershipType.INDIVIDUAL
+    const amount = selectedType === 'FAMILY'
+      ? membershipPrices?.family
+      : membershipPrices?.individual
+
     if (!amount || amount <= 0) {
       return NextResponse.json(
         { error: 'Invalid membership price' }, 
@@ -58,18 +66,50 @@ export async function POST(request: NextRequest) {
 
     if (cleaned.phone) cleaned.phone = cleaned.phone.slice(-10)
 
-    const result = await initMembership(
-      cleaned.email,
-      cleaned.name,
-      cleaned.phone,
-      cleaned.address,
-      language,
-      ref,
-    )
+    const additionalMembers = Array.isArray(members) ? members : []
+    for (const member of additionalMembers) {
+      if (member.email && !isValidEmail(member.email)) {
+        return NextResponse.json(
+          { error: 'Invalid additional member email' },
+          { status: 400 },
+        )
+      }
+      if (member.phone && !isValidUsPhone(member.phone)) {
+        return NextResponse.json(
+          { error: 'Invalid additional member phone' },
+          { status: 400 },
+        )
+      }
+      if (member.phone) {
+        member.phone = member.phone.slice(-10)
+      }
+    }
+
+    const result = await initMembership({
+      membershipType: selectedType,
+      primaryContact: {
+        email: cleaned.email,
+        name: cleaned.name,
+        phone: cleaned.phone,
+        address: cleaned.address,
+        language,
+        ref,
+      },
+      householdName: cleaned.householdName,
+      members: additionalMembers,
+      maxHouseholdSize,
+    })
 
     if (!result.success) {
       // DAO didn't add because there is an active membership - user error
       if (result.reason === 'ACTIVE_MEMBERSHIP') {
+        return NextResponse.json(
+          { error: result.reason },
+          { status: 400 }
+        )
+      }
+
+      if (result.reason === 'MAX_HOUSEHOLD_SIZE') {
         return NextResponse.json(
           { error: result.reason },
           { status: 400 }
@@ -103,7 +143,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.FRONT_END_URL}/orderFailed?sessionId={CHECKOUT_SESSION_ID}`,
       language: language,
       metadata: {
-        personId: result.personId ?? '',
+        householdId: result.householdId ?? '',
         email: cleaned.email,
         itemName: cleaned.itemName ?? 'Membership',
         itemType: 'MEMBERSHIP',

@@ -7,7 +7,10 @@ import { NextRequest } from "next/server"
 
 const PERSON = {
   id: CONSTANTS.generalId,
+  email: CONSTANTS.email,
+  name: CONSTANTS.name,
 }
+const HOUSEHOLD = { id: CONSTANTS.generalId, primaryContact: PERSON }
 
 jest.mock('/src/lib/stripe', () => ({
   getEventFromWebhookRequest: jest.fn(),
@@ -15,6 +18,7 @@ jest.mock('/src/lib/stripe', () => ({
 
 jest.mock('/src/dao/membershipDao', () => ({
   completeMembership: jest.fn(() => Promise.resolve()),
+  getHouseholdById: jest.fn(() => Promise.resolve(HOUSEHOLD)),
 }))
 
 jest.mock('/src/dao/personDao', () => ({
@@ -121,6 +125,7 @@ function mockStripeEvent(itemType: string, eventId: string) {
       object: {
         metadata: {
           personId: CONSTANTS.generalId,
+          householdId: CONSTANTS.generalId,
           email: CONSTANTS.email,
           itemName: CONSTANTS.itemName,
           itemType,

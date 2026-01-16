@@ -40,3 +40,7 @@ Saved changes in the CMS will be made available immediately on the CMS backend a
 ## Additional Information
 
 This project in its current state is implemented to meet requirements for WGU D424. This software is unlicensed and is not currently intended for distribution.
+
+## AI Notes
+
+For future AI/codegen work, start with `AI_GUIDELINES.md` for repo-specific rules (globals for shared strings, validation parity, payment/webhook care, localization, and testing expectations).

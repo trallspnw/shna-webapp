@@ -22,7 +22,7 @@ const EXPECTED_SESSION_CREATE = expect.objectContaining({
   cancel_url: expect.stringContaining('/orderFailed'),
   language: CONSTANTS.language,
   metadata: {
-    personId: CONSTANTS.generalId,
+    householdId: CONSTANTS.generalId,
     email: CONSTANTS.email,
     itemName: CONSTANTS.itemName,
     itemType: CONSTANTS.itemTypeMembership,
@@ -32,13 +32,16 @@ const EXPECTED_SESSION_CREATE = expect.objectContaining({
 })
 
 jest.mock('/src/lib/globalsUtil', () => ({
-  getMembershipPrice: jest.fn(() => Promise.resolve(CONSTANTS.monetaryAmount)),
+  getMembershipSettings: jest.fn(() => Promise.resolve({
+    membershipPrices: { individual: Number(CONSTANTS.monetaryAmount) },
+    maxHouseholdSize: 5,
+  })),
 }))
 
 jest.mock('/src/dao/membershipDao', () => ({
   initMembership: jest.fn(() => Promise.resolve({ 
     success: true,
-    personId: CONSTANTS.generalId,
+    householdId: CONSTANTS.generalId,
   })),
 }))
 
@@ -60,6 +63,7 @@ describe('POST /api/membership/init', () => {
         entryUrl: CONSTANTS.generalUrl,
         language: CONSTANTS.language,
         ref: CONSTANTS.ref,
+        membershipType: 'INDIVIDUAL',
       }),
       headers: CONSTANTS.apiHeaders,
     }) as NextRequest)
@@ -69,14 +73,20 @@ describe('POST /api/membership/init', () => {
     expect(json.paymentUrl).toBe(CONSTANTS.stripeUrl)
 
     expect(initMembership).toHaveBeenCalledTimes(1)
-    expect(initMembership).toHaveBeenCalledWith(
-      CONSTANTS.email,
-      CONSTANTS.name,
-      CONSTANTS.phone,
-      CONSTANTS.address,
-      CONSTANTS.language,
-      CONSTANTS.ref,
-    )
+    expect(initMembership).toHaveBeenCalledWith({
+      membershipType: 'INDIVIDUAL',
+      primaryContact: {
+        email: CONSTANTS.email,
+        name: CONSTANTS.name,
+        phone: CONSTANTS.phone,
+        address: CONSTANTS.address,
+        language: CONSTANTS.language,
+        ref: CONSTANTS.ref,
+      },
+      householdName: undefined,
+      members: [],
+      maxHouseholdSize: 5,
+    })
 
     expect(createSession).toHaveBeenCalledTimes(1)
     expect(createSession).toHaveBeenCalledWith(EXPECTED_SESSION_CREATE)
@@ -94,6 +104,7 @@ describe('POST /api/membership/init', () => {
         entryUrl: CONSTANTS.generalUrl,
         language: CONSTANTS.language,
         ref: CONSTANTS.ref,
+        membershipType: 'INDIVIDUAL',
       }),
       headers: CONSTANTS.apiHeaders,
     }) as NextRequest)
@@ -103,14 +114,20 @@ describe('POST /api/membership/init', () => {
     expect(json.paymentUrl).toBe(CONSTANTS.stripeUrl)
 
     expect(initMembership).toHaveBeenCalledTimes(1)
-    expect(initMembership).toHaveBeenCalledWith(
-      CONSTANTS.email,
-      CONSTANTS.name,
-      CONSTANTS.phone,
-      CONSTANTS.address,
-      CONSTANTS.language,
-      CONSTANTS.ref,
-    )
+    expect(initMembership).toHaveBeenCalledWith({
+      membershipType: 'INDIVIDUAL',
+      primaryContact: {
+        email: CONSTANTS.email,
+        name: CONSTANTS.name,
+        phone: CONSTANTS.phone,
+        address: CONSTANTS.address,
+        language: CONSTANTS.language,
+        ref: CONSTANTS.ref,
+      },
+      householdName: undefined,
+      members: [],
+      maxHouseholdSize: 5,
+    })
 
     expect(createSession).toHaveBeenCalledTimes(1)
     expect(createSession).toHaveBeenCalledWith(EXPECTED_SESSION_CREATE)

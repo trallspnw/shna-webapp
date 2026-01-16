@@ -16,7 +16,11 @@ export async function getMembershipsByRef(ref: string) {
   return prisma.membership.findMany({
     where: { ref },
     include: {
-      person: true,
+      household: {
+        include: {
+          primaryContact: true,
+        },
+      },
     },
   })
 }

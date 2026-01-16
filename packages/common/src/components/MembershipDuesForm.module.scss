@@ -7,9 +7,23 @@
   width: 100%;
 }
 
+.sectionHeading {
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
 .checkoutRow {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+}
+
+.addMemberButton {
+  background-color: transparent;
+}
+
+.addMemberButton[data-disabled] {
+  background-color: transparent;
+  color: var(--mantine-color-dimmed);
 }

@@ -26,9 +26,28 @@ export const GeneralGlobal: GlobalConfig = {
       label: 'Icon',
     },
     {
-      name: 'membershipPrice',
+      type: 'group',
+      name: 'membershipPrices',
+      label: 'Membership Prices',
+      fields: [
+        {
+          name: 'individual',
+          type: 'number',
+          label: 'Individual Price',
+          required: true,
+        },
+        {
+          name: 'family',
+          type: 'number',
+          label: 'Family Price',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'maxHouseholdSize',
       type: 'number',
-      label: 'Membership Price',
+      label: 'Max Household Size',
       required: true,
     },
     {
@@ -79,6 +98,24 @@ export const GeneralGlobal: GlobalConfig = {
         createLocalizedTextField('addressLabel', 'Address Label'),
         createLocalizedTextField('addressPlaceholder', 'Address Placeholder'),
         createLocalizedTextField('addressValidationError', 'Address Input Error'),
+      ],
+    },
+    {
+      type: 'group',
+      name: 'memberLabels',
+      label: 'Member Labels',
+      fields: [
+        createLocalizedTextField('primaryMemberLabel', 'Primary Member Label'),
+        createLocalizedTextField('additionalMemberLabel', 'Additional Member Label'),
+      ],
+    },
+    {
+      type: 'group',
+      name: 'membershipForm',
+      label: 'Membership Form Labels',
+      fields: [
+        createLocalizedTextField('detailsHeading', 'Details Heading'),
+        createLocalizedTextField('memberOptionalHelp', 'Member Optional Help'),
       ],
     },
   ],
