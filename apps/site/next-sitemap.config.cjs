@@ -2,14 +2,12 @@ const resolveVercelURL = (value) => (value ? `https://${value}` : undefined)
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.NEXT_PUBLIC_SERVER_URL ||
   resolveVercelURL(process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
   'https://example.com'
 
 const CMS_URL =
   process.env.NEXT_PUBLIC_CMS_URL ||
   process.env.CMS_PUBLIC_URL ||
-  process.env.NEXT_PUBLIC_SERVER_URL ||
   resolveVercelURL(process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
   'http://localhost:3000'
 

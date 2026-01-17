@@ -30,7 +30,7 @@ export const getCachedGlobal = (
     return async () => getGlobal(slug, depth, true, headers)
   }
 
-  return unstable_cache(async () => getGlobal(slug, depth, false, headers), [slug, depth], {
+  return unstable_cache(async () => getGlobal(slug, depth, false, headers), [slug, String(depth)], {
     tags: [`global_${slug}`],
   })
 }

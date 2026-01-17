@@ -2,6 +2,7 @@ import canUseDOM from './canUseDOM'
 
 export const getServerSideURL = () => {
   return (
+    process.env.NEXT_PUBLIC_CMS_URL ||
     process.env.NEXT_PUBLIC_SERVER_URL ||
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
@@ -17,7 +18,6 @@ export const getCMSURL = () => {
   return (
     process.env.NEXT_PUBLIC_CMS_URL ||
     process.env.CMS_PUBLIC_URL ||
-    process.env.NEXT_PUBLIC_SERVER_URL ||
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : 'http://localhost:3000')
@@ -37,5 +37,5 @@ export const getClientSideURL = () => {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   }
 
-  return process.env.NEXT_PUBLIC_SERVER_URL || ''
+  return process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_SERVER_URL || ''
 }

@@ -30,14 +30,13 @@ pnpm install
 
 2. Configure environment
 
-Copy `.env.example` (or create `.env`) and set at least:
+Copy `.env.example` (or create `.env`) in the repo root and set at least:
 
 ```env
 DATABASE_URL=postgresql://payload:payload@localhost:5432/payload
 PAYLOAD_SECRET=YOUR_SECRET_HERE
-NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-NEXT_PUBLIC_SITE_URL=http://localhost:3001
 NEXT_PUBLIC_CMS_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
 NEXT_PUBLIC_DEMO_SITE_URL=https://demo.seminaryhillnaturalarea.org
 CRON_SECRET=YOUR_CRON_SECRET_HERE
 PREVIEW_SECRET=YOUR_SECRET_HERE
@@ -61,6 +60,8 @@ pnpm dev:site
 * The static site runs at `http://localhost:3001`
 * It reads content from `NEXT_PUBLIC_CMS_URL`
 
+Note: workspace scripts load the repo-root `.env` via `dotenv-cli`, so you do not need per-app `.env` files under `apps/cms` or `apps/site`.
+
 ## Common commands
 
 ### App
@@ -75,6 +76,18 @@ pnpm dev:site
 
   ```bash
   pnpm dev:site
+  ```
+
+* Export static site (copies CMS media into the site first)
+
+  ```bash
+  pnpm export:site
+  ```
+
+* Export and serve static site on port 3001
+
+  ```bash
+  pnpm export:site:serve
   ```
 
 * Start deps only (Docker)
@@ -201,7 +214,8 @@ pnpm deps:up
 ### Port conflicts
 
 * If something else is using `5432`, change the host port in `compose.dev.yml`.
-* If something else is using `3000`, set `PORT` and update `NEXT_PUBLIC_SERVER_URL`.
+* If something else is using `3000`, set `PORT` and update `NEXT_PUBLIC_CMS_URL`.
+* If `NEXT_PUBLIC_SITE_URL` is unset, sitemaps will default to `https://example.com`.
 
 ## Guardrails reminder
 

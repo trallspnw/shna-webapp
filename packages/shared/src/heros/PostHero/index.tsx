@@ -1,4 +1,4 @@
-import { formatDateTime } from 'src/utilities/formatDateTime'
+import { formatDateTime } from '@shna/shared/utilities/formatDateTime'
 import React from 'react'
 
 import type { Post } from '@shna/shared/payload-types'

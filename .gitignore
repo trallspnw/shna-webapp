@@ -8,9 +8,13 @@ node_modules
 
 # Payload default media upload directory
 public/media/
-
-public/robots.txt
-public/sitemap*.xml
+apps/cms/public/media/
+apps/site/public/media/
+apps/site/out/
+apps/site/public/robots.txt
+apps/site/public/sitemap*.xml
+apps/cms/public/robots.txt
+apps/cms/public/sitemap*.xml
 
 
 # Playwright

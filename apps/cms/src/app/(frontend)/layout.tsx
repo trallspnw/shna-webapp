@@ -18,7 +18,7 @@ import { getServerSideURL } from '@shna/shared/utilities/getURL'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
-  const requestHeaders = headers()
+  const requestHeaders = await headers()
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>

@@ -4,27 +4,36 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @shna/cms dev",
-    "dev:site": "pnpm --filter @shna/site dev -- --port 3001",
+    "dev": "dotenv -e ./.env -- pnpm --filter @shna/cms dev",
+    "dev:site": "dotenv -e ./.env -- pnpm --filter @shna/site dev -- --port 3001",
     "dev:full": "pnpm deps:up && pnpm dev",
     "dev:full:codegen": "pnpm deps:up && pnpm codegen && pnpm dev",
-
-    "build:cms": "pnpm --filter @shna/cms build",
-    "build:site": "pnpm --filter @shna/site build",
+    "build:cms": "dotenv -e ./.env -- pnpm --filter @shna/cms build",
+    "build:site": "dotenv -e ./.env -- pnpm --filter @shna/site build",
     "build": "pnpm build:cms && pnpm build:site",
-    "export:site": "pnpm --filter @shna/site build",
-
-    "start": "pnpm --filter @shna/cms start",
-    "codegen": "pnpm --filter @shna/cms codegen",
-
+    "sync:media": "node ./scripts/sync-media.mjs",
+    "export:site": "pnpm sync:media && dotenv -e ./.env -- pnpm --filter @shna/site build",
+    "serve:site": "npx serve -l 3001 apps/site/out",
+    "export:site:serve": "pnpm export:site && pnpm serve:site",
+    "start": "dotenv -e ./.env -- pnpm --filter @shna/cms start",
+    "codegen": "dotenv -e ./.env -- pnpm --filter @shna/cms codegen",
     "lint": "pnpm --filter @shna/cms lint",
     "test": "pnpm --filter @shna/cms test",
-
     "deps:up": "docker compose -f compose.dev.yml up -d",
     "deps:down": "docker compose -f compose.dev.yml down",
     "deps:restart": "docker compose -f compose.dev.yml down && docker compose -f compose.dev.yml up -d",
     "deps:reset": "docker compose -f compose.dev.yml down -v",
     "deps:logs": "docker compose -f compose.dev.yml logs -f",
     "deps:ps": "docker compose -f compose.dev.yml ps"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "dotenv-cli": "7.4.4"
   }
 }
