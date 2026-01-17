@@ -28,6 +28,18 @@ If a change conflicts with these docs, update the docs first or stop and ask.
 
 ---
 
+## SHNA Local Development
+
+This repo is a **pnpm workspace** with:
+
+- `apps/cms` (Payload CMS)
+- `apps/site` (static export)
+- `packages/shared` (shared blocks/types/components)
+
+Use `docs/DEVELOPMENT.md` for the canonical setup and commands.
+
+---
+
 ## Key Project Constraints (Non-Negotiable)
 
 - **Static-first public site**

@@ -35,13 +35,13 @@ These constraints are enforced intentionally. If something conflicts, stop and c
 
 **Static Site**
 
-* Built/exported from the Payload website template
+* Built/exported from `apps/site`
 * Deployed to **Cloudflare Pages**
 * Uses **Cloudflare R2** for media assets
 
 **Backend**
 
-* **Payload CMS only**, deployed to **Fly.io**
+* **Payload CMS only** (`apps/cms`), deployed to **Fly.io**
 * Serves:
 
   * Admin UI
@@ -152,8 +152,9 @@ Public site rules:
 
 ### Data Access
 
-* Content is fetched at **build/export time** from Payload
-* Read‑only APIs only
+* Content is fetched at **build/export time** from the **Payload HTTP API**
+* Read‑only APIs only (no server‑only secrets required)
+* Build-time source: `NEXT_PUBLIC_CMS_URL`
 
 ### Media
 
@@ -165,6 +166,11 @@ Public site rules:
 
 * Live preview exists **only inside Payload admin**
 * Public site remains static
+
+### Search
+
+* The search page renders statically; results are fetched client-side from the CMS API.
+* The site still renders without the backend, but search results require CMS availability.
 
 ---
 
@@ -240,3 +246,8 @@ All architectural decisions and reversals are tracked in:
 * `docs/DECISIONS.md`
 
 If implementation conflicts with this document, update the docs **before** changing code.
+### Monorepo Layout
+
+* `apps/cms` — Payload CMS (admin + API + preview)
+* `apps/site` — static export site (Cloudflare Pages)
+* `packages/shared` — shared blocks, types, and frontend components

@@ -4,6 +4,16 @@ This doc describes how to run SHNA locally.
 
 > **Goal:** run **Postgres in Docker** and run **Payload/Next** on your host machine.
 
+## Repo layout
+
+```
+apps/
+  cms/   # Payload CMS app (admin + API + preview)
+  site/  # Static export site app (Cloudflare Pages)
+packages/
+  shared/ # Shared blocks, types, and frontend components
+```
+
 ## Prerequisites
 
 * Node + pnpm (repo uses pnpm)
@@ -15,7 +25,7 @@ This doc describes how to run SHNA locally.
 1. Install deps
 
 ```bash
-pnpm ii
+pnpm install
 ```
 
 2. Configure environment
@@ -26,11 +36,14 @@ Copy `.env.example` (or create `.env`) and set at least:
 DATABASE_URL=postgresql://payload:payload@localhost:5432/payload
 PAYLOAD_SECRET=YOUR_SECRET_HERE
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
+NEXT_PUBLIC_CMS_URL=http://localhost:3000
+NEXT_PUBLIC_DEMO_SITE_URL=https://demo.seminaryhillnaturalarea.org
 CRON_SECRET=YOUR_CRON_SECRET_HERE
 PREVIEW_SECRET=YOUR_SECRET_HERE
 ```
 
-3. Start local Postgres (Docker) + start dev server (host)
+3. Start local Postgres (Docker) + start CMS dev server (host)
 
 ```bash
 pnpm dev:full
@@ -39,14 +52,29 @@ pnpm dev:full
 * Postgres runs in Docker via `compose.dev.yml`
 * The app runs on your host at `http://localhost:3000`
 
+4. (Optional) Start the static site dev server
+
+```bash
+pnpm dev:site
+```
+
+* The static site runs at `http://localhost:3001`
+* It reads content from `NEXT_PUBLIC_CMS_URL`
+
 ## Common commands
 
 ### App
 
-* Start dev server (host)
+* Start CMS dev server (host)
 
   ```bash
   pnpm dev
+  ```
+
+* Start site dev server (host)
+
+  ```bash
+  pnpm dev:site
   ```
 
 * Start deps only (Docker)
@@ -82,12 +110,25 @@ This runs:
 
 > You do **not** need to run codegen on every startup. Run it when schema/config or admin component paths change.
 
+Generated types are written to `packages/shared/src/payload-types.ts`.
+
 ## Contribution checklist
 
 - Read `AGENTS.md` and `docs/ARCHITECTURE.md` before making changes.
 - Update docs when behavior or workflows change (see `AGENTS.md` doc hierarchy).
 - Run `pnpm codegen` after schema/config or admin component path changes.
 - Run relevant tests when you touch core logic or UI (`pnpm test` for full suite).
+
+## Static export (site)
+
+Build a static export (outputs `apps/site/out`):
+
+```bash
+pnpm export:site
+```
+
+This build reads content from the CMS HTTP API (`NEXT_PUBLIC_CMS_URL`) at build time.
+Make sure the CMS is reachable when you run the export.
 
 ## Database
 

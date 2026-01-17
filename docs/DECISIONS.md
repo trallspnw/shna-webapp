@@ -143,3 +143,26 @@ SHNA will operate **one Payload backend instance** that supports both production
 - Demo resolution must be deterministic and early in the request lifecycle.
 - Schema switching must never rely on mutable global state.
 - Demo-specific behaviors (email subject tagging, sync restrictions, etc.) should derive from the resolved mode, not ad-hoc flags.
+
+---
+
+## Decision G — Workspace split: cms + site + shared with build-time HTTP export
+
+**Status:** Accepted  
+**Date:** 2026-01-16
+
+### Context
+We need a static export that can run independently on Cloudflare Pages while keeping the Payload Website Template feature set in the CMS app. The existing single-app layout made it too easy to accidentally couple public rendering to a Node server.
+
+### Decision
+Adopt a pnpm workspace with:
+- `apps/cms` for Payload CMS (admin + API + preview)
+- `apps/site` for static export (Cloudflare Pages)
+- `packages/shared` for shared blocks, types, and frontend components
+
+Static export reads content at build time from the Payload HTTP API (read-only), using `NEXT_PUBLIC_CMS_URL`.
+
+### Consequences
+- Public pages are fully static and can render without a backend runtime.
+- The CMS app retains preview/live preview capabilities.
+- Shared blocks/types reduce drift between the CMS schema and site rendering.
