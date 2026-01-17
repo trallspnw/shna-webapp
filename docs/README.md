@@ -11,6 +11,7 @@ operations.
 - `docs/RUNBOOK.md` — operational procedures and incident playbooks
 - `docs/DECISIONS.md` — decision log explaining why key choices were made
 - `docs/ROADMAP.md` — phased roadmap and scope boundaries
+- `docs/LESSONS_LEARNED.md` — short notes captured during implementation
 
 ## Reading order
 
@@ -22,3 +23,4 @@ If you are new to the project:
 4. `docs/RUNBOOK.md`
 5. `docs/DECISIONS.md`
 6. `docs/ROADMAP.md`
+7. `docs/LESSONS_LEARNED.md`

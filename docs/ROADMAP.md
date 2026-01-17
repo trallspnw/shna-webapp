@@ -9,11 +9,12 @@ It is not a task list or delivery schedule.
 These are the next steps to validate the overall direction before deeper
 feature work:
 
-- Prioritize deployment plumbing over perfect local dev
-- Cloudflare Pages: static export of the site app that serves a simple "Coming Soon" page with no backend dependency at runtime
-- Fly: deploy the CMS app (Payload admin + API) against Supabase Postgres
-- Add demo subdomain routing + demo schema switching (separate schema; default to prod schema when no demo host)
-- After deployment baseline is green, return to remaining site errors and feature parity
+- ✅ Static export pipeline works locally and serves media without CMS running
+- ✅ Local export/serve workflow documented
+- ⏳ Cloudflare Pages: static export of the site app that serves a simple "Coming Soon" page with no backend dependency at runtime
+- ⏳ Fly: deploy the CMS app (Payload admin + API) against Supabase Postgres
+- ⏳ Add demo subdomain routing + demo schema switching (separate schema; default to prod schema when no demo host)
+- ⏳ After deployment baseline is green, return to remaining site errors and feature parity
 
 ## Guiding Principles
 
