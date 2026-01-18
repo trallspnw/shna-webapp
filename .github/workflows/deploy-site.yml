@@ -1,16 +1,10 @@
 name: Deploy Site (Cloudflare Pages)
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Deploy CMS (Fly)"]
     branches: [main]
-    paths:
-      - "apps/site/**"
-      - "packages/shared/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "scripts/sync-media.mjs"
-      - ".github/workflows/deploy-site.yml"
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -19,6 +13,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:

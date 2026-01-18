@@ -3,15 +3,6 @@ name: Deploy CMS (Fly)
 on:
   push:
     branches: [main]
-    paths:
-      - "apps/cms/**"
-      - "packages/shared/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "apps/cms/fly.toml"
-      - "apps/cms/Dockerfile"
-      - ".github/workflows/deploy-cms.yml"
   workflow_dispatch:
 
 concurrency:
