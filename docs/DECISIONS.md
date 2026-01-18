@@ -12,37 +12,37 @@ Format:
 
 ---
 
-## Decision B — Demo mode uses duplicate content + manual content-only sync
+## Test Mode (Current Policy)
 
-**Status:** Accepted  
+Test mode is for internal ops testing, not marketing demos.
+
+- **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
+- **Activation:** Append `?mode=test` to a URL.
+- **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
+- **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
+- **Admin UX:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.
+
+---
+
+## Decision B — Superseded demo approach (duplicate content + manual sync)
+
+**Status:** Superseded (by Decision H)  
 **Date:** 2026-01-16
 
 ### Context
-We want a demo environment for training/testing that:
-- allows editing demo content freely without touching production content
-- avoids copying operational data (contacts, memberships, payments)
-- can be refreshed on demand from production “content” when desired
+We previously explored a demo environment for training/testing.
 
 ### Decision
-Demo mode will use:
-- a **separate Postgres schema** (demo schema) + demo subdomain routing
-- **duplicate content data** in demo (not shared live content)
-- a **manual trigger** to sync *content-only* from prod → demo
-- **no ops data** is ever synced (contacts, memberships, payments, etc.)
+Superseded by **Decision H** (Test Mode). Demo mode is no longer part of the architecture.
 
 ### Consequences
-- Demo can safely be “messed with” for training/testing.
-- Demo requires an explicit sync path for content collections/globals.
-- We must clearly define which collections/globals count as “content” vs “ops”.
-
-### Notes
-Implementation should use a clear allowlist for “content” (and a denylist for “ops”) and should never rely on “sync everything except…” patterns.
+Demo-specific schemas, routing, and content sync are not implemented or maintained.
 
 ---
 
 ## Decision C — Bilingual routing uses URL prefixes
 
-**Status:** Accepted  
+**Status:** Superseded (by Decision H)  
 **Date:** 2026-01-16
 
 ### Context
@@ -71,7 +71,7 @@ We need transactional emails (stable templates) and broadcast emails (many insta
 ### Decision
 - Transactional templates/constants: **Globals**
 - Broadcast email instances: **Collection**
-- Demo emails must include **`[DEMO]`** in the subject.
+- Test emails must include **`[TEST]`** in the subject.
 
 ### Consequences
 - Globals act as canonical templates/config.
@@ -100,49 +100,19 @@ We want easy local setup with minimal moving parts and no need to install/manage
 
 ---
 
-## Decision F — Single backend instance with demo resolution via routing + schema mapping
+## Decision F — Superseded demo routing + schema mapping plan
 
-**Status:** Accepted  
+**Status:** Superseded (by Decision H)  
 **Date:** 2026-01-16
 
 ### Context
-We want to minimize operational complexity and cost while still supporting:
-- production usage
-- demo/training usage
-- static-first public delivery
-
-Running multiple Payload instances (prod + staging + demo) increases:
-- operational overhead
-- risk of config drift
-- mental load for a small, volunteer-run org
-
-At the same time, demo mode must be **safe**, **isolated**, and **explicit**.
+We previously explored a demo/training mode while keeping a single backend instance.
 
 ### Decision
-SHNA will operate **one Payload backend instance** that supports both production and demo modes via:
-
-- **Request-based resolution** (e.g. subdomain or hostname):
-  - `www.seminaryhillnaturalarea.org` → production
-  - `demo.seminaryhillnaturalarea.org` → demo
-
-- **Database-level isolation**:
-  - Production and demo use **separate Postgres schemas**
-  - Schema selection is resolved per-request (not per-process)
-
-- **Shared codebase and config**:
-  - Same Payload config, collections, globals, plugins
-  - No separate “demo server” or “staging server”
+Superseded by **Decision H** (Test Mode). No demo routing or schema switching is used.
 
 ### Consequences
-- Fewer moving parts to deploy, monitor, and secure.
-- Demo behavior must be *explicitly handled* in code (routing, email flags, sync rules).
-- All “environment-sensitive” logic must be request-aware (never global process state).
-- Demo bugs can impact prod if guardrails are violated—so safeguards must be strong.
-
-### Notes
-- Demo resolution must be deterministic and early in the request lifecycle.
-- Schema switching must never rely on mutable global state.
-- Demo-specific behaviors (email subject tagging, sync restrictions, etc.) should derive from the resolved mode, not ad-hoc flags.
+Demo-specific routing and schema selection are intentionally avoided.
 
 ---
 
@@ -166,3 +136,27 @@ Static export reads content at build time from the Payload HTTP API (read-only),
 - Public pages are fully static and can render without a backend runtime.
 - The CMS app retains preview/live preview capabilities.
 - Shared blocks/types reduce drift between the CMS schema and site rendering.
+
+---
+
+## Decision H — Test Mode uses request-scoped flagging (no parallel demo environment)
+
+**Status:** Accepted  
+**Date:** 2026-02-01
+
+### Context
+We need a safe way to test operational flows (payments, memberships, emails)
+without standing up a parallel environment or switching database schemas.
+
+### Decision
+Test mode will be:
+- Activated by the canonical query param `?mode=test`
+- Persisted for the browsing session across internal links
+- Stored in the same database using `isTest: true` on operational collections
+- Routed to Stripe **test keys** (and test webhook secrets when applicable)
+- Surfaced in admin with a **Show test data** filter and **Delete all test records** action
+
+### Consequences
+- No separate demo subdomain, schema, or static build is required.
+- All operational code paths must honor `isTest` and avoid mixing test with live data.
+- Cleanup is manual and intentional; the database stays small by purging test records.

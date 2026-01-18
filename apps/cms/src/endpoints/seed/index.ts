@@ -70,14 +70,14 @@ export const seed = async ({
       .map((collection) => payload.db.deleteVersions({ collection, req, where: {} })),
   )
 
-  payload.logger.info(`— Seeding demo author and user...`)
+  payload.logger.info(`— Seeding seed author and user...`)
 
   await payload.delete({
     collection: 'users',
     depth: 0,
     where: {
       email: {
-        equals: 'demo-author@example.com',
+        equals: 'seed-author@example.com',
       },
     },
   })
@@ -99,12 +99,12 @@ export const seed = async ({
     ),
   ])
 
-  const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = (await Promise.all([
+  const [seedAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = (await Promise.all([
     payload.create({
       collection: 'users',
       data: {
-        name: 'Demo Author',
-        email: 'demo-author@example.com',
+        name: 'Seed Author',
+        email: 'seed-author@example.com',
         password: 'password',
       },
     }),
@@ -149,7 +149,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: seedAuthor }),
   })
 
   const post2Doc = await payload.create({
@@ -158,7 +158,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: seedAuthor }),
   })
 
   const post3Doc = await payload.create({
@@ -167,7 +167,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: seedAuthor }),
   })
 
   // update each post with related posts

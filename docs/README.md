@@ -6,7 +6,7 @@ operations.
 
 ## Canonical docs
 
-- `docs/ARCHITECTURE.md` — system design, environments, demo mode, localization, email strategy
+- `docs/ARCHITECTURE.md` — system design, environments, test mode, localization, email strategy
 - `docs/DEVELOPMENT.md` — local development setup and workflows
 - `docs/RUNBOOK.md` — operational procedures and incident playbooks
 - `docs/DECISIONS.md` — decision log explaining why key choices were made
@@ -24,3 +24,13 @@ If you are new to the project:
 5. `docs/DECISIONS.md`
 6. `docs/ROADMAP.md`
 7. `docs/LESSONS_LEARNED.md`
+
+## Test Mode
+
+Test mode is for internal ops testing, not marketing demos.
+
+- **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
+- **Activation:** Append `?mode=test` to a URL.
+- **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
+- **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
+- **Admin UX:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.

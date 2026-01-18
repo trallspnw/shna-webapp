@@ -37,7 +37,6 @@ DATABASE_URL=postgresql://payload:payload@localhost:5432/payload
 PAYLOAD_SECRET=YOUR_SECRET_HERE
 NEXT_PUBLIC_CMS_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_URL=http://localhost:3001
-NEXT_PUBLIC_DEMO_SITE_URL=https://demo.seminaryhillnaturalarea.org
 CRON_SECRET=YOUR_CRON_SECRET_HERE
 PREVIEW_SECRET=YOUR_SECRET_HERE
 CMS_INTERNAL_URL=http://localhost:3000
@@ -70,6 +69,14 @@ pnpm dev:site
 * It reads content from `NEXT_PUBLIC_CMS_URL`
 
 Note: workspace scripts load the repo-root `.env` via `dotenv-cli`, so you do not need per-app `.env` files under `apps/cms` or `apps/site`.
+
+## Test Mode (Ops Testing)
+
+* **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
+* **Activation:** Append `?mode=test` to URLs.
+* **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
+* **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
+* **Admin:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.
 
 ## Common commands
 

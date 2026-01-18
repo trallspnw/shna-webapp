@@ -53,10 +53,9 @@ Use `docs/DEVELOPMENT.md` for the canonical setup and commands.
 
   One Payload instance (CMS + API). No separate staging instance.
 
-- **Demo mode via schema + subdomain**
+- **Test mode via request flag**
 
-  Demo uses a separate database schema and is routed by the demo subdomain.
-  Demo content is duplicated and refreshed via a **manual content-only sync** (never sync ops data like contacts, memberships, payments).
+  Test mode runs in the same deployment and database. Operational records are flagged with `isTest: true`.
 
 - **Bilingual routing**
 
@@ -66,11 +65,24 @@ Use `docs/DEVELOPMENT.md` for the canonical setup and commands.
 
   - Transactional email templates are **Globals**
   - Email “instances” (e.g. broadcasts) use a **Collection**
-  - Demo emails are sent with a `[DEMO]` subject prefix
+  - Test emails are sent with a `[TEST]` subject prefix
 
 - **Low operational overhead**
 
   This project must coexist with full-time work and family commitments.
+
+---
+
+## Test Mode
+
+Test mode is for internal ops testing, not marketing demos.
+
+- **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
+- **No parallel environment:** No separate static build or subdomain for test mode.
+- **Activation:** Append `?mode=test` to a URL.
+- **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
+- **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
+- **Admin UX:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.
 
 ---
 
@@ -318,10 +330,10 @@ That's it! The Docker instance will help you get up and running quickly while al
 
 To seed the database with a few pages, posts, and projects you can click the 'seed database' link from the admin panel.
 
-The seed script will also create a demo user for demonstration purposes only:
+The seed script will also create a seed user for testing purposes only:
 
-- Demo Author
-  - Email: `demo-author@payloadcms.com`
+- Seed Author
+  - Email: `seed-author@example.com`
   - Password: `password`
 
 > NOTICE: seeding the database is destructive because it drops your current database to populate a fresh one from the seed template. Only run this command if you are starting a new project or can afford to lose your current data.

@@ -10,11 +10,11 @@ This repo is based on the Payload Website Template, but SHNA has non-negotiable 
 2. **Single backend instance**
    - One Payload instance powers CMS + API. No staging instance.
 
-3. **Demo mode**
-   - Demo uses a **separate DB schema** + **demo subdomain routing**.
-   - Demo data is refreshed via **manual content-only sync**.
-   - Never sync ops data (contacts, memberships, payments).
-   - If demo subdomain is not present, default to production schema.
+3. **Test mode**
+   - Triggered by `?mode=test` and persists across internal links for the browsing session.
+   - Uses the **same deployment and database**; operational records are flagged `isTest: true`.
+   - Stripe uses **test keys** when test mode is active.
+   - If `mode=test` is not present, default to live behavior.
 
 4. **Bilingual routing**
    - Routes are prefix-based: `/en/*` and `/es/*`.
@@ -23,7 +23,7 @@ This repo is based on the Payload Website Template, but SHNA has non-negotiable 
 5. **Emails**
    - Transactional templates are **Globals**.
    - Broadcasts/instances are a **Collection**.
-   - Demo emails must include `[DEMO]` in the subject.
+   - Test emails must include `[TEST]` in the subject.
 
 Database: Postgres only (@payloadcms/db-postgres). DATABASE_URL must be set. Do not reintroduce Mongo examples.
 

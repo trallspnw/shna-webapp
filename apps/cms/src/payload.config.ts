@@ -21,7 +21,6 @@ const dirname = path.dirname(filename)
 const corsOrigins = [
   getServerSideURL(),
   process.env.NEXT_PUBLIC_SITE_URL,
-  process.env.NEXT_PUBLIC_DEMO_SITE_URL,
 ].filter((origin): origin is string => Boolean(origin))
 
 export default buildConfig({
