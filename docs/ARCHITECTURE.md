@@ -173,6 +173,13 @@ Public site rules:
 * The search page renders statically; results are fetched client-side from the CMS API.
 * The site still renders without the backend, but search results require CMS availability.
 
+### Indexing Control
+
+* Public site indexing is controlled by the `site-settings` global (`allowIndexing`) at build time.
+* When indexing is disabled, the site outputs `noindex` meta tags, a `Disallow: /` robots.txt, and a static `_headers` rule that sets `X-Robots-Tag`.
+* Changing this global requires a new static build; a CMS webhook can be added later to trigger the build if automation is desired.
+* The CMS always emits `X-Robots-Tag: noindex` headers and a `Disallow: /` robots.txt.
+
 ---
 
 ## 8) Localization Strategy

@@ -11,6 +11,7 @@ import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
 import { Footer } from '@shna/shared/Footer/config'
 import { Header } from '@shna/shared/Header/config'
+import { SiteSettings } from '@shna/shared/SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
@@ -69,7 +70,7 @@ export default buildConfig({
   }),
   collections: [Pages, Posts, Media, Categories, Users],
   cors: corsOrigins,
-  globals: [Header, Footer],
+  globals: [Header, Footer, SiteSettings],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,
