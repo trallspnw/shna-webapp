@@ -95,6 +95,7 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 
 * Workflow: `.github/workflows/deploy-cms.yml`
 * Config: `apps/cms/fly.toml` (single instance in `iad`, 512 MB RAM)
+* Post-deploy step forces a single machine (`flyctl scale count 1`) to avoid Fly defaulting to 2 machines after fresh deploys
 * Required GitHub secret: `FLY_API_TOKEN`
 * Required Fly secrets: `DATABASE_URL`, `PAYLOAD_SECRET`, `CRON_SECRET`, `PREVIEW_SECRET`
 * Public URLs live in `apps/cms/fly.toml` under `[env]` and `[build.args]` (update if domains change)
@@ -110,9 +111,24 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 
 * Workflow: `.github/workflows/deploy-site.yml`
 * Required GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
-* Required GitHub variables: `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`
+* Required GitHub variables (Actions → Variables): `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`
 * Build uses `NEXT_PUBLIC_CMS_URL` to fetch content during static export
 * There is no separate test/demo Pages project; test mode uses `?mode=test` on the same site
+
+#### Trigger Site Rebuild From CMS (Planned)
+
+Goal: allow admins to trigger a Cloudflare Pages rebuild from the Payload admin UI,
+without redeploying CMS.
+
+Approach:
+
+* Keep `workflow_dispatch` enabled in `.github/workflows/deploy-site.yml`
+* Add an **admin-only** action/button in the CMS admin UI
+* The UI calls a **server-side** CMS endpoint that triggers the GitHub Actions
+  `workflow_dispatch` API for the site deploy workflow
+* Store a GitHub token with `actions:write` scope as a Fly secret (e.g.
+  `GITHUB_ACTIONS_TOKEN`) and never expose it client-side
+* Enforce admin access at the endpoint (RBAC), and log the trigger action for auditability
 
 ### Restart Backend
 
