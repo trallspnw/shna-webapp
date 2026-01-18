@@ -99,6 +99,33 @@ When in doubt: **pause, document, and escalate**.
 
 ## Common Operations
 
+### Deployments (GitHub Actions)
+
+Deployments run from GitHub Actions on `main` and can be triggered manually.
+
+#### CMS (Fly.io)
+
+* Workflow: `.github/workflows/deploy-cms.yml`
+* Config: `apps/cms/fly.toml` (single instance in `iad`, 512 MB RAM)
+* Required GitHub secret: `FLY_API_TOKEN`
+* Required Fly secrets: `DATABASE_URL`, `PAYLOAD_SECRET`, `CRON_SECRET`, `PREVIEW_SECRET`
+* Public URLs live in `apps/cms/fly.toml` under `[env]` and `[build.args]` (update if domains change)
+* **DB connection choice:** use Supabase **Session pooler** for Fly (persistent Node server). Transaction pooler is only for serverless/edge, and would require disabling prepared statements if used later.
+* Supabase path: Dashboard → **Connect** → copy the **Session** pooler connection string.
+* `DATABASE_URL` format (Session pooler):
+
+  ```env
+  DATABASE_URL=postgresql://postgres.<project-ref>:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:5432/postgres
+  ```
+
+#### Site (Cloudflare Pages)
+
+* Workflow: `.github/workflows/deploy-site.yml`
+* Required GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+* Required GitHub variables: `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_DEMO_SITE_URL`
+* Build uses `NEXT_PUBLIC_CMS_URL` to fetch content during static export
+* For a demo Pages project, add a second job that swaps the demo URLs and project name
+
 ### Restart Backend
 
 * Restart via Fly.io dashboard

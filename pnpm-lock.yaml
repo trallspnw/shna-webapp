@@ -138,6 +138,9 @@ importers:
       '@types/react-dom':
         specifier: 19.2.1
         version: 19.2.1(@types/react@19.2.1)
+      '@next/eslint-plugin-next':
+        specifier: 15.4.7
+        version: 15.4.7
       '@vitejs/plugin-react':
         specifier: 4.5.2
         version: 4.5.2(vite@7.3.1(@types/node@22.5.4)(jiti@1.21.7)(sass@1.77.4)(tsx@4.20.6))
@@ -153,6 +156,9 @@ importers:
       eslint-config-next:
         specifier: 15.4.7
         version: 15.4.7(eslint@9.39.2(jiti@1.21.7))(typescript@5.7.3)
+      eslint-plugin-react-hooks:
+        specifier: 5.2.0
+        version: 5.2.0(eslint@9.39.2(jiti@1.21.7))
       jsdom:
         specifier: 26.1.0
         version: 26.1.0
@@ -268,6 +274,9 @@ importers:
       next:
         specifier: 15.4.10
         version: 15.4.10(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
+      payload:
+        specifier: 3.71.1
+        version: 3.71.1(graphql@16.12.0)(typescript@5.7.3)
       prism-react-renderer:
         specifier: ^2.3.1
         version: 2.4.1(react@19.2.1)

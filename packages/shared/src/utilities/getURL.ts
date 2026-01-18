@@ -15,6 +15,10 @@ export const getSiteURL = () => {
 }
 
 export const getCMSURL = () => {
+  if (!canUseDOM && process.env.CMS_INTERNAL_URL) {
+    return process.env.CMS_INTERNAL_URL
+  }
+
   return (
     process.env.NEXT_PUBLIC_CMS_URL ||
     process.env.CMS_PUBLIC_URL ||

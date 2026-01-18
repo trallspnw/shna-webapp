@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { RelatedPosts } from '@shna/shared/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@shna/shared/components/PayloadRedirects'
 import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { getPayload, type PaginatedDocs } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import RichText from '@shna/shared/components/RichText'
@@ -16,6 +16,10 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
+  if (!process.env.PAYLOAD_SECRET || !process.env.DATABASE_URL) {
+    return []
+  }
+
   const payload = await getPayload({ config: configPromise })
   const posts = await payload.find({
     collection: 'posts',
@@ -86,12 +90,12 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   return generateMeta({ doc: post })
 }
 
-const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
+const queryPostBySlug = cache(async ({ slug }: { slug: string }): Promise<Post | null> => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
 
-  const result = await payload.find({
+  const result = (await payload.find({
     collection: 'posts',
     draft,
     limit: 1,
@@ -102,7 +106,7 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
         equals: slug,
       },
     },
-  })
+  })) as unknown as PaginatedDocs<Post>
 
   return result.docs?.[0] || null
 })

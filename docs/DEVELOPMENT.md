@@ -40,6 +40,15 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3001
 NEXT_PUBLIC_DEMO_SITE_URL=https://demo.seminaryhillnaturalarea.org
 CRON_SECRET=YOUR_CRON_SECRET_HERE
 PREVIEW_SECRET=YOUR_SECRET_HERE
+CMS_INTERNAL_URL=http://localhost:3000
+```
+
+`CMS_INTERNAL_URL` is optional; use it on server hosts (e.g., Fly) to point server-side CMS fetches to an internal address.
+
+For Fly + Supabase, use the Supabase **Session pooler** connection string format:
+
+```env
+DATABASE_URL=postgresql://postgres.<project-ref>:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:5432/postgres
 ```
 
 3. Start local Postgres (Docker) + start CMS dev server (host)

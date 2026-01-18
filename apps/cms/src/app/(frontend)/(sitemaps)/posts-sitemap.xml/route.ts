@@ -35,10 +35,15 @@ const getPostsSitemap = unstable_cache(
     const sitemap = results.docs
       ? results.docs
           .filter((post) => Boolean(post?.slug))
-          .map((post) => ({
-            loc: `${SITE_URL}/posts/${post?.slug}`,
-            lastmod: post.updatedAt || dateFallback,
-          }))
+          .map((post) => {
+            const updatedAt = post?.updatedAt
+            const lastmod = updatedAt ? new Date(updatedAt).toISOString() : dateFallback
+
+            return {
+              loc: `${SITE_URL}/posts/${post?.slug}`,
+              lastmod,
+            }
+          })
       : []
 
     return sitemap
