@@ -89,11 +89,11 @@ When in doubt: **pause, document, and escalate**.
 
 ### Deployments (GitHub Actions)
 
-Deployments run from GitHub Actions on `main` and can be triggered manually.
+Deployments run from GitHub Actions on `main` and can be triggered manually as noted below.
 
 #### CMS (Fly.io)
 
-* Workflow: `.github/workflows/deploy-all.yml` (job: `cms`)
+* Workflow: `.github/workflows/deploy-all.yml` (job: `cms`, runs on every `main` commit)
 * Config: `apps/cms/fly.toml` (single instance in `iad`, 512 MB RAM)
 * Post-deploy step forces a single machine (`flyctl scale count 1`) to avoid Fly defaulting to 2 machines after fresh deploys
 * Required GitHub secret: `FLY_API_TOKEN`
@@ -114,6 +114,8 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 * Required GitHub variables (Actions → Variables): `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`
 * Build uses `NEXT_PUBLIC_CMS_URL` to fetch content during static export
 * There is no separate test/demo Pages project; test mode uses `?mode=test` on the same site
+* Custom domain: `seminaryhillnaturalarea.org` is attached in Cloudflare Pages
+* CMS domain: `cms.seminaryhillnaturalarea.org` points to Fly.io
 
 #### Trigger Site Rebuild From CMS (Planned)
 
