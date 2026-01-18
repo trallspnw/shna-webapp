@@ -13,8 +13,12 @@ feature work:
 - ✅ Local export/serve workflow documented
 - ⏳ Cloudflare Pages: static export of the site app that serves a simple "Coming Soon" page with no backend dependency at runtime
 - ⏳ Fly: deploy the CMS app (Payload admin + API) against Supabase Postgres
+- ⏳ R2 media storage for CMS uploads (avoid container-local media loss on deploy; restore media cache-busting)
 - ⏳ Add demo subdomain routing + demo schema switching (separate schema; default to prod schema when no demo host)
 - ⏳ After deployment baseline is green, return to remaining site errors and feature parity
+- ⏳ TODO: add Fly automation to scale CMS down to a single instance (cost-first, allow brief downtime)
+- ⏳ TODO: add a workflow step to reduce Fly CMS instances to 1 after deploy
+- ⏳ TODO: add tests to verify CMS build and site static export
 
 ## Guiding Principles
 

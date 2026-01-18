@@ -19,6 +19,11 @@ import { getServerSideURL } from '@shna/shared/utilities/getURL'
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
   const requestHeaders = await headers()
+  const hasCMSURL = Boolean(
+    process.env.NEXT_PUBLIC_CMS_URL ||
+      process.env.CMS_PUBLIC_URL ||
+      process.env.VERCEL_PROJECT_PRODUCTION_URL,
+  )
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
@@ -35,9 +40,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }}
           />
 
-          <Header draft={isEnabled} headers={requestHeaders} />
+          {hasCMSURL && <Header draft={isEnabled} headers={requestHeaders} />}
           {children}
-          <Footer draft={isEnabled} headers={requestHeaders} />
+          {hasCMSURL && <Footer draft={isEnabled} headers={requestHeaders} />}
         </Providers>
       </body>
     </html>

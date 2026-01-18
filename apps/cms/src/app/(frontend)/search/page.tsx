@@ -15,49 +15,53 @@ type Args = {
 }
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
   const { q: query } = await searchParamsPromise
-  const payload = await getPayload({ config: configPromise })
-
-  const posts = await payload.find({
-    collection: 'search',
-    depth: 1,
-    limit: 12,
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      meta: true,
-    },
-    // pagination: false reduces overhead if you don't need totalDocs
-    pagination: false,
-    ...(query
-      ? {
-          where: {
-            or: [
-              {
-                title: {
-                  like: query,
-                },
-              },
-              {
-                'meta.description': {
-                  like: query,
-                },
-              },
-              {
-                'meta.title': {
-                  like: query,
-                },
-              },
-              {
-                slug: {
-                  like: query,
-                },
-              },
-            ],
+  const hasPayloadEnv = Boolean(process.env.PAYLOAD_SECRET && process.env.DATABASE_URL)
+  const posts = hasPayloadEnv
+    ? await (async () => {
+        const payload = await getPayload({ config: configPromise })
+        return payload.find({
+          collection: 'search',
+          depth: 1,
+          limit: 12,
+          select: {
+            title: true,
+            slug: true,
+            categories: true,
+            meta: true,
           },
-        }
-      : {}),
-  })
+          // pagination: false reduces overhead if you don't need totalDocs
+          pagination: false,
+          ...(query
+            ? {
+                where: {
+                  or: [
+                    {
+                      title: {
+                        like: query,
+                      },
+                    },
+                    {
+                      'meta.description': {
+                        like: query,
+                      },
+                    },
+                    {
+                      'meta.title': {
+                        like: query,
+                      },
+                    },
+                    {
+                      slug: {
+                        like: query,
+                      },
+                    },
+                  ],
+                },
+              }
+            : {}),
+        })
+      })()
+    : { totalDocs: 0, docs: [] }
 
   return (
     <div className="pt-24 pb-24">

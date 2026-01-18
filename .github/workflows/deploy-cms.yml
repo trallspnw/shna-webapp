@@ -1,0 +1,35 @@
+name: Deploy CMS (Fly)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/cms/**"
+      - "packages/shared/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "apps/cms/fly.toml"
+      - "apps/cms/Dockerfile"
+      - ".github/workflows/deploy-cms.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: fly-cms-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@v1
+
+      - name: Deploy CMS
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --config apps/cms/fly.toml --remote-only

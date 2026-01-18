@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { PayloadRedirects } from '@shna/shared/components/PayloadRedirects'
 import configPromise from '@payload-config'
-import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
+import { getPayload, type PaginatedDocs, type RequiredDataFromCollectionSlug } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import { homeStatic } from '@/endpoints/seed/home-static'
@@ -10,10 +10,15 @@ import { homeStatic } from '@/endpoints/seed/home-static'
 import { RenderBlocks } from '@shna/shared/blocks/RenderBlocks'
 import { RenderHero } from '@shna/shared/heros/RenderHero'
 import { generateMeta } from '@shna/shared/utilities/generateMeta'
+import type { Page } from '@shna/shared/payload-types'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
+  if (!process.env.PAYLOAD_SECRET || !process.env.DATABASE_URL) {
+    return []
+  }
+
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({
     collection: 'pages',
@@ -88,15 +93,16 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     slug: decodedSlug,
   })
 
-  return generateMeta({ doc: page })
+  return generateMeta({ doc: page as unknown as Page })
 }
 
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
+const queryPageBySlug = cache(
+  async ({ slug }: { slug: string }): Promise<RequiredDataFromCollectionSlug<'pages'> | null> => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
 
-  const result = await payload.find({
+  const result = (await payload.find({
     collection: 'pages',
     draft,
     limit: 1,
@@ -107,7 +113,8 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
         equals: slug,
       },
     },
-  })
+  })) as unknown as PaginatedDocs<RequiredDataFromCollectionSlug<'pages'>>
 
-  return result.docs?.[0] || null
-})
+  return result.docs?.[0] ?? null
+  },
+)

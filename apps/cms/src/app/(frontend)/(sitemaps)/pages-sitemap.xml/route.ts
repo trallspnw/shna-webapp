@@ -47,9 +47,12 @@ const getPagesSitemap = unstable_cache(
       ? results.docs
           .filter((page) => Boolean(page?.slug))
           .map((page) => {
+            const updatedAt = page?.updatedAt
+            const lastmod = updatedAt ? new Date(updatedAt).toISOString() : dateFallback
+
             return {
               loc: page?.slug === 'home' ? `${SITE_URL}/` : `${SITE_URL}/${page?.slug}`,
-              lastmod: page.updatedAt || dateFallback,
+              lastmod,
             }
           })
       : []

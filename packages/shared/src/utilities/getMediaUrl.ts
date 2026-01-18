@@ -29,14 +29,17 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
   }
 
   if (normalizedUrl.startsWith('/')) {
-    return cacheTag ? `${normalizedUrl}?${cacheTag}` : normalizedUrl
+    // Avoid query params on relative paths; Next image does not encode "?" in the url param.
+    return normalizedUrl
   }
 
   if (isAbsolute && !hasApiMediaPath) {
-    return cacheTag ? `${normalizedUrl}?${cacheTag}` : normalizedUrl
+    if (!cacheTag) return normalizedUrl
+    return `${normalizedUrl}${normalizedUrl.includes('?') ? '&' : '?'}v=${cacheTag}`
   }
 
   // Otherwise prepend client-side URL
   const baseUrl = getClientSideURL()
-  return cacheTag ? `${baseUrl}${normalizedUrl}?${cacheTag}` : `${baseUrl}${normalizedUrl}`
+  if (!cacheTag) return `${baseUrl}${normalizedUrl}`
+  return `${baseUrl}${normalizedUrl}${normalizedUrl.includes('?') ? '&' : '?'}v=${cacheTag}`
 }

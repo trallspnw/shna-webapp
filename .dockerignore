@@ -1,0 +1,13 @@
+.git
+.github
+.next
+.cursor
+.vscode
+node_modules
+apps/**/.next
+apps/**/node_modules
+packages/**/node_modules
+*.log
+.env
+.env.*
+test.env

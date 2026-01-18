@@ -98,6 +98,12 @@ We intentionally support **three modes**, not environments:
 | `prod` (or `public`) | Production data |
 | `demo`               | Demo data       |
 
+### DB Connection Choice
+
+* **Fly CMS uses Supavisor Session pooler** (persistent Node server).
+* **Transaction pooler** is only for serverless/edge use and requires disabling prepared statements if adopted later.
+* Use the Supabase Dashboard → Connect → **Session** connection string for `DATABASE_URL`.
+
 ### Content vs Ops Data
 
 **Content (syncable to demo)**
