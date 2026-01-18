@@ -17,13 +17,13 @@
   * Public site must statically build and deploy.
 * **One Payload instance only** (no staging environment).
 * **Postgres only** (`@payloadcms/db-postgres`).
-* **Demo mode**:
+* **Test mode**:
 
-  * Separate **Postgres schema**
-  * Routed via **demo subdomain**
-  * **Manual, content‑only sync** from prod
-  * Never sync ops data (contacts, memberships, payments, email logs)
-* **Demo emails** must include `[DEMO]` in the subject.
+  * Operational records live in the **same deployment + database**, flagged with `isTest: true`
+  * Activated via `?mode=test` and persists for the browsing session across internal links
+  * Stripe uses **test keys** when active; records from test flows store `isTest: true`
+  * Admin UX includes a **Show test data** filter + **Delete all test records** action
+* **Test emails** must include `[TEST]` in the subject.
 
 These constraints are enforced intentionally. If something conflicts, stop and consult the docs.
 
@@ -54,16 +54,14 @@ These constraints are enforced intentionally. If something conflicts, stop and c
 | ----------- | -------------------------------------- | ------------------- |
 | Public site | `seminaryhillnaturalarea.org`          | Cloudflare Pages    |
 | CMS / API   | `cms.seminaryhillnaturalarea.org`      | Fly.io (Payload)    |
-| Demo site   | `demo.seminaryhillnaturalarea.org`     | Cloudflare Pages    |
-| Demo CMS    | `cms-demo.seminaryhillnaturalarea.org` | Same Fly.io Payload |
 
-> **Important:** There is only *one* Payload deployment. Demo vs prod behavior is determined at runtime.
+> **Important:** There is only *one* Payload deployment.
 
 ---
 
 ## 4) Environment Model
 
-We intentionally support **three modes**, not environments:
+We intentionally support **two environments**:
 
 1. **prod**
 
@@ -71,32 +69,24 @@ We intentionally support **three modes**, not environments:
    * Real memberships & payments
    * Real email delivery
 
-2. **demo**
-
-   * Separate Postgres schema
-   * Safe for training/testing
-   * Test Stripe keys
-   * Email subject prefixed with `[DEMO]`
-
-3. **local**
+2. **local**
 
    * Developer machine
    * Usually local Postgres
    * May point to remote Supabase only in rare cases
 
-> There is **no staging environment**. Demo replaces staging.
+**Test mode is not an environment.** It is a request-scoped flag that marks
+operational records as `isTest: true` inside the same deployment and database.
+
+> There is **no staging environment**.
 
 ---
 
-## 5) Database Strategy (Supabase + Schemas)
+## 5) Database Strategy (Supabase)
 
 * **Supabase Postgres** is used in production.
-* A **single database** contains multiple schemas:
-
-| Schema               | Purpose         |
-| -------------------- | --------------- |
-| `prod` (or `public`) | Production data |
-| `demo`               | Demo data       |
+* A **single schema** stores both production and test data.
+* Operational collections include an `isTest: boolean` flag (and optional `expiresAt`) to mark test records.
 
 ### DB Connection Choice
 
@@ -106,7 +96,7 @@ We intentionally support **three modes**, not environments:
 
 ### Content vs Ops Data
 
-**Content (syncable to demo)**
+**Content**
 
 * Pages
 * Posts / News
@@ -114,7 +104,7 @@ We intentionally support **three modes**, not environments:
 * Media metadata
 * Globals (Header, Footer, email templates)
 
-**Ops Data (never synced)**
+**Ops Data (test-flagged when `mode=test`)**
 
 * Contacts
 * Members / Users
@@ -122,29 +112,33 @@ We intentionally support **three modes**, not environments:
 * Payments / Stripe artifacts
 * Email delivery logs
 
-### Demo Content Sync
-
-* Triggered manually (admin action or CLI)
-* Copies **content only** from prod schema → demo schema
-* Overwrites demo content
-* Never touches ops tables
-
 ---
 
-## 6) Demo Routing & Schema Selection
+## 6) Test Mode
 
-Payload determines **mode** per request based on host:
+Test mode is a **request-scoped** behavior for operational flows.
 
-* `cms.seminaryhillnaturalarea.org` → **prod schema**
-* `cms-demo.seminaryhillnaturalarea.org` → **demo schema**
+**Definition**
 
-Implementation concept:
+* Operational records created/handled in the same deployment
+* Persisted in the same database with `isTest: true`
+* No separate static build or subdomain
+* Optional `expiresAt` may be used, but cleanup is primarily manual
 
-* Request middleware resolves `mode = 'prod' | 'demo'`
-* Mode stored on `req.context`
-* Database adapter selects the correct Postgres schema
+**Activation**
 
-> This preserves a **single Payload instance** while enabling isolated demo data.
+* Canonical trigger: `?mode=test`
+* Once enabled, test mode remains active for the browsing session and is carried across internal links
+
+**Stripe behavior**
+
+* Test mode uses Stripe **test keys** (and test webhook secret when applicable)
+* Records from test flows must store `isTest: true`
+
+**Admin visibility + cleanup**
+
+* Admin lists should include a **Show test data** filter/toggle
+* When viewing test data, provide a **Delete all test records** action (`isTest=true`)
 
 ---
 
@@ -171,6 +165,7 @@ Public site rules:
 ### Preview
 
 * Live preview exists **only inside Payload admin**
+* Revisions/drafts in Payload are used to demo content or UI changes
 * Public site remains static
 
 ### Search
@@ -210,9 +205,9 @@ Rules:
   * Broadcasts / announcements
   * Individual send instances
 
-### Demo Behavior
+### Test Mode Behavior
 
-* Subject automatically prefixed with `[DEMO]`
+* Subject automatically prefixed with `[TEST]`
 * Uses test keys / sandbox rules
 * Guardrails prevent sending to real lists by default
 
@@ -223,8 +218,8 @@ Rules:
 ## 10) Payments & Memberships
 
 * **Stripe** used for memberships and donations
-* Demo mode uses **Stripe test keys**
-* Membership and payment data are ops data and **never synced**
+* Test mode uses **Stripe test keys**
+* Membership and payment records created in test mode must store `isTest: true`
 
 ---
 
@@ -245,7 +240,17 @@ Nice‑to‑have enhancements:
 
 ---
 
-## 12) Decision Log
+## 12) Glossary
+
+**Test Mode**
+
+Operational testing state activated by `?mode=test` that keeps all data in the
+same deployment and database, flagged with `isTest: true`. Intended for internal
+ops testing, not marketing demos.
+
+---
+
+## 13) Decision Log
 
 All architectural decisions and reversals are tracked in:
 

@@ -12,9 +12,9 @@ feature work:
 - ✅ Static export pipeline works locally and serves media without CMS running
 - ✅ Local export/serve workflow documented
 - ⏳ Cloudflare Pages: static export of the site app that serves a simple "Coming Soon" page with no backend dependency at runtime
-- ⏳ Fly: deploy the CMS app (Payload admin + API) against Supabase Postgres
+- ✅ Fly: deploy the CMS app (Payload admin + API) against Supabase Postgres
 - ⏳ R2 media storage for CMS uploads (avoid container-local media loss on deploy; restore media cache-busting)
-- ⏳ Add demo subdomain routing + demo schema switching (separate schema; default to prod schema when no demo host)
+- ⏳ Implement test mode flagging (`isTest`) + admin filters/bulk delete
 - ⏳ After deployment baseline is green, return to remaining site errors and feature parity
 - ⏳ TODO: add Fly automation to scale CMS down to a single instance (cost-first, allow brief downtime)
 - ⏳ TODO: add a workflow step to reduce Fly CMS instances to 1 after deploy
@@ -28,11 +28,21 @@ feature work:
 - Single-backend architecture
 - Docs are the source of truth
 
+## Test Mode
+
+Test mode is for internal ops testing, not marketing demos.
+
+- **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
+- **Activation:** Append `?mode=test` to a URL.
+- **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
+- **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
+- **Admin UX:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.
+
 ## Explicit Non-Goals
 
 - Multiple backend instances (prod/staging)
 - Dynamic public rendering
-- Automated demo data syncing
+- Automated test data syncing or seeding
 - CRM-style contact automation
 - Real-time personalization
 
@@ -102,8 +112,8 @@ Status: ✅ Complete
 - Role explosion
 - Complex permission matrices
 
-## Demo & Privacy Constraints (Always-On)
+## Test Mode & Privacy Constraints (Always-On)
 
-- Demo data is content-only
-- Ops data never syncs
+- Test data is stored alongside live data and flagged with `isTest`
+- No parallel demo environment (no subdomain, schema, or duplicate build)
 - Data access and deletion requests handled manually

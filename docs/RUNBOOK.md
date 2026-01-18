@@ -24,7 +24,7 @@ If something feels urgent, confusing, or risky — start here.
 * **Database**: Postgres (Supabase)
 * **Payments**: Stripe
 * **Email**: Brevo
-* **Demo mode**: Same backend, separate Postgres schema, demo subdomain routing
+* **Test mode**: Same backend and database, operational records flagged with `isTest`
 
 **Key principle**: There is **one backend instance**. Safety is achieved through routing, schema separation, and process — not duplicated infrastructure.
 
@@ -57,8 +57,8 @@ If you do not have access, **do not attempt workarounds**. Escalate instead.
 ## Core Safety Rules (Non-Negotiable)
 
 * Never modify production data casually or experimentally
-* Never sync **demo → prod** data
-* Never test payments outside demo mode
+* Never test payments outside **test mode**
+* Never mix test data with live data (ensure `isTest` is set)
 * Never expose contact or membership data for testing
 * Prefer stopping functionality over risking corruption or disclosure
 
@@ -66,34 +66,22 @@ When in doubt: **pause, document, and escalate**.
 
 ---
 
-## Demo Mode Operations
+## Test Mode Operations
 
-### What Demo Mode Is
+### What Test Mode Is
 
-* Uses the **same backend instance**
-* Uses a **separate Postgres schema**
-* Accessed via a **demo subdomain**
-* Intended for:
+* Uses the **same backend instance** and database
+* Activated by the canonical query param `?mode=test`
+* Remains active for the browsing session and is carried across internal links
+* Intended for internal ops testing (not marketing demos)
 
-  * demos
-  * training
-  * safe testing of flows
+### Test Mode Constraints
 
-### Demo Constraints
-
-* Demo emails **must include `[DEMO]` in the subject**
-* Demo payments use Stripe test keys only
-* Demo content may be freely modified
-
-### Data Sync Rules
-
-* Demo content is refreshed via **manual, content-only sync**
-* **Never sync operational data**, including:
-
-  * contacts
-  * memberships
-  * donations
-  * payments
+* Test emails **must include `[TEST]` in the subject**
+* Test payments use Stripe test keys only
+* Operational records created in test mode must store `isTest: true`
+* Admin lists should provide a **Show test data** toggle/filter
+* When viewing test data, provide a **Delete all test records** action
 
 ---
 
@@ -122,9 +110,9 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 
 * Workflow: `.github/workflows/deploy-site.yml`
 * Required GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
-* Required GitHub variables: `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_DEMO_SITE_URL`
+* Required GitHub variables: `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`
 * Build uses `NEXT_PUBLIC_CMS_URL` to fetch content during static export
-* For a demo Pages project, add a second job that swaps the demo URLs and project name
+* There is no separate test/demo Pages project; test mode uses `?mode=test` on the same site
 
 ### Restart Backend
 
@@ -135,14 +123,14 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 ### Rebuild Public Site
 
 * Trigger static rebuild via Cloudflare Pages
-* Ensure correct environment (prod vs demo)
+* Ensure correct mode (live vs test)
 
-### Verify Demo Safety
+### Verify Test Mode Safety
 
-Before any demo:
+Before any ops testing:
 
-* Confirm demo subdomain
-* Confirm `[DEMO]` email subject prefix
+* Confirm `?mode=test` is active and persisting across links
+* Confirm `[TEST]` email subject prefix
 * Confirm Stripe test mode
 
 ---
