@@ -93,7 +93,7 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 
 #### CMS (Fly.io)
 
-* Workflow: `.github/workflows/deploy-cms.yml`
+* Workflow: `.github/workflows/deploy-all.yml` (job: `cms`)
 * Config: `apps/cms/fly.toml` (single instance in `iad`, 512 MB RAM)
 * Post-deploy step forces a single machine (`flyctl scale count 1`) to avoid Fly defaulting to 2 machines after fresh deploys
 * Required GitHub secret: `FLY_API_TOKEN`
@@ -109,7 +109,7 @@ Deployments run from GitHub Actions on `main` and can be triggered manually.
 
 #### Site (Cloudflare Pages)
 
-* Workflow: `.github/workflows/deploy-site.yml`
+* Workflow: `.github/workflows/deploy-site.yml` (manual) or `.github/workflows/deploy-all.yml` (after CMS)
 * Required GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 * Required GitHub variables (Actions → Variables): `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`
 * Build uses `NEXT_PUBLIC_CMS_URL` to fetch content during static export
