@@ -11,25 +11,28 @@ import type { Page } from '@shna/shared/payload-types'
 import PageClient from './page.client'
 
 export const dynamic = 'force-static'
+export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const pages = await fetchFromCMS<{ docs: Pick<Page, 'slug'>[] }>('/api/pages', {
-    depth: 0,
-    params: {
-      limit: 1000,
-      pagination: false,
-    },
-  })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
+  try {
+    const pages = await fetchFromCMS<{ docs: Pick<Page, 'slug'>[] }>('/api/pages', {
+      depth: 0,
+      params: {
+        limit: 1000,
+        pagination: false,
+      },
     })
 
-  return params
+    const params =
+      pages.docs
+        ?.filter((doc) => Boolean(doc.slug) && doc.slug !== 'home')
+        .map(({ slug }) => ({ slug })) ?? []
+
+    return params.length > 0 ? params : [{ slug: 'home' }]
+  } catch (error) {
+    console.warn('Failed to fetch pages for static params; exporting home only.', error)
+    return [{ slug: 'home' }]
+  }
 }
 
 type Args = {

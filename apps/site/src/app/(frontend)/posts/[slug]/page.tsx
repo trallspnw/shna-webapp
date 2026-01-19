@@ -12,22 +12,27 @@ import { generateMeta } from '@shna/shared/utilities/generateMeta'
 import { fetchFromCMS } from '@shna/shared/utilities/payloadAPI'
 import PageClient from './page.client'
 
-export const dynamic = 'force-static'
+export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const posts = await fetchFromCMS<{ docs: Pick<Post, 'slug'>[] }>('/api/posts', {
-    depth: 0,
-    params: {
-      limit: 1000,
-      pagination: false,
-    },
-  })
+  try {
+    const posts = await fetchFromCMS<{ docs: Pick<Post, 'slug'>[] }>('/api/posts', {
+      depth: 0,
+      params: {
+        limit: 1000,
+        pagination: false,
+      },
+    })
 
-  const params = posts.docs.map(({ slug }) => {
-    return { slug }
-  })
+    const params = posts.docs
+      ?.filter((doc) => Boolean(doc.slug))
+      .map(({ slug }) => ({ slug })) ?? []
 
-  return params
+    return params.length > 0 ? params : [{ slug: 'no-posts' }]
+  } catch (error) {
+    console.warn('Failed to fetch posts for static params; exporting no posts.', error)
+    return [{ slug: 'no-posts' }]
+  }
 }
 
 type Args = {

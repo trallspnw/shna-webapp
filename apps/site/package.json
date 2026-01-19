@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "build": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs && node scripts/generate-headers.mjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"

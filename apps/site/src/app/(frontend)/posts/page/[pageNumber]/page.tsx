@@ -10,6 +10,7 @@ import PageClient from './page.client'
 import { notFound } from 'next/navigation'
 
 export const dynamic = 'force-static'
+export const dynamicParams = false
 
 type Args = {
   params: Promise<{
@@ -74,19 +75,24 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 }
 
 export async function generateStaticParams() {
-  const { totalDocs } = await fetchFromCMS<{ totalDocs: number }>('/api/posts', {
-    params: {
-      limit: 1,
-    },
-  })
+  try {
+    const { totalDocs } = await fetchFromCMS<{ totalDocs: number }>('/api/posts', {
+      params: {
+        limit: 1,
+      },
+    })
 
-  const totalPages = Math.ceil(totalDocs / 12)
+    const totalPages = Math.ceil((totalDocs ?? 0) / 12)
 
-  const pages: { pageNumber: string }[] = []
+    const pages: { pageNumber: string }[] = []
 
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push({ pageNumber: String(i) })
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push({ pageNumber: String(i) })
+    }
+
+    return pages.length > 0 ? pages : [{ pageNumber: '1' }]
+  } catch (error) {
+    console.warn('Failed to fetch post counts for pagination; exporting no pages.', error)
+    return [{ pageNumber: '1' }]
   }
-
-  return pages
 }
