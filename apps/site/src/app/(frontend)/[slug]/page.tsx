@@ -13,7 +13,7 @@ import PageClient from './page.client'
 export const dynamic = 'force-static'
 export const dynamicParams = false
 
-export const generateStaticParams = async () => {
+export async function generateStaticParams() {
   try {
     const pages = await fetchFromCMS<{ docs: Pick<Page, 'slug'>[] }>('/api/pages', {
       depth: 0,
