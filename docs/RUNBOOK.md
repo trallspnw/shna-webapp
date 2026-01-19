@@ -95,6 +95,7 @@ Deployments run from GitHub Actions on `main` and can be triggered manually as n
 
 * Workflow: `.github/workflows/deploy-all.yml` (job: `cms`, runs on every `main` commit)
 * Config: `apps/cms/fly.toml` (single instance in `iad`, 512 MB RAM)
+* Migrations run automatically on deploy via Fly release command (`payload migrate`)
 * Post-deploy step forces a single machine (`flyctl scale count 1`) to avoid Fly defaulting to 2 machines after fresh deploys
 * Required GitHub secret: `FLY_API_TOKEN`
 * Required Fly secrets: `DATABASE_URL`, `PAYLOAD_SECRET`, `CRON_SECRET`, `PREVIEW_SECRET`

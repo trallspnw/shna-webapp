@@ -9,6 +9,9 @@ primary_region = "iad"
   NEXT_PUBLIC_CMS_URL = "https://cms.seminaryhillnaturalarea.org"
   NEXT_PUBLIC_SITE_URL = "https://seminaryhillnaturalarea.org"
 
+[deploy]
+  release_command = "pnpm --filter @shna/cms payload migrate"
+
 [env]
   NODE_ENV = "production"
   CMS_INTERNAL_URL = "http://localhost:3000"
