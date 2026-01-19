@@ -21,7 +21,7 @@ const collections: CollectionSlug[] = [
   'search',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+const globals: GlobalSlug[] = ['header', 'footer', 'site-settings']
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
@@ -46,18 +46,45 @@ export const seed = async ({
 
   // clear the database
   await Promise.all(
-    globals.map((global) =>
-      payload.updateGlobal({
-        slug: global,
-        data: {
-          navItems: [],
-        },
-        depth: 0,
-        context: {
-          disableRevalidate: true,
-        },
-      }),
-    ),
+    globals.map((global) => {
+      switch (global) {
+        case 'header':
+          return payload.updateGlobal({
+            slug: 'header',
+            data: {
+              navItems: [],
+            },
+            depth: 0,
+            context: {
+              disableRevalidate: true,
+            },
+          })
+        case 'footer':
+          return payload.updateGlobal({
+            slug: 'footer',
+            data: {
+              navItems: [],
+            },
+            depth: 0,
+            context: {
+              disableRevalidate: true,
+            },
+          })
+        case 'site-settings':
+          return payload.updateGlobal({
+            slug: 'site-settings',
+            data: {
+              allowIndexing: false,
+            },
+            depth: 0,
+            context: {
+              disableRevalidate: true,
+            },
+          })
+        default:
+          return Promise.resolve()
+      }
+    }),
   )
 
   await Promise.all(
