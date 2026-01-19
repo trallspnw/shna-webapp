@@ -179,6 +179,7 @@ Public site rules:
 * When indexing is disabled, the site outputs `noindex` meta tags, a `Disallow: /` robots.txt, and a static `_headers` rule that sets `X-Robots-Tag`.
 * Changing this global requires a new static build; a CMS webhook can be added later to trigger the build if automation is desired.
 * The CMS always emits `X-Robots-Tag: noindex` headers and a `Disallow: /` robots.txt.
+* `robots.txt` is generated at build time for the site and served by a dedicated route in the CMS.
 
 ---
 

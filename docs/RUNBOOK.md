@@ -87,6 +87,29 @@ When in doubt: **pause, document, and escalate**.
 
 ## Common Operations
 
+### Sync Production DB to Local (Destructive)
+
+Use this when you need to reproduce production issues locally. This operation
+**overwrites your local database** and must never target a non-local host.
+
+**Requirements**
+
+* You are authorized to handle PII
+* Local Postgres is running (`pnpm deps:up`)
+* `PROD_DATABASE_URL` is set in `.env`
+* `pg_dump`, `pg_restore`, and `psql` are installed locally
+
+**Command**
+
+```bash
+pnpm db:sync:prod
+```
+
+**Notes**
+
+* The sync script refuses to restore to non-local hosts.
+* Supabase-only extensions (`pg_graphql`, `supabase_vault`) are skipped during restore.
+
 ### Deployments (GitHub Actions)
 
 Deployments run from GitHub Actions on `main` and can be triggered manually as noted below.
@@ -114,6 +137,7 @@ Deployments run from GitHub Actions on `main` and can be triggered manually as n
 * Required GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 * Required GitHub variables (Actions → Variables): `SITE_PROJECT_NAME`, `NEXT_PUBLIC_CMS_URL`, `NEXT_PUBLIC_SITE_URL`
 * Build uses `NEXT_PUBLIC_CMS_URL` to fetch content during static export
+* Site `robots.txt` and `_headers` are generated at build time based on the `site-settings.allowIndexing` global
 * There is no separate test/demo Pages project; test mode uses `?mode=test` on the same site
 * Custom domain: `seminaryhillnaturalarea.org` is attached in Cloudflare Pages
 * CMS domain: `cms.seminaryhillnaturalarea.org` points to Fly.io

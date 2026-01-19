@@ -24,7 +24,8 @@
     "deps:restart": "docker compose -f compose.dev.yml down && docker compose -f compose.dev.yml up -d",
     "deps:reset": "docker compose -f compose.dev.yml down -v",
     "deps:logs": "docker compose -f compose.dev.yml logs -f",
-    "deps:ps": "docker compose -f compose.dev.yml ps"
+    "deps:ps": "docker compose -f compose.dev.yml ps",
+    "db:sync:prod": "dotenv -e ./.env -- bash ./scripts/db-sync-prod.sh"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

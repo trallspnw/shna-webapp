@@ -124,6 +124,17 @@ Note: workspace scripts load the repo-root `.env` via `dotenv-cli`, so you do no
   pnpm deps:logs
   ```
 
+* Sync prod DB into local Postgres (destructive; local only)
+
+  ```bash
+  PROD_DATABASE_URL=postgresql://... pnpm db:sync:prod
+  ```
+
+  Requirements:
+  * `PROD_DATABASE_URL` set in `.env` (Supabase Session pooler string)
+  * Local Postgres running via `pnpm deps:up`
+  * `pg_dump`, `pg_restore`, and `psql` available on your PATH
+
 ### Codegen
 
 When you change collections/globals/fields, run:
