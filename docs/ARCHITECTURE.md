@@ -56,6 +56,7 @@ These constraints are enforced intentionally. If something conflicts, stop and c
 | CMS / API   | `cms.seminaryhillnaturalarea.org`      | Fly.io (Payload)    |
 
 > **Important:** There is only *one* Payload deployment.
+> Cloudflare uses the "Redirect from WWW to root" rule template for the public site.
 
 ---
 

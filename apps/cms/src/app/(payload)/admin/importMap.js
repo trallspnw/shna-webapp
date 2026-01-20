@@ -19,6 +19,7 @@ import { RowLabel as RowLabel_23faec2986fee9f85b6c4b70e6c42875 } from '@shna/sha
 import { RowLabel as RowLabel_0374f82b5310b7348b27b7d8c3da71e3 } from '@shna/shared/Footer/RowLabel'
 import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
+import { default as default_b39f2d96c5778d5698b3c9e7777aa63a } from '@/components/Dashboard'
 import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
 
 export const importMap = {
@@ -43,5 +44,6 @@ export const importMap = {
   "@shna/shared/Footer/RowLabel#RowLabel": RowLabel_0374f82b5310b7348b27b7d8c3da71e3,
   "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
+  "@/components/Dashboard#default": default_b39f2d96c5778d5698b3c9e7777aa63a,
   "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
 }

@@ -22,7 +22,8 @@ type SiteSettings = Config['globals']['site-settings']
 
 const resolveFaviconUrl = (media?: Media | number | null): string | null => {
   if (!media || typeof media !== 'object') return null
-  const fromPrefix = getMediaUrlFromPrefix(media.prefix, media.filename, media.updatedAt)
+  const prefix = 'prefix' in media ? (media as { prefix?: string | null }).prefix : undefined
+  const fromPrefix = getMediaUrlFromPrefix(prefix, media.filename, media.updatedAt)
   return fromPrefix || getMediaUrl(media.url, media.updatedAt) || null
 }
 
@@ -75,8 +76,4 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 export const metadata: Metadata = {
   metadataBase: new URL(getServerSideURL()),
   openGraph: mergeOpenGraph(),
-  twitter: {
-    card: 'summary_large_image',
-    creator: '@payloadcms',
-  },
 }

@@ -1,13 +1,6 @@
-import type { Form } from '@shna/shared/payload-types'
 import { RequiredDataFromCollectionSlug } from 'payload'
 
-type ContactArgs = {
-  contactForm: Form
-}
-
-export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
-  contactForm,
-}) => {
+export const contact: () => RequiredDataFromCollectionSlug<'pages'> = () => {
   return {
     slug: 'contact',
     _status: 'published',
@@ -16,39 +9,62 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
     },
     layout: [
       {
-        blockType: 'formBlock',
-        enableIntro: true,
-        form: contactForm,
-        introContent: {
-          root: {
-            type: 'root',
-            children: [
-              {
-                type: 'heading',
+        blockType: 'content',
+        columns: [
+          {
+            size: 'full',
+            enableLink: false,
+            richText: {
+              root: {
+                type: 'root',
                 children: [
                   {
-                    type: 'text',
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: 'Example contact form:',
+                    type: 'heading',
+                    children: [
+                      {
+                        type: 'text',
+                        detail: 0,
+                        format: 0,
+                        mode: 'normal',
+                        style: '',
+                        text: 'Contact',
+                        version: 1,
+                      },
+                    ],
+                    direction: 'ltr',
+                    format: '',
+                    indent: 0,
+                    tag: 'h2',
+                    version: 1,
+                  },
+                  {
+                    type: 'paragraph',
+                    children: [
+                      {
+                        type: 'text',
+                        detail: 0,
+                        format: 0,
+                        mode: 'normal',
+                        style: '',
+                        text: 'Email us at info@seminaryhillnaturalarea.org.',
+                        version: 1,
+                      },
+                    ],
+                    direction: 'ltr',
+                    format: '',
+                    indent: 0,
+                    textFormat: 0,
                     version: 1,
                   },
                 ],
                 direction: 'ltr',
                 format: '',
                 indent: 0,
-                tag: 'h3',
                 version: 1,
               },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            version: 1,
+            },
           },
-        },
+        ],
       },
     ],
     title: 'Contact',

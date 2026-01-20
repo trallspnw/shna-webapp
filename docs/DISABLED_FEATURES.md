@@ -86,3 +86,38 @@ What was disabled
 How to re-enable
 - Re-add `beforeDashboard: ['@/components/BeforeDashboard']` in `apps/cms/src/payload.config.ts`.
 - Regenerate the admin import map.
+
+## Dashboard Customization (Per-User)
+
+Status: disabled (custom dashboard view renders static widgets only).
+
+What was disabled
+- Per-user dashboard editing/custom layouts. The dashboard is rendered as a fixed set of widgets.
+
+How to re-enable
+- Remove `admin.components.views.dashboard` from `apps/cms/src/payload.config.ts`.
+- Regenerate the admin import map.
+
+## Redirects Collection (Admin UI)
+
+Status: hidden in admin UI (collection still active).
+
+What was disabled
+- Redirects collection hidden via plugin overrides in `apps/cms/src/plugins/index.ts`.
+
+How to re-enable
+- Remove the `admin.hidden` override from the redirects plugin config.
+
+## Forms + Submissions (Form Builder Plugin)
+
+Status: removed (plugin + form block).
+
+What was disabled
+- Form Builder plugin removed from `apps/cms/src/plugins/index.ts`.
+- Form block removed from Pages layout blocks.
+- Seed contact form removed and contact page no longer references a form.
+
+How to re-enable
+- Restore `formBuilderPlugin` in `apps/cms/src/plugins/index.ts` and add fields/overrides.
+- Re-add the Form Block to `apps/cms/src/collections/Pages/index.ts` and shared renderers.
+- Recreate a contact form (and optionally `form-submissions`) as needed.

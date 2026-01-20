@@ -160,3 +160,23 @@ Test mode will be:
 - No separate demo subdomain, schema, or static build is required.
 - All operational code paths must honor `isTest` and avoid mixing test with live data.
 - Cleanup is manual and intentional; the database stays small by purging test records.
+
+---
+
+## Decision I — Remove Form Builder + Submissions (use custom transactional flows)
+
+**Status:** Accepted  
+**Date:** 2026-03-08
+
+### Context
+The built-in Form Builder plugin creates generic `forms` and `form-submissions` collections, but SHNA’s core flows
+(donations, memberships, status checks, email signup) are transactional and require Stripe + custom logic.
+
+### Decision
+Disable the Form Builder plugin and remove the Form Block from pages. Keep the existing custom transactional flows
+as the primary implementation path. Leave database tables in place for potential future reuse.
+
+### Consequences
+- No generic “Form submissions” collection is surfaced in admin.
+- Contact forms, if needed later, should be implemented as purpose-built collections or custom flows.
+- Re-enabling the Form Builder requires restoring plugin config + page blocks + types.

@@ -64,8 +64,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let src: StaticImageData | string = srcFromProps || ''
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, height: fullHeight, url, width: fullWidth, filename, prefix } =
-      resource
+    const { alt: altFromResource, height: fullHeight, url, width: fullWidth, filename } = resource
+    const prefix = 'prefix' in resource ? (resource as { prefix?: string | null }).prefix : undefined
 
     width = fullWidth!
     height = fullHeight!

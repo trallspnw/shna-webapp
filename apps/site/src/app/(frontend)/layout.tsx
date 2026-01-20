@@ -22,7 +22,8 @@ const getSiteSettings = getCachedGlobal('site-settings', 1)
 
 const resolveFaviconUrl = (media?: Media | number | null): string | null => {
   if (!media || typeof media !== 'object') return null
-  const fromPrefix = getMediaUrlFromPrefix(media.prefix, media.filename, media.updatedAt)
+  const prefix = 'prefix' in media ? (media as { prefix?: string | null }).prefix : undefined
+  const fromPrefix = getMediaUrlFromPrefix(prefix, media.filename, media.updatedAt)
   return fromPrefix || getMediaUrl(media.url, media.updatedAt) || null
 }
 

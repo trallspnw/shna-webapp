@@ -1,7 +1,6 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
-import type { Form, Media, User } from '@shna/shared/payload-types'
+import type { Media, User } from '@shna/shared/payload-types'
 
-import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
 import { image1 } from './image-1'
@@ -14,8 +13,6 @@ import { post3 } from './post-3'
 const baseCollections: CollectionSlug[] = [
   'media',
   'pages',
-  'forms',
-  'form-submissions',
 ]
 
 const globals: GlobalSlug[] = ['header', 'footer', 'site-settings']
@@ -218,14 +215,6 @@ export const seed = async ({
     })
   }
 
-  payload.logger.info(`— Seeding contact form...`)
-
-  const contactForm = (await payload.create({
-    collection: 'forms',
-    depth: 0,
-    data: contactFormData,
-  })) as unknown as Form
-
   payload.logger.info(`— Seeding pages...`)
 
   const [_, contactPage] = await Promise.all([
@@ -237,7 +226,7 @@ export const seed = async ({
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: contactPageData({ contactForm: contactForm }),
+      data: contactPageData(),
     }),
   ])
 
@@ -248,13 +237,6 @@ export const seed = async ({
       slug: 'header',
       data: {
         navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Posts',
-              url: '/posts',
-            },
-          },
           {
             link: {
               type: 'reference',

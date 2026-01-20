@@ -28,6 +28,11 @@ export default buildConfig({
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeLogin: ['@/components/BeforeLogin'],
+      views: {
+        dashboard: {
+          Component: '@/components/Dashboard',
+        },
+      },
       // TODO: Decide whether to remove or SHNA-tailor the seed workflow in the admin UI.
     },
     importMap: {

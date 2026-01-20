@@ -24,7 +24,8 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
   }, [])
 
   if (resource && typeof resource === 'object') {
-    const { filename, updatedAt, url, prefix } = resource
+    const { filename, updatedAt, url } = resource
+    const prefix = 'prefix' in resource ? (resource as { prefix?: string | null }).prefix : undefined
     const r2Url = getMediaUrlFromPrefix(prefix, filename, updatedAt)
     const src = r2Url || (url ? getMediaUrl(url, updatedAt) : getMediaUrl(`/media/${filename}`, updatedAt))
 
