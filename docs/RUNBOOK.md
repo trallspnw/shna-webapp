@@ -108,6 +108,7 @@ pnpm db:sync:prod
 **Notes**
 
 * The sync script refuses to restore to non-local hosts.
+* It drops favicon media foreign keys before restore to avoid dependency errors.
 * Supabase-only extensions (`pg_graphql`, `supabase_vault`) are skipped during restore.
 
 ### Deployments (GitHub Actions)

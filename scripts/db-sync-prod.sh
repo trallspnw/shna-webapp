@@ -24,6 +24,12 @@ echo "Dumping production database..."
 pg_dump --format=custom --no-owner --no-privileges "${PROD_DATABASE_URL}" > "${dump_file}"
 
 echo "Restoring into local database..."
+# Drop media-linked favicon constraints first to avoid dependency errors during restore.
+psql --set ON_ERROR_STOP=1 "${LOCAL_DATABASE_URL}" <<'SQL'
+ALTER TABLE IF EXISTS site_settings DROP CONSTRAINT IF EXISTS site_settings_favicon_svg_id_media_id_fk;
+ALTER TABLE IF EXISTS site_settings DROP CONSTRAINT IF EXISTS site_settings_favicon_ico_id_media_id_fk;
+SQL
+
 pg_restore \
   --clean \
   --exclude-schema=graphql \

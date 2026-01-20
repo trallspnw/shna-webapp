@@ -134,6 +134,7 @@ Note: workspace scripts load the repo-root `.env` via `dotenv-cli`, so you do no
   * `PROD_DATABASE_URL` set in `.env` (Supabase Session pooler string)
   * Local Postgres running via `pnpm deps:up`
   * `pg_dump`, `pg_restore`, and `psql` available on your PATH
+  * The script drops favicon media FKs before restore to avoid dependency errors
 
 ### Codegen
 
