@@ -51,6 +51,7 @@ What was disabled
 - Frontend posts routes removed in both site and CMS apps.
 - Archive/related-post UI blocks and cards removed.
 - Redirects plugin no longer registers posts.
+- Sitemap generation omits posts while the collection is disabled.
 - Shared helpers now assume pages only (linking, rich text internal links, redirects, metadata).
 
 How to re-enable

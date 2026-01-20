@@ -63,10 +63,7 @@ module.exports = {
     },
   },
   additionalPaths: async (config) => {
-    const [pages, posts] = await Promise.all([
-      fetchCollection('pages'),
-      fetchCollection('posts'),
-    ])
+    const pages = await fetchCollection('pages')
 
     const pagePaths = pages.docs
       .filter((page) => page.slug && page.slug !== 'home')
@@ -75,18 +72,12 @@ module.exports = {
         lastmod: page.updatedAt,
       }))
 
-    const postPaths = posts.docs.map((post) => ({
-      loc: `${config.siteUrl}/posts/${post.slug}`,
-      lastmod: post.updatedAt,
-    }))
-
     return [
       {
         loc: `${config.siteUrl}/`,
         priority: 1.0,
       },
       ...pagePaths,
-      ...postPaths,
     ]
   },
 }
