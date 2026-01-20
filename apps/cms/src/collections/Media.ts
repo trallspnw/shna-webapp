@@ -9,10 +9,6 @@ import {
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
-const r2PublicUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, '')
-const r2Prefix = process.env.R2_PREFIX || 'local'
-const mediaBaseUrl = r2PublicUrl ? `${r2PublicUrl}/${r2Prefix}/media` : undefined
-
 export const Media: CollectionConfig = {
   slug: 'media',
   folders: true,
@@ -40,7 +36,6 @@ export const Media: CollectionConfig = {
   ],
   upload: {
     disableLocalStorage: true,
-    staticURL: mediaBaseUrl,
     adminThumbnail: 'thumbnail',
     focalPoint: true,
     imageSizes: [

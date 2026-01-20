@@ -33,6 +33,7 @@ jobs:
       - name: Build static site
         env:
           NEXT_PUBLIC_CMS_URL: ${{ vars.NEXT_PUBLIC_CMS_URL }}
+          NEXT_PUBLIC_MEDIA_ORIGIN: ${{ vars.NEXT_PUBLIC_MEDIA_ORIGIN }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: pnpm --filter @shna/site build
 

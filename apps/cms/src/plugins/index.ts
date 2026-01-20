@@ -14,21 +14,17 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import type { Page, Post } from '@shna/shared/payload-types'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
 
-const requireEnv = (key: string): string => {
-  const value = process.env[key]
-  if (!value) {
-    throw new Error(`Missing required env var: ${key}`)
-  }
-  return value
-}
+const getEnv = (key: string): string | undefined => process.env[key]
 
-const r2Bucket = requireEnv('R2_BUCKET')
-const r2Endpoint = requireEnv('R2_ENDPOINT')
+const r2Bucket = getEnv('R2_BUCKET')
+const r2Endpoint = getEnv('R2_ENDPOINT')
 const r2Region = process.env.R2_REGION || 'auto'
-const r2AccessKeyId = requireEnv('R2_ACCESS_KEY_ID')
-const r2SecretAccessKey = requireEnv('R2_SECRET_ACCESS_KEY')
-const r2PublicUrl = requireEnv('R2_PUBLIC_URL')
+const r2AccessKeyId = getEnv('R2_ACCESS_KEY_ID')
+const r2SecretAccessKey = getEnv('R2_SECRET_ACCESS_KEY')
 const r2Prefix = process.env.R2_PREFIX || 'local'
+
+const hasR2Config =
+  r2Bucket && r2Endpoint && r2AccessKeyId && r2SecretAccessKey
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
@@ -40,25 +36,28 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
+const r2Plugin = hasR2Config
+  ? s3Storage({
+      bucket: r2Bucket,
+      config: {
+        credentials: {
+          accessKeyId: r2AccessKeyId,
+          secretAccessKey: r2SecretAccessKey,
+        },
+        endpoint: r2Endpoint,
+        forcePathStyle: true,
+        region: r2Region,
+      },
+      collections: {
+        media: {
+          prefix: `${r2Prefix}/media`,
+        },
+      },
+    })
+  : null
+
 export const plugins: Plugin[] = [
-  s3Storage({
-    bucket: r2Bucket,
-    config: {
-      credentials: {
-        accessKeyId: r2AccessKeyId,
-        secretAccessKey: r2SecretAccessKey,
-      },
-      endpoint: r2Endpoint,
-      forcePathStyle: true,
-      region: r2Region,
-    },
-    publicUrl: r2PublicUrl,
-    collections: {
-      media: {
-        prefix: `${r2Prefix}/media`,
-      },
-    },
-  }),
+  ...(r2Plugin ? [r2Plugin] : []),
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {
