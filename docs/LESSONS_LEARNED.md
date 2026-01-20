@@ -25,6 +25,11 @@ later. Keep it concise and update only when a lesson is repeatable.
   excludes it from TS checks and uses a minimal `payload` module shim to avoid
   augmentation errors.
 
+## Themes
+
+- The template included a light/dark theme system with a footer selector and a `data-theme` initializer.
+  We removed it for SHNA, but can reintroduce the Theme provider and InitTheme script if needed later.
+
 ## Test Mode
 
 Test mode is for internal ops testing, not marketing demos.

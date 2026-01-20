@@ -1,8 +1,8 @@
 'use client'
 
-import type { Theme } from '@shna/shared/providers/Theme/types'
-
 import React, { createContext, useCallback, use, useState } from 'react'
+
+type Theme = 'light' | 'dark'
 
 import canUseDOM from '@shna/shared/utilities/canUseDOM'
 

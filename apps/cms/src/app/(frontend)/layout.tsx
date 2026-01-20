@@ -9,7 +9,6 @@ import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@shna/shared/Footer/Component'
 import { Header } from '@shna/shared/Header/Component'
 import { Providers } from '@shna/shared/providers'
-import { InitTheme } from '@shna/shared/providers/Theme/InitTheme'
 import type { Config, Media } from '@shna/shared/payload-types'
 import { mergeOpenGraph } from '@shna/shared/utilities/mergeOpenGraph'
 import { draftMode, headers } from 'next/headers'
@@ -46,9 +45,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const faviconIcoUrl = resolveFaviconUrl(siteSettings?.faviconIco)
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(GeistSans.variable, GeistMono.variable)}
+      lang="en"
+      suppressHydrationWarning
+      data-theme="light"
+    >
       <head>
-        <InitTheme />
         {faviconIcoUrl && <link href={faviconIcoUrl} rel="icon" sizes="32x32" />}
         {faviconSvgUrl && <link href={faviconSvgUrl} rel="icon" type="image/svg+xml" />}
       </head>
