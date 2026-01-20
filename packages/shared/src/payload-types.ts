@@ -1701,6 +1701,14 @@ export interface SiteSetting {
    * When enabled, search engines can crawl and index the public site. When disabled, they are asked to stop crawling, which may reduce search visibility until re-enabled. Changing this setting requires a site rebuild.
    */
   allowIndexing?: boolean | null;
+  /**
+   * Optional. SVG favicon preferred by modern browsers.
+   */
+  faviconSvg?: (number | null) | Media;
+  /**
+   * Optional fallback for older browsers.
+   */
+  faviconIco?: (number | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1756,6 +1764,8 @@ export interface FooterSelect<T extends boolean = true> {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   allowIndexing?: T;
+  faviconSvg?: T;
+  faviconIco?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

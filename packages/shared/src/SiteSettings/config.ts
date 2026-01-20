@@ -17,5 +17,33 @@ export const SiteSettings: GlobalConfig = {
           'When enabled, search engines can crawl and index the public site. When disabled, they are asked to stop crawling, which may reduce search visibility until re-enabled. Changing this setting requires a site rebuild.',
       },
     },
+    {
+      name: 'faviconSvg',
+      label: 'Favicon (SVG)',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Optional. SVG favicon preferred by modern browsers.',
+      },
+      filterOptions: {
+        mimeType: {
+          equals: 'image/svg+xml',
+        },
+      },
+    },
+    {
+      name: 'faviconIco',
+      label: 'Favicon (ICO)',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Optional fallback for older browsers.',
+      },
+      filterOptions: {
+        mimeType: {
+          in: ['image/x-icon', 'image/vnd.microsoft.icon'],
+        },
+      },
+    },
   ],
 }

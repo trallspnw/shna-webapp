@@ -10,9 +10,8 @@ node_modules
 public/media/
 apps/cms/public/media/
 apps/site/public/media/
+apps/site/public/
 apps/site/out/
-apps/site/public/robots.txt
-apps/site/public/sitemap*.xml
 apps/cms/public/robots.txt
 apps/cms/public/sitemap*.xml
 

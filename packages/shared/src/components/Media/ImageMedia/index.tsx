@@ -20,14 +20,14 @@ const placeholderBlur =
 /**
  * ImageMedia
  *
- * This component passes a **relative** `src` (e.g. `/media/...`) to Next.js Image.
- * The `getMediaUrl` utility constructs the full URL by prepending the base URL from env vars
- * (NEXT_PUBLIC_CMS_URL). Next.js then optimizes this using `remotePatterns` configured
- * in next.config.js — no custom `loader` needed.
+ * This component prefers external media URLs (R2) when available.
+ * The `getMediaUrl` utilities construct the full URL using the media prefix plus
+ * `NEXT_PUBLIC_MEDIA_ORIGIN` (client-safe). Next.js then optimizes this using
+ * `remotePatterns` configured in next.config.js — no custom `loader` needed.
  *
  * Flow:
- *   1. Resource URL from Payload: `/media/image-123.jpg`
- *   2. getMediaUrl() adds base URL: `https://yourdomain.com/media/image-123.jpg`
+ *   1. Resource URL from Payload: `/api/media/file/image-123.jpg`
+ *   2. getMediaUrlFromPrefix() builds: `https://media.yourdomain.com/<prefix>/image-123.jpg`
  *   3. Next.js Image optimizes via remotePatterns: `/_next/image?url=...&w=1200&q=75`
  *
  * If your storage/plugin returns **external CDN URLs** (e.g. `https://cdn.example.com/...`),

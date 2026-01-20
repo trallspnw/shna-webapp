@@ -172,6 +172,7 @@ Make sure the CMS is reachable when you run the export.
 Media URLs are served from Cloudflare R2 (`R2_PUBLIC_URL`) and do not require local sync.
 Set `NEXT_PUBLIC_MEDIA_ORIGIN` to the public media origin so previews and static exports
 resolve media from R2 using each media item's stored prefix.
+Favicons are configurable in the `site-settings` global (SVG + ICO).
 
 ## Media storage (R2)
 

@@ -9,30 +9,36 @@ import { Footer } from '@shna/shared/Footer/Component'
 import { Header } from '@shna/shared/Header/Component'
 import { Providers } from '@shna/shared/providers'
 import { InitTheme } from '@shna/shared/providers/Theme/InitTheme'
+import type { Config, Media } from '@shna/shared/payload-types'
 import { mergeOpenGraph } from '@shna/shared/utilities/mergeOpenGraph'
-import { fetchFromCMS } from '@shna/shared/utilities/payloadAPI'
+import { getCachedGlobal } from '@shna/shared/utilities/getGlobals'
+import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMediaUrl'
 
 import './globals.css'
 import { getSiteURL } from '@shna/shared/utilities/getURL'
 
-type SiteSettingsResponse = {
-  allowIndexing?: boolean
-}
+type SiteSettings = Config['globals']['site-settings']
 
-const getAllowIndexing = async () => {
-  const settings = await fetchFromCMS<SiteSettingsResponse>('/api/globals/site-settings')
-  return settings?.allowIndexing === true
+const getSiteSettings = getCachedGlobal('site-settings', 1)
+
+const resolveFaviconUrl = (media?: Media | number | null): string | null => {
+  if (!media || typeof media !== 'object') return null
+  const fromPrefix = getMediaUrlFromPrefix(media.prefix, media.filename, media.updatedAt)
+  return fromPrefix || getMediaUrl(media.url, media.updatedAt) || null
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const allowIndexing = await getAllowIndexing()
+  const siteSettings = (await getSiteSettings()) as SiteSettings
+  const allowIndexing = siteSettings?.allowIndexing === true
+  const faviconSvgUrl = resolveFaviconUrl(siteSettings?.faviconSvg)
+  const faviconIcoUrl = resolveFaviconUrl(siteSettings?.faviconIco)
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
       <head>
         <InitTheme />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        {faviconIcoUrl && <link href={faviconIcoUrl} rel="icon" sizes="32x32" />}
+        {faviconSvgUrl && <link href={faviconSvgUrl} rel="icon" type="image/svg+xml" />}
         {!allowIndexing && <meta content="noindex, nofollow" name="robots" />}
       </head>
       <body>
