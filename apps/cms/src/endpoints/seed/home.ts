@@ -1,12 +1,12 @@
 import type { Media } from '@shna/shared/payload-types'
+import type { RequiredDataFromCollectionSlug } from 'payload'
 
 type HomeArgs = {
   heroImage: Media
   metaImage: Media
 }
 
-// NOTE: This seed includes legacy archive blocks; keep it flexible while posts are disabled.
-type HomeSeedData = Record<string, unknown>
+type HomeSeedData = RequiredDataFromCollectionSlug<'pages'>
 
 export const home: (args: HomeArgs) => HomeSeedData = ({
   heroImage,
@@ -18,14 +18,6 @@ export const home: (args: HomeArgs) => HomeSeedData = ({
     hero: {
       type: 'highImpact',
       links: [
-        {
-          link: {
-            type: 'custom',
-            appearance: 'default',
-            label: 'All posts',
-            url: '/posts',
-          },
-        },
         {
           link: {
             type: 'custom',
@@ -213,7 +205,7 @@ export const home: (args: HomeArgs) => HomeSeedData = ({
                         format: 0,
                         mode: 'normal',
                         style: '',
-                        text: "Manage this site's pages and posts from the ",
+                        text: "Manage this site's pages from the ",
                         version: 1,
                       },
                       {
@@ -516,62 +508,6 @@ export const home: (args: HomeArgs) => HomeSeedData = ({
         media: metaImage.id,
       },
       {
-        blockName: 'Archive Block',
-        blockType: 'archive',
-        categories: [],
-        introContent: {
-          root: {
-            type: 'root',
-            children: [
-              {
-                type: 'heading',
-                children: [
-                  {
-                    type: 'text',
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: 'Recent posts',
-                    version: 1,
-                  },
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                tag: 'h3',
-                version: 1,
-              },
-              {
-                type: 'paragraph',
-                children: [
-                  {
-                    type: 'text',
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: 'The posts below are displayed in an "Archive" layout building block which is an extremely powerful way to display documents on a page. It can be auto-populated by collection or by category, or posts can be individually selected. Pagination controls will automatically appear if the number of results exceeds the number of items per page.',
-                    version: 1,
-                  },
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                textFormat: 0,
-                version: 1,
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            version: 1,
-          },
-        },
-        populateBy: 'collection',
-        relationTo: 'posts',
-      },
-      {
         blockName: 'CTA',
         blockType: 'cta',
         links: [
@@ -579,8 +515,8 @@ export const home: (args: HomeArgs) => HomeSeedData = ({
             link: {
               type: 'custom',
               appearance: 'default',
-              label: 'All posts',
-              url: '/posts',
+              label: 'Contact',
+              url: '/contact',
             },
           },
         ],

@@ -14,17 +14,16 @@ import {
 import { CodeBlock, CodeBlockProps } from '@shna/shared/blocks/Code/Component'
 
 import type {
-  BannerBlock as BannerBlockProps,
   CallToActionBlock as CTABlockProps,
   MediaBlock as MediaBlockProps,
 } from '@shna/shared/payload-types'
-import { BannerBlock } from '@shna/shared/blocks/Banner/Component'
+import { BannerBlock, type BannerBlockFields } from '@shna/shared/blocks/Banner/Component'
 import { CallToActionBlock } from '@shna/shared/blocks/CallToAction/Component'
 import { cn } from '@shna/shared/utilities/ui'
 
 type NodeTypes =
   | DefaultNodeTypes
-  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
+  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockFields | CodeBlockProps>
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const { value, relationTo } = linkNode.fields.doc!
@@ -39,7 +38,9 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref }),
   blocks: {
-    banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
+    banner: ({ node }: { node: SerializedBlockNode<BannerBlockFields> }) => (
+      <BannerBlock className="col-start-2 mb-4" {...node.fields} />
+    ),
     mediaBlock: ({ node }) => (
       <MediaBlock
         className="col-start-1 col-span-3"

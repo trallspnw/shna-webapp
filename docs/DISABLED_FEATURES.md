@@ -51,12 +51,14 @@ What was disabled
 - Frontend posts routes removed in both site and CMS apps.
 - Archive/related-post UI blocks and cards removed.
 - Redirects plugin no longer registers posts.
+- Shared helpers now assume pages only (linking, rich text internal links, redirects, metadata).
 
 How to re-enable
 - Restore the Posts collection config in `apps/cms/src/collections/Posts` and add it back to `payload.config.ts`.
 - Restore posts routes under `apps/site/src/app/(frontend)/posts` and `apps/cms/src/app/(frontend)/posts`.
 - Restore archive/related-post components and wire them back into Pages blocks.
 - Re-add posts to redirects plugin collections in `apps/cms/src/plugins/index.ts`.
+- Reintroduce posts support in shared helpers (links, rich text, redirects, metadata) and regenerate types/import map.
 - Regenerate types and import map after schema changes.
 
 ## Categories (Taxonomy)

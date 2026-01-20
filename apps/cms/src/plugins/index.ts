@@ -7,7 +7,7 @@ import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 
-import type { Page, Post } from '@shna/shared/payload-types'
+import type { Page } from '@shna/shared/payload-types'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
 
 const getEnv = (key: string): string | undefined => process.env[key]
@@ -22,11 +22,11 @@ const r2Prefix = process.env.R2_PREFIX || 'local'
 const hasR2Config =
   r2Bucket && r2Endpoint && r2AccessKeyId && r2SecretAccessKey
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
+const generateTitle: GenerateTitle<Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
+const generateURL: GenerateURL<Page> = ({ doc }) => {
   const url = getServerSideURL()
 
   return doc?.slug ? `${url}/${doc.slug}` : url

@@ -21,6 +21,7 @@ feature work:
 - ✅ TODO: add a workflow step to reduce Fly CMS instances to 1 after deploy
 - ⏳ TODO: add tests to verify CMS build and site static export
 - ⏳ TODO: decide whether to remove seed functionality or make it SHNA-specific
+- ⏳ TODO: evaluate scheduled publishing + whether it can trigger a static rebuild
 
 ## Guiding Principles
 

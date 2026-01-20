@@ -1,12 +1,17 @@
-import type { BannerBlock as BannerBlockProps } from '@shna/shared/payload-types'
+import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { cn } from '@shna/shared/utilities/ui'
 import React from 'react'
 import RichText from '@shna/shared/components/RichText'
 
+export type BannerBlockFields = {
+  content: DefaultTypedEditorState
+  style?: 'info' | 'warning' | 'error' | 'success' | null
+}
+
 type Props = {
   className?: string
-} & BannerBlockProps
+} & BannerBlockFields
 
 export const BannerBlock: React.FC<Props> = ({ className, content, style }) => {
   return (

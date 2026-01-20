@@ -160,51 +160,56 @@ export const seed = async ({
   if (hasPostsCollection) {
     payload.logger.info(`— Seeding posts...`)
 
+    const payloadAny = payload as unknown as {
+      create: (args: { collection: 'posts' } & Record<string, unknown>) => Promise<unknown>
+      update: (args: { collection: 'posts' } & Record<string, unknown>) => Promise<unknown>
+    }
+
     // Do not create posts with `Promise.all` because we want the posts to be created in order
     // This way we can sort them by `createdAt` or `publishedAt` and they will be in the expected order
-    const post1Doc = await payload.create({
+    const post1Doc = (await payloadAny.create({
       collection: 'posts',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
       data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: seedAuthor }),
-    })
+    })) as { id: number | string }
 
-    const post2Doc = await payload.create({
+    const post2Doc = (await payloadAny.create({
       collection: 'posts',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
       data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: seedAuthor }),
-    })
+    })) as { id: number | string }
 
-    const post3Doc = await payload.create({
+    const post3Doc = (await payloadAny.create({
       collection: 'posts',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
       data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: seedAuthor }),
-    })
+    })) as { id: number | string }
 
     // update each post with related posts
-    await payload.update({
+    await payloadAny.update({
       id: post1Doc.id,
       collection: 'posts',
       data: {
         relatedPosts: [post2Doc.id, post3Doc.id],
       },
     })
-    await payload.update({
+    await payloadAny.update({
       id: post2Doc.id,
       collection: 'posts',
       data: {
         relatedPosts: [post1Doc.id, post3Doc.id],
       },
     })
-    await payload.update({
+    await payloadAny.update({
       id: post3Doc.id,
       collection: 'posts',
       data: {
