@@ -9,7 +9,7 @@ import React from 'react'
 import type { Props as MediaProps } from '../types'
 
 import { cssVariables } from '@shna/shared/cssVariables'
-import { getMediaUrl } from '@shna/shared/utilities/getMediaUrl'
+import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMediaUrl'
 
 const { breakpoints } = cssVariables
 
@@ -20,14 +20,14 @@ const placeholderBlur =
 /**
  * ImageMedia
  *
- * This component passes a **relative** `src` (e.g. `/media/...`) to Next.js Image.
- * The `getMediaUrl` utility constructs the full URL by prepending the base URL from env vars
- * (NEXT_PUBLIC_CMS_URL). Next.js then optimizes this using `remotePatterns` configured
- * in next.config.js — no custom `loader` needed.
+ * This component prefers external media URLs (R2) when available.
+ * The `getMediaUrl` utilities construct the full URL using the media prefix plus
+ * `NEXT_PUBLIC_MEDIA_ORIGIN` (client-safe). Next.js then optimizes this using
+ * `remotePatterns` configured in next.config.js — no custom `loader` needed.
  *
  * Flow:
- *   1. Resource URL from Payload: `/media/image-123.jpg`
- *   2. getMediaUrl() adds base URL: `https://yourdomain.com/media/image-123.jpg`
+ *   1. Resource URL from Payload: `/api/media/file/image-123.jpg`
+ *   2. getMediaUrlFromPrefix() builds: `https://media.yourdomain.com/<prefix>/image-123.jpg`
  *   3. Next.js Image optimizes via remotePatterns: `/_next/image?url=...&w=1200&q=75`
  *
  * If your storage/plugin returns **external CDN URLs** (e.g. `https://cdn.example.com/...`),
@@ -64,15 +64,16 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let src: StaticImageData | string = srcFromProps || ''
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, height: fullHeight, url, width: fullWidth } = resource
+    const { alt: altFromResource, height: fullHeight, url, width: fullWidth, filename, prefix } =
+      resource
 
     width = fullWidth!
     height = fullHeight!
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
-
-    src = getMediaUrl(url, cacheTag)
+    const r2Url = getMediaUrlFromPrefix(prefix, filename, cacheTag)
+    src = r2Url || getMediaUrl(url, cacheTag)
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)

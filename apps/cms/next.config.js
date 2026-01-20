@@ -11,11 +11,13 @@ const CMS_URL =
   process.env.__NEXT_PRIVATE_ORIGIN ||
   'http://localhost:3000'
 
+const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
-      ...[CMS_URL /* 'https://example.com' */].map((item) => {
+      ...[CMS_URL, R2_PUBLIC_URL].filter(Boolean).map((item) => {
         const url = new URL(item)
 
         return {

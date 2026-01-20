@@ -94,7 +94,7 @@ Note: workspace scripts load the repo-root `.env` via `dotenv-cli`, so you do no
   pnpm dev:site
   ```
 
-* Export static site (copies CMS media into the site first)
+* Export static site (media served from R2)
 
   ```bash
   pnpm export:site
@@ -169,6 +169,23 @@ pnpm export:site
 
 This build reads content from the CMS HTTP API (`NEXT_PUBLIC_CMS_URL`) at build time.
 Make sure the CMS is reachable when you run the export.
+Media URLs are served from Cloudflare R2 (`R2_PUBLIC_URL`) and do not require local sync.
+Set `NEXT_PUBLIC_MEDIA_ORIGIN` to the public media origin so previews and static exports
+resolve media from R2 using each media item's stored prefix.
+Favicons are configurable in the `site-settings` global (SVG + ICO).
+
+## Media storage (R2)
+
+CMS uploads are stored in Cloudflare R2 and referenced by absolute URLs.
+
+Recommended local setup:
+
+* Use the same bucket as prod.
+* Set `R2_PREFIX=local/<your-name>` for local uploads.
+* Configure an R2 lifecycle rule to delete objects under `local/` after a short TTL.
+
+This keeps local uploads isolated while allowing prod DB syncs to keep working
+without rewriting media URLs.
 
 ## Database
 

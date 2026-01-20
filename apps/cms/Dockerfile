@@ -26,8 +26,8 @@ COPY --from=deps /app/apps/cms/node_modules ./apps/cms/node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY --from=builder /app/apps/cms ./apps/cms
 COPY --from=builder /app/packages/shared ./packages/shared
-RUN mkdir -p /app/apps/cms/public/media /app/apps/cms/.next/cache \
-  && chown -R nextjs:nodejs /app/apps/cms/public /app/apps/cms/.next
+RUN mkdir -p /app/apps/cms/.next/cache \
+  && chown -R nextjs:nodejs /app/apps/cms/.next
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000

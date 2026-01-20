@@ -12,7 +12,7 @@
     "build:site": "dotenv -e ./.env -- pnpm --filter @shna/site build",
     "build": "pnpm build:cms && pnpm build:site",
     "sync:media": "node ./scripts/sync-media.mjs",
-    "export:site": "pnpm sync:media && dotenv -e ./.env -- pnpm --filter @shna/site build",
+    "export:site": "dotenv -e ./.env -- pnpm --filter @shna/site build",
     "serve:site": "npx serve -l 3001 apps/site/out",
     "export:site:serve": "pnpm export:site && pnpm serve:site",
     "start": "dotenv -e ./.env -- pnpm --filter @shna/cms start",
