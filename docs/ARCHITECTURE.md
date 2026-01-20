@@ -168,11 +168,6 @@ Public site rules:
 * Revisions/drafts in Payload are used to demo content or UI changes
 * Public site remains static
 
-### Search
-
-* The search page renders statically; results are fetched client-side from the CMS API.
-* The site still renders without the backend, but search results require CMS availability.
-
 ### Indexing Control
 
 * Public site indexing is controlled by the `site-settings` global (`allowIndexing`) at build time.

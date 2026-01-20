@@ -19,11 +19,6 @@ later. Keep it concise and update only when a lesson is repeatable.
 - The CMS base URL is `NEXT_PUBLIC_CMS_URL`. Keep it consistent across docs and
   scripts to avoid split-brain routing.
 
-## Site runtime behavior
-
-- Static site pages are fully static after export, but search results are fetched
-  client-side from the CMS API. Search is not offline without CMS.
-
 ## Type generation
 
 - `packages/shared/src/payload-types.ts` is used by both apps. The site app

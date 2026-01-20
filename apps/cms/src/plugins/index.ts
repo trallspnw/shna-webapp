@@ -2,14 +2,11 @@ import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
-import { searchPlugin } from '@payloadcms/plugin-search'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { searchFields } from '@/search/fieldOverrides'
-import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import type { Page, Post } from '@shna/shared/payload-types'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
@@ -111,15 +108,6 @@ export const plugins: Plugin[] = [
           }
           return field
         })
-      },
-    },
-  }),
-  searchPlugin({
-    collections: ['posts'],
-    beforeSync: beforeSyncWithSearch,
-    searchOverrides: {
-      fields: ({ defaultFields }) => {
-        return [...defaultFields, ...searchFields]
       },
     },
   }),
