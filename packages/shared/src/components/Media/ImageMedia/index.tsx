@@ -9,7 +9,7 @@ import React from 'react'
 import type { Props as MediaProps } from '../types'
 
 import { cssVariables } from '@shna/shared/cssVariables'
-import { getMediaUrl } from '@shna/shared/utilities/getMediaUrl'
+import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMediaUrl'
 
 const { breakpoints } = cssVariables
 
@@ -64,15 +64,16 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let src: StaticImageData | string = srcFromProps || ''
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, height: fullHeight, url, width: fullWidth } = resource
+    const { alt: altFromResource, height: fullHeight, url, width: fullWidth, filename, prefix } =
+      resource
 
     width = fullWidth!
     height = fullHeight!
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
-
-    src = getMediaUrl(url, cacheTag)
+    const r2Url = getMediaUrlFromPrefix(prefix, filename, cacheTag)
+    src = r2Url || getMediaUrl(url, cacheTag)
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)

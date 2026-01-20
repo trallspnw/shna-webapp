@@ -7,11 +7,10 @@ later. Keep it concise and update only when a lesson is repeatable.
 
 - Static export must not depend on CMS runtime routes. Media URLs that point to
   `/api/media/file/*` will break when the CMS is stopped.
-- The current workaround copies CMS media from `apps/cms/public/media` to
-  `apps/site/public/media` during export (`pnpm sync:media`). This assumes local
-  disk storage.
-- If media moves to R2/S3 or another external store, replace `sync:media` with a
-  build-time download or switch the frontend to use the external media origin.
+- Media now lives in Cloudflare R2 and is referenced by absolute URLs, so the
+  static export no longer needs to copy files locally.
+- If media storage changes again, ensure the frontend keeps using externally
+  reachable URLs so the public site stays static-only.
 
 ## Env + URLs
 

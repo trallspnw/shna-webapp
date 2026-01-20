@@ -1,5 +1,39 @@
 import { getClientSideURL, getCMSURL } from '@shna/shared/utilities/getURL'
 
+const normalizeMediaBaseUrl = (): string | undefined => {
+  if (process.env.NEXT_PUBLIC_MEDIA_URL) {
+    return process.env.NEXT_PUBLIC_MEDIA_URL.replace(/\/$/, '')
+  }
+
+  const mediaOrigin = getMediaOrigin()
+  if (!mediaOrigin) return undefined
+
+  const r2Prefix = process.env.R2_PREFIX || 'local'
+  return `${mediaOrigin}/${r2Prefix}/media`
+}
+
+export const getMediaOrigin = (): string | undefined => {
+  const origin = process.env.NEXT_PUBLIC_MEDIA_ORIGIN
+  return origin ? origin.replace(/\/$/, '') : undefined
+}
+
+export const getMediaUrlFromPrefix = (
+  prefix: string | null | undefined,
+  filename: string | null | undefined,
+  cacheTag?: string | null,
+): string | undefined => {
+  if (!prefix || !filename) return undefined
+  const origin = getMediaOrigin()
+  if (!origin) return undefined
+
+  const normalizedPrefix = prefix.replace(/^\/+/, '').replace(/\/$/, '')
+  let url = `${origin}/${normalizedPrefix}/${filename}`
+  if (cacheTag && cacheTag !== '') {
+    url += `${url.includes('?') ? '&' : '?'}v=${encodeURIComponent(cacheTag)}`
+  }
+  return url
+}
+
 /**
  * Processes media resource URL to ensure proper formatting
  * @param url The original URL from the resource
@@ -23,9 +57,21 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
   }
 
   if (hasApiMediaPath) {
-    // Use static media path so exported sites do not depend on CMS runtime routes.
+    // Prefer external media origin when available; fallback to local static path.
     const withoutOrigin = normalizedUrl.replace(/^https?:\/\/[^/]+/, '')
-    normalizedUrl = withoutOrigin.replace('/api/media/file/', '/media/')
+    const mediaBaseUrl = normalizeMediaBaseUrl()
+    if (mediaBaseUrl) {
+      normalizedUrl = `${mediaBaseUrl}/${withoutOrigin.replace('/api/media/file/', '')}`
+    } else {
+      normalizedUrl = withoutOrigin.replace('/api/media/file/', '/media/')
+    }
+  }
+
+  if (normalizedUrl.startsWith('/media/')) {
+    const mediaBaseUrl = normalizeMediaBaseUrl()
+    if (mediaBaseUrl) {
+      normalizedUrl = `${mediaBaseUrl}${normalizedUrl.replace('/media', '')}`
+    }
   }
 
   if (normalizedUrl.startsWith('/')) {
