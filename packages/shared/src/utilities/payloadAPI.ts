@@ -5,6 +5,7 @@ type FetchOptions = {
   depth?: number
   draft?: boolean
   headers?: HeadersInit
+  locale?: string
   params?: Record<string, string | number | boolean | undefined>
 }
 
@@ -26,8 +27,8 @@ const buildURL = (path: string, params?: FetchOptions['params'], draft?: boolean
 }
 
 export const fetchFromCMS = async <T>(path: string, options: FetchOptions = {}): Promise<T> => {
-  const { cache, depth, draft, headers, params } = options
-  const url = buildURL(path, { ...params, depth }, draft)
+  const { cache, depth, draft, headers, locale, params } = options
+  const url = buildURL(path, { ...params, depth, locale }, draft)
 
   const response = await fetch(url, {
     headers,

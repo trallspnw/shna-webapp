@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -18,6 +18,15 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import {
+  clearEmptyLocalizedText,
+  requireDefaultLocale,
+} from '@shna/shared/utilities/localizedFieldHooks'
+
+const withLocalization = <T extends Field>(field: T): T => ({
+  ...field,
+  localized: true,
+})
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -42,6 +51,7 @@ export const Pages: CollectionConfig<'pages'> = {
           slug: data?.slug,
           collection: 'pages',
           req,
+          locale: req.locale,
         }),
     },
     preview: (data, { req }) =>
@@ -49,6 +59,7 @@ export const Pages: CollectionConfig<'pages'> = {
         slug: data?.slug as string,
         collection: 'pages',
         req,
+        locale: req.locale,
       }),
     useAsTitle: 'title',
   },
@@ -56,7 +67,12 @@ export const Pages: CollectionConfig<'pages'> = {
     {
       name: 'title',
       type: 'text',
-      required: true,
+      localized: true,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedText],
+      },
+      validate: requireDefaultLocale,
+      required: false,
     },
     {
       type: 'tabs',
@@ -88,14 +104,17 @@ export const Pages: CollectionConfig<'pages'> = {
               descriptionPath: 'meta.description',
               imagePath: 'meta.image',
             }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-
-            MetaDescriptionField({}),
+            withLocalization(
+              MetaTitleField({
+                hasGenerateFn: true,
+              }) as Field,
+            ),
+            withLocalization(
+              MetaImageField({
+                relationTo: 'media',
+              }) as Field,
+            ),
+            withLocalization(MetaDescriptionField({}) as Field),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,

@@ -1,11 +1,16 @@
 import React from 'react'
 
 import type { CallToActionBlock as CTABlockProps } from '@shna/shared/payload-types'
+import type { Locale } from '@shna/shared/utilities/locale'
 
 import RichText from '@shna/shared/components/RichText'
 import { CMSLink } from '@shna/shared/components/Link'
 
-export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) => {
+type Props = CTABlockProps & {
+  locale?: Locale
+}
+
+export const CallToActionBlock: React.FC<Props> = ({ links, richText, locale }) => {
   return (
     <div className="container">
       <div className="bg-card rounded border-border border p-4 flex flex-col gap-8 md:flex-row md:justify-between md:items-center">
@@ -14,7 +19,7 @@ export const CallToActionBlock: React.FC<CTABlockProps> = ({ links, richText }) 
         </div>
         <div className="flex flex-col gap-8">
           {(links || []).map(({ link }, i) => {
-            return <CMSLink key={i} size="lg" {...link} />
+            return <CMSLink key={i} size="lg" {...link} locale={locale} />
           })}
         </div>
       </div>

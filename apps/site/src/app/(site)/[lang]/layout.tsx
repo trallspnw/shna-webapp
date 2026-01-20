@@ -13,12 +13,17 @@ import { mergeOpenGraph } from '@shna/shared/utilities/mergeOpenGraph'
 import { getCachedGlobal } from '@shna/shared/utilities/getGlobals'
 import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMediaUrl'
 
-import './globals.css'
+import '../globals.css'
 import { getSiteURL } from '@shna/shared/utilities/getURL'
+import { getLocaleFromParam } from '@shna/shared/utilities/locale'
 
 type SiteSettings = Config['globals']['site-settings']
 
-const getSiteSettings = getCachedGlobal('site-settings', 1)
+export const dynamicParams = false
+
+export async function generateStaticParams() {
+  return ['en', 'es'].map((lang) => ({ lang }))
+}
 
 const resolveFaviconUrl = (media?: Media | number | null): string | null => {
   if (!media || typeof media !== 'object') return null
@@ -27,8 +32,15 @@ const resolveFaviconUrl = (media?: Media | number | null): string | null => {
   return fromPrefix || getMediaUrl(media.url, media.updatedAt) || null
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const siteSettings = (await getSiteSettings()) as SiteSettings
+type Props = {
+  children: React.ReactNode
+  params: Promise<{ lang: string }>
+}
+
+export default async function RootLayout({ children, params }: Props) {
+  const { lang } = await params
+  const locale = getLocaleFromParam(lang)
+  const siteSettings = (await getCachedGlobal('site-settings', 1, false, undefined, locale)()) as SiteSettings
   const allowIndexing = siteSettings?.allowIndexing === true
   const faviconSvgUrl = resolveFaviconUrl(siteSettings?.faviconSvg)
   const faviconIcoUrl = resolveFaviconUrl(siteSettings?.faviconIco)
@@ -36,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       className={cn(GeistSans.variable, GeistMono.variable)}
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       data-theme="light"
     >
@@ -47,9 +59,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <Providers>
-          <Header />
+          <Header locale={locale} />
           {children}
-          <Footer />
+          <Footer locale={locale} />
         </Providers>
       </body>
     </html>

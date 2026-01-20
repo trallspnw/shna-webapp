@@ -9,11 +9,13 @@ async function getGlobal(
   depth = 0,
   draft = false,
   headers?: HeadersInit,
+  locale?: string,
 ) {
   return fetchFromCMS<Config['globals'][Global]>(`/api/globals/${slug}`, {
     depth,
     draft,
     headers,
+    locale,
   })
 }
 
@@ -25,12 +27,17 @@ export const getCachedGlobal = (
   depth = 0,
   draft = false,
   headers?: HeadersInit,
+  locale?: string,
 ) => {
   if (draft) {
-    return async () => getGlobal(slug, depth, true, headers)
+    return async () => getGlobal(slug, depth, true, headers, locale)
   }
 
-  return unstable_cache(async () => getGlobal(slug, depth, false, headers), [slug, String(depth)], {
-    tags: [`global_${slug}`],
-  })
+  return unstable_cache(
+    async () => getGlobal(slug, depth, false, headers, locale),
+    [slug, String(depth), String(locale ?? '')],
+    {
+      tags: [`global_${slug}`],
+    },
+  )
 }

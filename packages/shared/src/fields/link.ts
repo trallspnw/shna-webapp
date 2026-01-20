@@ -1,6 +1,10 @@
 import type { Field, GroupField } from 'payload'
 
 import deepMerge from '@shna/shared/utilities/deepMerge'
+import {
+  clearEmptyLocalizedText,
+  requireDefaultLocale,
+} from '@shna/shared/utilities/localizedFieldHooks'
 
 export type LinkAppearances = 'default' | 'outline'
 
@@ -81,11 +85,16 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     {
       name: 'url',
       type: 'text',
+      localized: true,
+      required: false,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedText],
+      },
+      validate: requireDefaultLocale,
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'custom',
       },
       label: 'Custom URL',
-      required: true,
     },
   ]
 
@@ -105,11 +114,16 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
         {
           name: 'label',
           type: 'text',
+          localized: true,
+          required: false,
+          hooks: {
+            beforeValidate: [clearEmptyLocalizedText],
+          },
+          validate: requireDefaultLocale,
           admin: {
             width: '50%',
           },
           label: 'Label',
-          required: true,
         },
       ],
     })

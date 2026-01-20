@@ -92,7 +92,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'es') | ('en' | 'es')[];
   globals: {
     header: Header;
     footer: Footer;
@@ -103,7 +103,7 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'es';
   user: User & {
     collection: 'users';
   };
@@ -142,7 +142,7 @@ export interface UserAuthOperations {
  */
 export interface Page {
   id: number;
-  title: string;
+  title?: string | null;
   hero: {
     type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
     richText?: {
@@ -162,7 +162,7 @@ export interface Page {
     } | null;
     links?:
       | {
-          link: {
+          link?: {
             type?: ('reference' | 'custom') | null;
             newTab?: boolean | null;
             reference?: {
@@ -170,7 +170,7 @@ export interface Page {
               value: number | Page;
             } | null;
             url?: string | null;
-            label: string;
+            label?: string | null;
             /**
              * Choose how the link should be rendered.
              */
@@ -201,6 +201,8 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Media files are shared across locales. For localized imagery, upload a separate Media document and select it per locale.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -315,7 +317,7 @@ export interface CallToActionBlock {
   } | null;
   links?:
     | {
-        link: {
+        link?: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
           reference?: {
@@ -323,7 +325,7 @@ export interface CallToActionBlock {
             value: number | Page;
           } | null;
           url?: string | null;
-          label: string;
+          label?: string | null;
           /**
            * Choose how the link should be rendered.
            */
@@ -368,7 +370,7 @@ export interface ContentBlock {
             value: number | Page;
           } | null;
           url?: string | null;
-          label: string;
+          label?: string | null;
           /**
            * Choose how the link should be rendered.
            */
@@ -931,7 +933,7 @@ export interface Header {
   id: number;
   navItems?:
     | {
-        link: {
+        link?: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
           reference?: {
@@ -939,7 +941,7 @@ export interface Header {
             value: number | Page;
           } | null;
           url?: string | null;
-          label: string;
+          label?: string | null;
         };
         id?: string | null;
       }[]
@@ -955,7 +957,7 @@ export interface Footer {
   id: number;
   navItems?:
     | {
-        link: {
+        link?: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
           reference?: {
@@ -963,7 +965,7 @@ export interface Footer {
             value: number | Page;
           } | null;
           url?: string | null;
-          label: string;
+          label?: string | null;
         };
         id?: string | null;
       }[]

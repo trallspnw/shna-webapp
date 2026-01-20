@@ -37,14 +37,15 @@ const getPagesSitemap = unstable_cache(
     const sitemap = results.docs
       ? results.docs
           .filter((page) => Boolean(page?.slug))
-          .map((page) => {
+          .flatMap((page) => {
             const updatedAt = page?.updatedAt
             const lastmod = updatedAt ? new Date(updatedAt).toISOString() : dateFallback
+            const slugPath = page?.slug === 'home' ? '' : `/${page?.slug}`
 
-            return {
-              loc: page?.slug === 'home' ? `${SITE_URL}/` : `${SITE_URL}/${page?.slug}`,
+            return ['en', 'es'].map((locale) => ({
+              loc: `${SITE_URL}/${locale}${slugPath}`,
               lastmod,
-            }
+            }))
           })
       : []
 

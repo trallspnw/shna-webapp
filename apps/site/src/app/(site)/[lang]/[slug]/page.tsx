@@ -9,6 +9,7 @@ import { generateMeta } from '@shna/shared/utilities/generateMeta'
 import { fetchFromCMS } from '@shna/shared/utilities/payloadAPI'
 import type { Page } from '@shna/shared/payload-types'
 import PageClient from './page.client'
+import { getLocaleFromParam } from '@shna/shared/utilities/locale'
 
 export const dynamic = 'force-static'
 export const dynamicParams = false
@@ -23,35 +24,40 @@ export async function generateStaticParams() {
       },
     })
 
-    const params =
+    const slugs =
       pages.docs
         ?.filter((doc) => Boolean(doc.slug) && doc.slug !== 'home')
         .map(({ slug }) => ({ slug })) ?? []
 
-    return params.length > 0 ? params : [{ slug: 'home' }]
+    const params = ['en', 'es'].flatMap((lang) => slugs.map(({ slug }) => ({ lang, slug })))
+
+    return params.length > 0 ? params : ['en', 'es'].map((lang) => ({ lang, slug: 'home' }))
   } catch (error) {
     console.warn('Failed to fetch pages for static params; exporting home only.', error)
-    return [{ slug: 'home' }]
+    return ['en', 'es'].map((lang) => ({ lang, slug: 'home' }))
   }
 }
 
 type Args = {
   params: Promise<{
+    lang: string
     slug?: string
   }>
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
-  const { slug = 'home' } = await paramsPromise
+  const { lang, slug = 'home' } = await paramsPromise
+  const locale = getLocaleFromParam(lang)
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const url = '/' + decodedSlug
+  const url = decodedSlug === 'home' ? `/${locale}` : `/${locale}/${decodedSlug}`
   const page = await queryPageBySlug({
     slug: decodedSlug,
+    locale,
   })
 
   if (!page) {
-    return <PayloadRedirects url={url} />
+    return <PayloadRedirects locale={locale} url={url} />
   }
 
   const { hero, layout } = page
@@ -60,28 +66,31 @@ export default async function Page({ params: paramsPromise }: Args) {
     <article className="pt-16 pb-24">
       <PageClient />
       {/* Allows redirects for valid pages too */}
-      <PayloadRedirects disableNotFound url={url} />
+      <PayloadRedirects disableNotFound locale={locale} url={url} />
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
+      <RenderHero locale={locale} {...hero} />
+      <RenderBlocks blocks={layout} locale={locale} />
     </article>
   )
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = 'home' } = await paramsPromise
+  const { lang, slug = 'home' } = await paramsPromise
+  const locale = getLocaleFromParam(lang)
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const page = await queryPageBySlug({
     slug: decodedSlug,
+    locale,
   })
 
-  return generateMeta({ doc: page })
+  return generateMeta({ doc: page, locale })
 }
 
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
+const queryPageBySlug = cache(async ({ slug, locale }: { slug: string; locale: string }) => {
   const result = await fetchFromCMS<{ docs: Page[] }>('/api/pages', {
     depth: 2,
+    locale,
     params: {
       'where[slug][equals]': slug,
       limit: 1,

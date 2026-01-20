@@ -13,51 +13,58 @@ import { generateMeta } from '@shna/shared/utilities/generateMeta'
 import type { Page } from '@shna/shared/payload-types'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { getLocaleFromParam, type Locale } from '@shna/shared/utilities/locale'
 
 export async function generateStaticParams() {
   if (!process.env.PAYLOAD_SECRET || !process.env.DATABASE_URL) {
     return []
   }
 
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const pages = await payload.find({
+      collection: 'pages',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: {
+        slug: true,
+      },
     })
 
-  return params
+    const params = pages.docs
+      ?.filter((doc) => doc.slug !== 'home')
+      .flatMap(({ slug }) => ['en', 'es'].map((lang) => ({ lang, slug })))
+
+    return params && params.length > 0
+      ? params
+      : ['en', 'es'].map((lang) => ({ lang, slug: 'home' }))
+  } catch (error) {
+    console.warn('Failed to fetch pages for static params; skipping.', error)
+    return []
+  }
 }
 
 type Args = {
   params: Promise<{
+    lang: string
     slug?: string
   }>
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { slug = 'home' } = await paramsPromise
+  const { lang, slug = 'home' } = await paramsPromise
+  const locale = getLocaleFromParam(lang)
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const url = '/' + decodedSlug
+  const url = decodedSlug === 'home' ? `/${locale}` : `/${locale}/${decodedSlug}`
   let page: RequiredDataFromCollectionSlug<'pages'> | null
 
   page = await queryPageBySlug({
     slug: decodedSlug,
+    locale,
   })
 
   // Remove this code once your website is seeded
@@ -66,7 +73,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   }
 
   if (!page) {
-    return <PayloadRedirects url={url} />
+    return <PayloadRedirects locale={locale} url={url} />
   }
 
   const { hero, layout } = page
@@ -75,29 +82,37 @@ export default async function Page({ params: paramsPromise }: Args) {
     <article className="pt-16 pb-24">
       <PageClient />
       {/* Allows redirects for valid pages too */}
-      <PayloadRedirects disableNotFound url={url} />
+      <PayloadRedirects disableNotFound locale={locale} url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
+      <RenderHero locale={locale} {...hero} />
+      <RenderBlocks blocks={layout} locale={locale} />
     </article>
   )
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = 'home' } = await paramsPromise
+  const { lang, slug = 'home' } = await paramsPromise
+  const locale = getLocaleFromParam(lang)
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const page = await queryPageBySlug({
     slug: decodedSlug,
+    locale,
   })
 
-  return generateMeta({ doc: page as unknown as Page })
+  return generateMeta({ doc: page as unknown as Page, locale })
 }
 
 const queryPageBySlug = cache(
-  async ({ slug }: { slug: string }): Promise<RequiredDataFromCollectionSlug<'pages'> | null> => {
+  async ({
+    slug,
+    locale,
+  }: {
+    slug: string
+    locale: Locale
+  }): Promise<RequiredDataFromCollectionSlug<'pages'> | null> => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
@@ -108,6 +123,7 @@ const queryPageBySlug = cache(
     limit: 1,
     pagination: false,
     overrideAccess: draft,
+    locale,
     where: {
       slug: {
         equals: slug,

@@ -8,6 +8,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { link } from '@shna/shared/fields/link'
+import { clearEmptyLocalizedRichText } from '@shna/shared/utilities/localizedFieldHooks'
 
 const columnFields: Field[] = [
   {
@@ -36,6 +37,10 @@ const columnFields: Field[] = [
   {
     name: 'richText',
     type: 'richText',
+    localized: true,
+    hooks: {
+      beforeValidate: [clearEmptyLocalizedRichText],
+    },
     editor: lexicalEditor({
       features: ({ rootFeatures }) => {
         return [

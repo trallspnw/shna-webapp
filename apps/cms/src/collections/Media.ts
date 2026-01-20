@@ -8,10 +8,18 @@ import {
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import {
+  clearEmptyLocalizedRichText,
+  clearEmptyLocalizedText,
+} from '@shna/shared/utilities/localizedFieldHooks'
 
 export const Media: CollectionConfig = {
   slug: 'media',
   folders: false,
+  admin: {
+    description:
+      'Media files are shared across locales. For localized imagery, upload a separate Media document and select it per locale.',
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -22,11 +30,19 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
+      localized: true,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedText],
+      },
       //required: true,
     },
     {
       name: 'caption',
       type: 'richText',
+      localized: true,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedRichText],
+      },
       editor: lexicalEditor({
         features: ({ rootFeatures }) => {
           return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]

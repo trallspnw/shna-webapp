@@ -3,11 +3,16 @@ import React from 'react'
 import RichText from '@shna/shared/components/RichText'
 
 import type { ContentBlock as ContentBlockProps } from '@shna/shared/payload-types'
+import type { Locale } from '@shna/shared/utilities/locale'
 
 import { CMSLink } from '../../components/Link'
 
-export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
-  const { columns } = props
+type Props = ContentBlockProps & {
+  locale?: Locale
+}
+
+export const ContentBlock: React.FC<Props> = (props) => {
+  const { columns, locale } = props
 
   const colsSpanClasses = {
     full: '12',
@@ -33,7 +38,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
               >
                 {richText && <RichText data={richText} enableGutter={false} />}
 
-                {enableLink && <CMSLink {...link} />}
+                {enableLink && <CMSLink {...link} locale={locale} />}
               </div>
             )
           })}

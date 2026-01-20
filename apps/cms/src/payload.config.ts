@@ -69,6 +69,11 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
+  localization: {
+    locales: ['en', 'es'],
+    defaultLocale: 'en',
+    fallback: true,
+  },
   collections: [Pages, Media, Users],
   cors: corsOrigins,
   globals: [Header, Footer, SiteSettings],

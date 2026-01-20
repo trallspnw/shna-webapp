@@ -5,6 +5,7 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
+import { clearEmptyLocalizedRichText } from '@shna/shared/utilities/localizedFieldHooks'
 
 export const Banner: Block = {
   slug: 'banner',
@@ -24,6 +25,10 @@ export const Banner: Block = {
     {
       name: 'content',
       type: 'richText',
+      localized: true,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedRichText],
+      },
       editor: lexicalEditor({
         features: ({ rootFeatures }) => {
           return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]

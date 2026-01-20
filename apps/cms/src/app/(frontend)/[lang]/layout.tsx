@@ -15,8 +15,9 @@ import { draftMode, headers } from 'next/headers'
 import { getCachedGlobal } from '@shna/shared/utilities/getGlobals'
 import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMediaUrl'
 
-import './globals.css'
+import '../globals.css'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
+import { getLocaleFromParam } from '@shna/shared/utilities/locale'
 
 type SiteSettings = Config['globals']['site-settings']
 
@@ -27,9 +28,22 @@ const resolveFaviconUrl = (media?: Media | number | null): string | null => {
   return fromPrefix || getMediaUrl(media.url, media.updatedAt) || null
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export const dynamicParams = false
+
+export async function generateStaticParams() {
+  return ['en', 'es'].map((lang) => ({ lang }))
+}
+
+type Props = {
+  children: React.ReactNode
+  params: Promise<{ lang: string }>
+}
+
+export default async function RootLayout({ children, params }: Props) {
   const { isEnabled } = await draftMode()
   const requestHeaders = await headers()
+  const { lang } = await params
+  const locale = getLocaleFromParam(lang)
   const hasCMSURL = Boolean(
     process.env.NEXT_PUBLIC_CMS_URL ||
       process.env.CMS_PUBLIC_URL ||
@@ -41,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     1,
     isEnabled,
     requestHeaders,
+    locale,
   )()) as SiteSettings
   const faviconSvgUrl = resolveFaviconUrl(siteSettings?.faviconSvg)
   const faviconIcoUrl = resolveFaviconUrl(siteSettings?.faviconIco)
@@ -48,7 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       className={cn(GeistSans.variable, GeistMono.variable)}
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       data-theme="light"
     >
@@ -64,9 +79,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }}
           />
 
-          {hasCMSURL && <Header draft={isEnabled} headers={requestHeaders} />}
+          {hasCMSURL && <Header draft={isEnabled} headers={requestHeaders} locale={locale} />}
           {children}
-          {hasCMSURL && <Footer draft={isEnabled} headers={requestHeaders} />}
+          {hasCMSURL && <Footer draft={isEnabled} headers={requestHeaders} locale={locale} />}
         </Providers>
       </body>
     </html>

@@ -8,6 +8,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@shna/shared/fields/linkGroup'
+import { clearEmptyLocalizedRichText } from '@shna/shared/utilities/localizedFieldHooks'
 
 export const CallToAction: Block = {
   slug: 'cta',
@@ -16,6 +17,10 @@ export const CallToAction: Block = {
     {
       name: 'richText',
       type: 'richText',
+      localized: true,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedRichText],
+      },
       editor: lexicalEditor({
         features: ({ rootFeatures }) => {
           return [

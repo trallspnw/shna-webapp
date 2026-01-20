@@ -4,12 +4,14 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { Page } from '@shna/shared/payload-types'
+import type { Locale } from '@shna/shared/utilities/locale'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
   children?: React.ReactNode
   className?: string
   label?: string | null
+  locale?: Locale
   newTab?: boolean | null
   reference?: {
     relationTo: 'pages'
@@ -27,18 +29,27 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     children,
     className,
     label,
+    locale,
     newTab,
     reference,
     size: sizeFromProps,
     url,
   } = props
 
-  const href =
+  const prefixPath = (path?: string | null) => {
+    if (!locale || !path || !path.startsWith('/')) return path
+    if (path === `/${locale}` || path.startsWith(`/${locale}/`)) return path
+    if (path.startsWith('/share')) return path
+    return `/${locale}${path === '/' ? '' : path}`
+  }
+
+  const rawHref =
     type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
       ? `${reference?.relationTo !== 'pages' ? `/${reference?.relationTo}` : ''}/${
-          reference.value.slug
+          reference.value.slug === 'home' ? '' : reference.value.slug
         }`
       : url
+  const href = prefixPath(rawHref)
 
   if (!href) return null
 

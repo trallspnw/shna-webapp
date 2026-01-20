@@ -25,6 +25,7 @@ feature work:
 - ⏳ TODO: implement social share pages + metadata (e.g., `/share/[slug]`)
 - ⏳ TODO: add an admin utility to generate share links
 - ⏳ TODO: review and extend noindex controls for page-level overrides
+- ⏳ TODO: investigate local media deletes affecting prod (local R2 prefix vs shared bucket safeguards)
 
 ## Guiding Principles
 

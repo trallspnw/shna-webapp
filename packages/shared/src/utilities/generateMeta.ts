@@ -3,7 +3,8 @@ import type { Metadata } from 'next'
 import type { Media, Page, Config } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
-import { getServerSideURL } from './getURL'
+import { getServerSideURL, getSiteURL } from './getURL'
+import type { Locale } from './locale'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL()
@@ -21,14 +22,21 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
 
 export const generateMeta = async (args: {
   doc: Partial<Page> | null
+  locale?: Locale
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { doc, locale } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
 
   const title = doc?.meta?.title
     ? doc?.meta?.title + ' | Payload Website Template'
     : 'Payload Website Template'
+
+  const siteURL = getSiteURL()
+  const prefix = locale ? `/${locale}` : ''
+  const slug = Array.isArray(doc?.slug) ? doc?.slug.join('/') : doc?.slug
+  const path = slug && slug !== 'home' ? `/${slug}` : ''
+  const url = `${siteURL}${prefix}${path}`
 
   return {
     description: doc?.meta?.description,
@@ -42,7 +50,7 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      url,
     }),
     title,
   }

@@ -4,14 +4,16 @@ import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import type { Header } from '@shna/shared/payload-types'
+import type { Locale } from '@shna/shared/utilities/locale'
 
 import { HeaderNav } from './Nav'
 
 interface HeaderClientProps {
   data: Header
+  locale?: Locale
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data, locale }) => {
   /* Storing the value in a useState to avoid hydration errors */
   const [theme, setTheme] = useState<string | null>(null)
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
@@ -28,9 +30,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   }, [headerTheme])
 
   return (
-    <header className="container relative z-20   " {...(theme ? { 'data-theme': theme } : {})}>
+    <header className="container relative z-40" {...(theme ? { 'data-theme': theme } : {})}>
       <div className="py-8 flex justify-end">
-        <HeaderNav data={data} />
+        <HeaderNav data={data} locale={locale} />
       </div>
     </header>
   )

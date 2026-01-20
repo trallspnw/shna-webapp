@@ -5,6 +5,7 @@ import type { Page } from '@shna/shared/payload-types'
 import { CallToActionBlock } from '@shna/shared/blocks/CallToAction/Component'
 import { ContentBlock } from '@shna/shared/blocks/Content/Component'
 import { MediaBlock } from '@shna/shared/blocks/MediaBlock/Component'
+import type { Locale } from '@shna/shared/utilities/locale'
 
 const blockComponents = {
   content: ContentBlock,
@@ -14,8 +15,9 @@ const blockComponents = {
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
+  locale?: Locale
 }> = (props) => {
-  const { blocks } = props
+  const { blocks, locale } = props
 
   const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
 
@@ -32,7 +34,7 @@ export const RenderBlocks: React.FC<{
               return (
                 <div className="my-16" key={index}>
                   {/* @ts-expect-error there may be some mismatch between the expected types here */}
-                  <Block {...block} disableInnerContainer />
+                  <Block {...block} disableInnerContainer locale={locale} />
                 </div>
               )
             }

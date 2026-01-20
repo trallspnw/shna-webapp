@@ -8,6 +8,10 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@shna/shared/fields/linkGroup'
+import {
+  clearEmptyLocalizedRichText,
+  requireDefaultLocale,
+} from '@shna/shared/utilities/localizedFieldHooks'
 
 export const hero: Field = {
   name: 'hero',
@@ -41,6 +45,10 @@ export const hero: Field = {
     {
       name: 'richText',
       type: 'richText',
+      localized: true,
+      hooks: {
+        beforeValidate: [clearEmptyLocalizedRichText],
+      },
       editor: lexicalEditor({
         features: ({ rootFeatures }) => {
           return [
@@ -61,11 +69,13 @@ export const hero: Field = {
     {
       name: 'media',
       type: 'upload',
+      localized: true,
+      validate: requireDefaultLocale,
       admin: {
         condition: (_, { type } = {}) => ['highImpact', 'mediumImpact'].includes(type),
       },
       relationTo: 'media',
-      required: true,
+      required: false,
     },
   ],
   label: false,

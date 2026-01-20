@@ -40,6 +40,10 @@ const fetchSiteSettings = async () => {
 module.exports = {
   siteUrl: SITE_URL,
   generateRobotsTxt: true,
+  alternateRefs: [
+    { href: `${SITE_URL}/en`, hreflang: 'en' },
+    { href: `${SITE_URL}/es`, hreflang: 'es' },
+  ],
   robotsTxtOptions: {
     policies: [
       {
@@ -66,15 +70,22 @@ module.exports = {
     const pages = await fetchCollection('pages')
 
     const pagePaths = pages.docs
-      .filter((page) => page.slug && page.slug !== 'home')
-      .map((page) => ({
-        loc: `${config.siteUrl}/${page.slug}`,
-        lastmod: page.updatedAt,
-      }))
+      .filter((page) => page.slug)
+      .flatMap((page) => {
+        const slugPath = page.slug === 'home' ? '' : `/${page.slug}`
+        return ['en', 'es'].map((locale) => ({
+          loc: `${config.siteUrl}/${locale}${slugPath}`,
+          lastmod: page.updatedAt,
+        }))
+      })
 
     return [
       {
-        loc: `${config.siteUrl}/`,
+        loc: `${config.siteUrl}/en`,
+        priority: 1.0,
+      },
+      {
+        loc: `${config.siteUrl}/es`,
         priority: 1.0,
       },
       ...pagePaths,
