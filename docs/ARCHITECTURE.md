@@ -188,10 +188,14 @@ Public site rules:
 
 Rules:
 
-* Locale is explicit in the URL
-* No localStorage‑based language state as source of truth
-* Content stored bilingually (localized fields or paired docs)
+* Locale is explicit in the URL and is the source of truth for content
+* LocalStorage is used only to remember explicit user selection (not for routing truth)
+* Root and share routes use a shared locale detection utility:
+  localStorage preference → browser languages → `en`
+* Content stored bilingually with Payload localized fields (fallback to `en` when missing)
+* Slugs are canonical (not localized)
 * Links must always include locale prefix
+* CMS frontend preview mirrors the same `/en/*` and `/es/*` structure
 
 ---
 

@@ -180,3 +180,23 @@ as the primary implementation path. Leave database tables in place for potential
 - No generic “Form submissions” collection is surfaced in admin.
 - Contact forms, if needed later, should be implemented as purpose-built collections or custom flows.
 - Re-enabling the Form Builder requires restoring plugin config + page blocks + types.
+
+---
+
+## Decision J — Localization via URL prefixes + localized fields
+
+**Status:** Accepted  
+**Date:** 2026-03-08
+
+### Context
+We need bilingual support that preserves content parity, remains static-export friendly, and avoids duplicate page documents.
+
+### Decision
+Use URL prefixes (`/en/*`, `/es/*`) as the canonical source of truth and enable Payload localization on public content fields.
+Slugs are canonical (not localized). LocalStorage is used only to remember a user’s explicit language choice and to inform
+root/share redirects, never as the routing source of truth.
+
+### Consequences
+- Each page is a single document with localized fields and fallback to `en` when missing.
+- Public site routes always include `/en` or `/es`, and internal links must include the prefix.
+- Root and share routes use a shared locale detection utility: localStorage → browser language → `en`.
