@@ -32,12 +32,7 @@ const getPagesSitemap = unstable_cache(
 
     const dateFallback = new Date().toISOString()
 
-    const defaultSitemap = [
-      {
-        loc: `${SITE_URL}/posts`,
-        lastmod: dateFallback,
-      },
-    ]
+    const defaultSitemap = []
 
     const sitemap = results.docs
       ? results.docs

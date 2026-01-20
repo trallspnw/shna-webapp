@@ -20,6 +20,7 @@ feature work:
 - ✅ TODO: add Fly automation to scale CMS down to a single instance (cost-first, allow brief downtime)
 - ✅ TODO: add a workflow step to reduce Fly CMS instances to 1 after deploy
 - ⏳ TODO: add tests to verify CMS build and site static export
+- ⏳ TODO: decide whether to remove seed functionality or make it SHNA-specific
 
 ## Guiding Principles
 

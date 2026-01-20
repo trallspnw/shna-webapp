@@ -12,6 +12,7 @@ operations.
 - `docs/DECISIONS.md` — decision log explaining why key choices were made
 - `docs/ROADMAP.md` — phased roadmap and scope boundaries
 - `docs/LESSONS_LEARNED.md` — short notes captured during implementation
+- `docs/DISABLED_FEATURES.md` — features intentionally disabled + how to re-enable
 
 ## Reading order
 

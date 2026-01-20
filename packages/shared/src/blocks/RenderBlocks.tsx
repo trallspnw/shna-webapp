@@ -2,14 +2,12 @@ import React, { Fragment } from 'react'
 
 import type { Page } from '@shna/shared/payload-types'
 
-import { ArchiveBlock } from '@shna/shared/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@shna/shared/blocks/CallToAction/Component'
 import { ContentBlock } from '@shna/shared/blocks/Content/Component'
 import { FormBlock } from '@shna/shared/blocks/Form/Component'
 import { MediaBlock } from '@shna/shared/blocks/MediaBlock/Component'
 
 const blockComponents = {
-  archive: ArchiveBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
   formBlock: FormBlock,

@@ -2,7 +2,6 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Archive } from '@shna/shared/blocks/ArchiveBlock/config'
 import { CallToAction } from '@shna/shared/blocks/CallToAction/config'
 import { Content } from '@shna/shared/blocks/Content/config'
 import { FormBlock } from '@shna/shared/blocks/Form/config'
@@ -72,7 +71,7 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [CallToAction, Content, MediaBlock, FormBlock],
               required: true,
               admin: {
                 initCollapsed: true,

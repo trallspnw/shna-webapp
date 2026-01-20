@@ -1,4 +1,3 @@
-import type { RequiredDataFromCollectionSlug } from 'payload'
 import type { Media } from '@shna/shared/payload-types'
 
 type HomeArgs = {
@@ -6,7 +5,10 @@ type HomeArgs = {
   metaImage: Media
 }
 
-export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
+// NOTE: This seed includes legacy archive blocks; keep it flexible while posts are disabled.
+type HomeSeedData = Record<string, unknown>
+
+export const home: (args: HomeArgs) => HomeSeedData = ({
   heroImage,
   metaImage,
 }) => {

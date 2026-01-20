@@ -11,7 +11,7 @@ import { authenticated } from '../access/authenticated'
 
 export const Media: CollectionConfig = {
   slug: 'media',
-  folders: true,
+  folders: false,
   access: {
     create: authenticated,
     delete: authenticated,

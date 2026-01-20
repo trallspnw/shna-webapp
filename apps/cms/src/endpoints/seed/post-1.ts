@@ -1,4 +1,5 @@
 import type { Media, User } from '@shna/shared/payload-types'
+import type { CollectionSlug } from 'payload'
 import { RequiredDataFromCollectionSlug } from 'payload'
 
 export type PostArgs = {
@@ -7,7 +8,12 @@ export type PostArgs = {
   author: User
 }
 
-export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> = ({
+export type PostsSlug = Extract<CollectionSlug, 'posts'>
+export type PostSeedData = PostsSlug extends never
+  ? Record<string, unknown>
+  : RequiredDataFromCollectionSlug<PostsSlug>
+
+export const post1: (args: PostArgs) => PostSeedData = ({
   heroImage,
   blockImage,
   author,
