@@ -9,7 +9,6 @@ node_modules
 # Payload default media upload directory
 public/media/
 apps/cms/public/media/
-apps/site/public/media/
 apps/site/public/
 apps/site/out/
 apps/cms/public/robots.txt
