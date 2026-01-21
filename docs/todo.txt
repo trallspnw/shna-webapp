@@ -4,3 +4,5 @@ Notable doc drift you should be aware of
   docs/DECISIONS.md (it contains the rationale/approach for demo mode)
   any runbook references to “demo Pages project”
 
+When loading root, I see a brief redirecting.. and then en loads.. I'm not sure I like this afterall. 
+  Perhaps we can load en by default on root and share paths, and redirect if needed.
