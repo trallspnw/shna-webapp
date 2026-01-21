@@ -1,0 +1,488 @@
+Okay - I'm starting to think about the next priorities.. automated deployments, trimmed features, language support, r2 hosting, dns.. a lot of work has been done. 
+
+I feel like the next priority might be setting up contacts, membership, subscribers, etc. 
+
+This was done with prisma before on a separate schema. Reference the main-old branch attached. 
+
+You've recommended sticking with the same approach. But I'd like to challenge this. 
+
+We already have a public schema and payload managed data. If reasonable or anywhere near best practice.. I'd like to expand on the infrastructure already present. This while hopefully keep migrations simpler - I'm just starting to understand how payload is handling these. I need this to be highly maintainable - so the fewer systems, the better. 
+
+Also - I need a AI approach for designing tables.. Ideally, I can instruct AI to propose a BRD.. and it does something like uml where it can easily be parsed and iterated on in the repo - but I can also view it graphically. 
+Thought for 1m 3s
+
+Nice — and that “prefix disappears after migrate” experience is exactly why I agree with your instinct: lean into Payload-managed schema so there’s only one “source of truth” for structure + migrations.
+
+From the main-old zip, your separate Prisma schema was basically:
+
+person (email unique, name/phone/address, language, ref)
+
+membership (belongs to person, expiresAt, createdAt, ref)
+
+subscription (one-to-one-ish with person via unique personId, createdAt, ref)
+
+That maps cleanly to Payload collections.
+
+Recommendation: move contacts/membership/subscribers into Payload collections
+
+This is reasonable and (for a small org app) “best practice enough” because:
+
+You get one DB adapter (Payload/Drizzle) and one migration system.
+
+Admin UI + access control “just works”.
+
+You can still keep operational logic in your app (hooks + endpoints + Stripe webhooks), without maintaining Prisma + separate schema.
+
+The key rule to keep it sane:
+
+Never let local “push/auto schema” drift again — treat migrations as the only way schema changes happen (local + prod). You already saw why.
+
+A clean Payload model (mirrors your old Prisma)
+Collections
+
+contacts (or people)
+
+email unique
+
+name, phone, address
+
+language (enum: en, es)
+
+ref (string)
+
+status (optional)
+
+Relationship fields:
+
+memberships (hasMany via reverse relationship)
+
+subscription (hasOne via relationship or keep as separate collection)
+
+memberships
+
+relationship: contact (required)
+
+startsAt, expiresAt (required)
+
+level (enum: Individual/Family/etc)
+
+stripeCustomerId, stripeSubscriptionId (optional)
+
+ref
+
+source (“checkout”, “admin”, “import”)
+
+subscriptions (email broadcast opt-in)
+
+relationship: contact (required, unique)
+
+status (subscribed/unsubscribed)
+
+subscribedAt, unsubscribedAt
+
+ref
+
+doubleOptIn fields if you care later
+
+Why keep subscriptions separate?
+
+Because “membership” and “newsletter subscription” diverge over time (unsubscribes, bounces, consent, etc). Keeping it separate prevents “one table does everything” rot.
+
+Next priority order (what I’d do)
+
+If you want maintainability and momentum, I’d do:
+
+Contacts + subscriptions first
+
+This unlocks basic comms, import workflows, and future membership work.
+
+It also forces you to settle identity rules (email uniqueness, merges).
+
+Memberships second
+
+Stripe webhook writes membership rows.
+
+Admin UI can view/override.
+
+Automation / deployments / DNS / polish alongside, but only when they unblock shipping.
+
+You can absolutely keep “language support, R2 hosting, DNS” moving, but identity + membership is the core business engine.
+
+“AI approach” for designing tables you can iterate and view graphically
+
+You want something:
+
+diffable in git
+
+easy for AI to generate
+
+renders nicely
+
+Best fit: Mermaid ER diagrams in Markdown
+
+Put this in docs/data-model.mmd or docs/data-model.md:
+
+erDiagram
+  CONTACT {
+    uuid id
+    string email
+    string name
+    string phone
+    string address
+    string language
+    string ref
+    datetime createdAt
+  }
+
+  MEMBERSHIP {
+    uuid id
+    uuid contactId
+    datetime startsAt
+    datetime expiresAt
+    string level
+    string ref
+    datetime createdAt
+  }
+
+  SUBSCRIPTION {
+    uuid id
+    uuid contactId
+    string status
+    datetime subscribedAt
+    datetime unsubscribedAt
+    string ref
+    datetime createdAt
+  }
+
+  CONTACT ||--o{ MEMBERSHIP : has
+  CONTACT ||--o| SUBSCRIPTION : has
+
+
+This is:
+
+easy for AI to emit
+
+easy for you to tweak
+
+viewable in GitHub + many editors
+
+If you want more “UML-ish”, PlantUML is also great, but Mermaid ER is usually the least friction.
+
+A prompt that reliably produces usable output
+
+When you ask AI to propose changes, use a contract like:
+
+Produce:
+
+A short BRD section (“Contacts & Memberships”) with goals, non-goals, workflows.
+
+A Mermaid ER diagram.
+
+A Payload collection plan: field list + constraints + indexes + access rules.
+
+Migration notes: how to add/change without schema drift.
+
+That forces it to generate artifacts you can commit.
+
+Concrete next step (low risk)
+
+Add contacts + subscriptions as Payload collections (no Stripe yet).
+
+Generate and run migrations.
+
+Add a simple admin workflow:
+
+create contact
+
+subscribe/unsubscribe
+
+Only then wire memberships + Stripe webhooks.
+
+If you want, paste your current Payload collections folder structure (or list of existing collections), and I’ll sketch the actual TypeScript collection definitions in your style (localized fields, access control, admin groupings, indexes), plus how to migrate any existing data from the old Prisma tables into the new Payload tables safely.
+
+Sanity check - Check payload docs and community for any plugins that might already be doing some of this.. anything related to member management, subscriptions, emails, donations.. or even retail and payments? 
+
+I had this all custom in the main-old branch - but if this work is already done somewhere, we might as well use it.
+
+Here’s a sanity-checked look at what’s already available in the Payload ecosystem around the kinds of features you’re thinking about (memberships, subscriptions, emails, donations/payments), and what you’ll probably need to build yourself versus what you can reuse:
+
+📦 Official & Community Plugins Worth Exploring
+✅ Stripe Plugin
+
+Payload ships an official Stripe plugin that gives you a foundation for payments integration — including webhooks, REST proxying, and syncing billing data. It doesn’t magically create a full membership system, but it does give you a solid Stripe integration layer so you don’t have to build everything from scratch.
+
+Great for:
+
+Payment processing with Stripe
+
+Receiving and handling webhooks in Payload
+
+Proxying Stripe API under Payload’s access control
+
+Not out-of-the-box for:
+
+Subscription business logic
+
+Membership lifecycle models
+(It gives you the plumbing, but you define how the data flows.)
+
+✅ Form Builder Plugin
+
+Payload has an official Form Builder plugin that lets you:
+
+Define forms in the admin UI
+
+Store submissions in your DB
+
+Send dynamic email notifications
+
+Accept form-based payments (e.g., donation forms) with some custom logic
+
+This can be used as a starting point for email signups and even donation forms if you build on its hooks.
+
+Great for:
+
+Custom forms + submission storage
+
+Email triggers based on form data
+
+Simple payment triggers from forms
+
+Limitations:
+
+Not a membership/subscription engine
+
+Payment logic still needs Stripe or your own handlers
+
+📌 Community Plugin: Newsletter / Subscriber Management
+
+There is a community plugin called payload-plugin-email-newsletter which provides:
+
+Subscriber management collection
+
+Magic link authentication for subscribers
+
+Integration with email providers like Resend & Broadcast
+
+Newsletter scheduling & tracking
+
+Built-in UI components and locale support
+
+This is very close to a “subscriber platform” out of the box and could replace your custom subscribers table.
+
+Potentially big win if you want:
+
+Newsletter + broadcast emails
+
+Subscriber management with email verification
+
+Built-in UI components for signup/preferences
+
+🧠 What Still Needs Custom Work
+
+Even with the plugins above:
+
+🚫 No “full membership module” yet
+
+There’s no official plugin that fully implements:
+
+Resource access based on membership status
+
+Billing + subscription lifecycle
+
+Membership tier logic
+
+Grace periods / renewals / expirations
+
+That logic tends to remain application-specific (because every org’s rules differ). The Stripe plugin helps — but you’ll still likely combine it with custom collections + hooks.
+
+🚫 No “donations + CRM” packaged system
+
+You’ll want either:
+
+A custom “donations” collection + Stripe checkout integration
+
+Or extend the Form Builder plugin to cover donations specifically
+
+Either way, you define logic for:
+
+storing donation records
+
+associating donations with contacts
+
+reporting / dashboards
+
+🧩 How the Ecosystem Looks Overall
+
+🚀 Payload’s plugin ecosystem is growing, but it’s not yet as extensive as WordPress or Shopify, so many advanced business features aren’t available as one-click install. Community plugins + official ones cover some useful pieces, but not full verticals yet.
+
+Good analogy: Payload is like a strong framework with building blocks — not a collection of prebuilt “business syste­ms” — so you often combine plugins with custom collections and hooks.
+
+📊 Suggested Path Forward
+
+Since you want fewer systems and less maintenance:
+
+🧱 Reuse what’s available
+
+1. Start with these:
+
+Stripe plugin → handle payments & webhooks centrally
+
+Newsletter plugin → subscriber/email foundation
+
+Form Builder plugin → for signup/donation forms
+
+2. Build custom collections + logic for:
+
+contacts / memberships / subscriptions
+
+Membership access control (hooks + Stripe webhooks)
+
+Donation tracking & report views
+
+This way you keep:
+
+✔ All data in one DB
+✔ One migration system (Payload’s)
+✔ Unified admin UI
+✔ Central access control
+✔ Single API surface
+
+🧠 Developer Tips
+🧩 Use Plugins + Hooks
+
+Instead of Prisma + separate schema:
+
+Plugins give you built-ins (email, forms, Stripe)
+
+Hooks give you the ability to “plug into” actions
+
+Custom collections give domain logic
+
+🪄 AI-Assisted Schema Design Tools
+
+For your desire to “generate ER diagrams, refine with AI”:
+
+Start with Mermaid ER diagrams stored in your repo
+
+Use a prompt that outputs:
+
+BRD description
+
+Mermaid ER
+
+Payload collection TS definitions
+
+DB migrations
+
+Access control rules
+
+This lets you iterate quickly and keep design artifacts human + machine-readable.
+
+If you want, I can generate a roundup of the best community plugins (with install examples and what each gives you) that match your membership/email/payment use cases — just say “show me the relevant payload plugins with install/config examples.”
+
+On the form builder - codex advised to disable this for my project.. or maybe it was a different plugin. The website template came with forms and submissions collections. This was great, but it seemed more related to contacts - incoming messages that required manual action. We want forms to trigger apis/workflows. Please confirm the recommendation here. 
+
+For the emails - will it work with brevo? 
+
+For stripe - Can you compare this to the setup I had before? I was importing stripe, but I don't think it was payload specific.
+Thought for 26s
+
+Yep — here’s the clean sanity-check, with what I’d do in your architecture (static site + Payload CMS app on Fly), plus Brevo + Stripe comparisons.
+
+Form Builder: keep it or disable it?
+What the Form Builder plugin actually gives you
+
+The official Form Builder plugin injects two collections (forms and formSubmissions) and a server-side submission handler that validates + stores submissions, can send emails, and can even handle payments if you enable payment fields.
+
+So it’s not “just contact messages” — it’s a general “editor-built forms” system.
+
+Your stated goal: “forms should trigger APIs/workflows”
+
+You can do that with Form Builder, but it’s a layer:
+
+Submissions are stored in formSubmissions
+
+You trigger workflows by adding hooks on that collection (e.g., afterChange / afterOperation) to call Stripe, Brevo, internal jobs, etc.
+
+When I’d keep it
+
+You want non-technical admins to build/edit forms in the CMS
+
+You want a generic “many forms” system (contact, volunteer signup, event RSVP, etc.)
+
+You’re okay with “submission stored first, then workflow triggers”
+
+When I’d disable it
+
+You only have a few forms and they are business-critical (donation + membership)
+
+You want each form to map to a very explicit API endpoint and workflow
+
+You want fewer moving parts and fewer schema objects that aren’t core
+
+Given your priorities (maintainability + fewer systems + workflows), my recommendation is:
+
+Use dedicated endpoints for donation/membership/signup workflows.
+Optionally keep Form Builder only for “misc contact/admin” forms if you want editors to manage them.
+
+That “website template came with forms/submissions collections” is consistent with the Form Builder approach (or a template implementing the same idea). It’s not wrong — it’s just not the cleanest fit for payments/membership workflows.
+
+Emails: will Payload work with Brevo?
+
+Yes — via SMTP, using Payload’s Nodemailer adapter.
+
+Payload has an official Nodemailer adapter approach.
+Brevo provides SMTP relay settings (host smtp-relay.brevo.com, ports 587/465/2525, auth with SMTP login + SMTP key).
+Nodemailer supports exactly that transport config.
+
+So you’d configure:
+
+Payload email: nodemailer adapter
+
+transportOptions: Brevo SMTP host/port/auth
+
+Brevo API-native sending is also possible, but Payload doesn’t (from what I can find) ship an “official Brevo adapter” — SMTP is the straightforward route.
+
+Stripe plugin vs your previous custom Stripe integration
+Your old setup (typical “custom Stripe”)
+
+You import stripe SDK directly
+
+You create Checkout Sessions / Payment Intents
+
+You expose an endpoint for webhooks
+
+You verify signatures + update DB yourself
+
+That’s totally valid, and often still needed for the domain logic.
+
+What @payloadcms/plugin-stripe adds
+
+The plugin provides a “Payload-native” integration layer:
+
+Proxy Stripe REST through Payload (/api/stripe/rest) if enabled
+
+Proxy Stripe webhooks (/api/stripe/webhooks) with the endpoint secret
+
+Optional sync between Stripe resources and Payload collections (creates hooks + webhook handlers + stripeID fields, plus a skipSync guard)
+
+A structured way to keep Stripe keys server-side and apply Payload access control to Stripe operations (nice if you ever expose Stripe actions to authenticated admin users)
+
+The practical difference for you
+
+If you only need “create checkout session + handle webhook + update memberships”, the plugin is helpful but not mandatory.
+
+If you want syncable Stripe objects inside the Payload admin (customers/subscriptions/etc), the plugin becomes more valuable.
+
+Also worth noting: the plugin’s old standalone repo was archived and moved into the Payload monorepo/packages — it’s still “official”, just relocated.
+
+What I’d choose for SHNA
+
+Brevo: use Payload + Nodemailer SMTP adapter.
+
+Membership/donations: keep your explicit workflow endpoints (the way you were doing it), but write to Payload collections instead of Prisma.
+
+Stripe plugin: optional. Add it if you want admin-friendly Stripe object sync + a standardized webhook path. Otherwise, your custom Stripe SDK approach is fine.
+
+If you want, paste (or point me to) your old Stripe webhook + checkout session code from main-old, and I’ll tell you exactly what the plugin would replace vs what stays custom, and whether “sync” would actually help your specific membership model.

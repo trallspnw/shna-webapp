@@ -15,6 +15,7 @@ feature work:
 - ✅ Fly: deploy the CMS app (Payload admin + API) against Supabase Postgres
 - ✅ Production domains configured for CMS and public site
 - ✅ R2 media storage for CMS uploads (avoid container-local media loss on deploy; restore media cache-busting)
+- ✅ Implement bilingual routing + localized fields (CMS + public site)
 - ⏳ Implement test mode alongside ops data or Stripe/email integrations (flagging `isTest` + admin filters/bulk delete)
 - ⏳ After deployment baseline is green, return to remaining site errors and feature parity
 - ✅ TODO: add Fly automation to scale CMS down to a single instance (cost-first, allow brief downtime)

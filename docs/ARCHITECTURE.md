@@ -197,6 +197,13 @@ Rules:
 * Links must always include locale prefix
 * CMS frontend preview mirrors the same `/en/*` and `/es/*` structure
 
+Implementation notes:
+
+* Shared locale utility lives in `packages/shared` and powers root/share routing plus link generation
+* Language toggle persists preference in localStorage and does not alter canonical routing
+* Pages, media, header/footer nav items, and rich text/link fields are localized in Payload
+* Empty localized values are cleared to allow fallback to `en`
+
 ---
 
 ## 9) Email Strategy
