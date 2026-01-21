@@ -1,0 +1,261 @@
+erDiagram
+
+  CONTACTS {
+    uuid id PK
+    string email UK  "required; normalized lower/trim"
+    string displayName "free-form"
+    string phone "optional; free-form"
+    string address "optional; free-form"
+    string language "en|es|unknown; default unknown"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  CAMPAIGNS {
+    uuid id PK
+    string key UK  "immutable identifier"
+    string slug UK "human-friendly"
+    string name
+    string channel "optional"
+    datetime startsAt "optional"
+    datetime endsAt "optional"
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  SUBSCRIPTION_TOPICS {
+    uuid id PK
+    string key UK  "immutable identifier"
+    string slug UK
+    string name
+    string description "optional"
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  SUBSCRIPTIONS {
+    uuid id PK
+    uuid contactId FK
+    uuid topicId FK
+    string status "subscribed|unsubscribed|bounced"
+    datetime subscribedAt
+    datetime unsubscribedAt "optional"
+    uuid campaignId FK "optional"
+    string refRaw "optional"
+    string utmSource "optional"
+    string utmMedium "optional"
+    string utmCampaign "optional"
+    string utmContent "optional"
+    string utmTerm "optional"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  MEMBERSHIP_PLANS {
+    uuid id PK
+    string key UK  "immutable identifier"
+    string slug UK
+    string name
+    number priceUSD "CMS-facing dollars"
+    int durationMonths "typically 12"
+    int renewalWindowDays "typically 30"
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  MEMBERSHIP_ACCOUNTS {
+    uuid id PK
+    string type "individual|household"
+    uuid primaryContactId FK
+    uuid campaignId FK "optional"
+    string refRaw "optional"
+    string utmSource "optional"
+    string utmMedium "optional"
+    string utmCampaign "optional"
+    string utmContent "optional"
+    string utmTerm "optional"
+    int anonymousMemberCount "optional; unnamed additional members"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  MEMBERSHIP_ACCOUNT_SECONDARIES {
+    uuid id PK
+    uuid membershipAccountId FK
+    uuid contactId FK
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  MEMBERSHIP_TERMS {
+    uuid id PK
+    uuid membershipAccountId FK
+    uuid planId FK
+    string planKeySnapshot "immutable plan key"
+    number pricePaidUSD "snapshot; dollars"
+    string status "active|expired|canceled|refunded|comped"
+    datetime startsAt
+    datetime expiresAt
+    uuid renewedFromTermId FK "optional"
+    uuid transactionId FK "optional"
+    uuid campaignId FK "optional"
+    string refRaw "optional"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  TRANSACTIONS {
+    uuid id PK
+    string kind "membership|donation|retail|other"
+    string paymentMethod "stripe|cash|check|comp|other"
+    string status "pending|paid|failed|refunded"
+    number amountUSD
+    string currency "USD"
+    uuid contactId FK "optional (absent for stayAnon/cash anon)"
+    boolean stayAnon "true => do not link, do not store email"
+    string pricingBasis "member|non_member|unknown"
+    uuid membershipTermId FK "optional convenience link"
+    uuid orderId FK "optional convenience link"
+    uuid eventId FK "optional"
+    uuid campaignId FK "optional"
+    string refRaw "optional"
+    string utmSource "optional"
+    string utmMedium "optional"
+    string utmCampaign "optional"
+    string utmContent "optional"
+    string utmTerm "optional"
+    string stripeCheckoutSessionId "optional"
+    string stripePaymentIntentId "optional"
+    datetime occurredAt
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  PRODUCTS {
+    uuid id PK
+    string key UK "immutable identifier"
+    string slug UK
+    string name
+    string description "optional"
+    boolean isActive
+    number nonMemberPriceUSD
+    number memberPriceUSD
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  ORDERS {
+    uuid id PK
+    string orderNumber UK
+    uuid contactId FK "optional; absent for stayAnon"
+    string status "pending_payment|paid|fulfilled|canceled"
+    string pricingBasis "member|non_member|unknown"
+    boolean stayAnon
+    uuid transactionId FK "optional/usually set when paid"
+    uuid eventId FK "optional"
+    uuid campaignId FK "optional"
+    string refRaw "optional"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  ORDER_ITEMS {
+    uuid id PK
+    uuid orderId FK
+    uuid productId FK
+    string variant "optional"
+    int quantity
+    number unitPriceUSD
+    number totalUSD
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  EVENTS {
+    uuid id PK
+    string slug UK
+    string title
+    string status "draft|published|canceled"
+    datetime startsAt
+    datetime endsAt "optional"
+    string timezone "default America/Los_Angeles"
+    string location "optional; free-form"
+    string summary "optional"
+    string body "optional; localized content in CMS"
+    boolean checkInEnabled
+    string checkInCode "secret token for QR check-in"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  EVENT_ATTENDANCES {
+    uuid id PK
+    uuid eventId FK
+    uuid contactId FK "optional"
+    uuid aliasId FK "optional (future)"
+    int anonymousCount "optional; aggregate anon tally"
+    string method "qr_self|admin_manual|paper"
+    datetime checkedInAt "optional; can use createdAt"
+    uuid campaignId FK "optional"
+    string refRaw "optional"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  ALIASES {
+    uuid id PK
+    string label "pseudonymous; no email"
+    string kind "membership_member|event_attendee|other"
+    datetime createdAt
+    datetime updatedAt
+    boolean isTest
+  }
+
+  %% Relationships
+  CONTACTS ||--o{ SUBSCRIPTIONS : has
+  SUBSCRIPTION_TOPICS ||--o{ SUBSCRIPTIONS : includes
+  CAMPAIGNS ||--o{ SUBSCRIPTIONS : attributes
+
+  CONTACTS ||--o{ MEMBERSHIP_ACCOUNTS : primary_of
+  MEMBERSHIP_ACCOUNTS ||--o{ MEMBERSHIP_ACCOUNT_SECONDARIES : has
+  CONTACTS ||--o{ MEMBERSHIP_ACCOUNT_SECONDARIES : secondary_of
+
+  MEMBERSHIP_PLANS ||--o{ MEMBERSHIP_TERMS : defines
+  MEMBERSHIP_ACCOUNTS ||--o{ MEMBERSHIP_TERMS : has
+
+  MEMBERSHIP_TERMS }o--o| MEMBERSHIP_TERMS : renewed_from
+
+  CONTACTS ||--o{ TRANSACTIONS : linked_to
+  EVENTS ||--o{ TRANSACTIONS : attributed_to
+  CAMPAIGNS ||--o{ TRANSACTIONS : attributes
+
+  ORDERS ||--o{ ORDER_ITEMS : contains
+  PRODUCTS ||--o{ ORDER_ITEMS : item
+  CONTACTS ||--o{ ORDERS : placed_by
+  EVENTS ||--o{ ORDERS : attributed_to
+  CAMPAIGNS ||--o{ ORDERS : attributes
+
+  TRANSACTIONS }o--o| ORDERS : funds
+  TRANSACTIONS }o--o| MEMBERSHIP_TERMS : funds
+
+  EVENTS ||--o{ EVENT_ATTENDANCES : has
+  CONTACTS ||--o{ EVENT_ATTENDANCES : attends
+  ALIASES ||--o{ EVENT_ATTENDANCES : attends_as
+  CAMPAIGNS ||--o{ EVENT_ATTENDANCES : attributes
