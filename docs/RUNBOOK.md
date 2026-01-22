@@ -66,25 +66,9 @@ When in doubt: **pause, document, and escalate**.
 
 ---
 
-## Test Mode Operations
+## Test Mode
 
-### What Test Mode Is
-
-* Uses the **same backend instance** and database
-* Activated by the canonical query param `?mode=test`
-* Remains active for the browsing session and is carried across internal links
-* Intended for internal ops testing (not marketing demos)
-
-### Test Mode Constraints
-
-* Test emails **must include `[TEST]` in the subject**
-* Test payments use Stripe test keys only
-* Operational records created in test mode must store `isTest: true`
-* Admin lists should provide a **Show test data** toggle/filter
-* When viewing test data, provide a **Delete all test records** action
-
----
-
+Test mode details live in `docs/DEVELOPMENT.md#test-mode-ops-testing`.
 ## Common Operations
 
 ### Sync Production DB to Local (Destructive)

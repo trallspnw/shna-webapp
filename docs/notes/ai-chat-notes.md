@@ -1,3 +1,8 @@
+# AI Chat Notes
+
+> Raw capture of exploratory discussions. Not authoritative.
+
+```
 Okay - I'm starting to think about the next priorities.. automated deployments, trimmed features, language support, r2 hosting, dns.. a lot of work has been done. 
 
 I feel like the next priority might be setting up contacts, membership, subscribers, etc. 
@@ -486,3 +491,4 @@ Membership/donations: keep your explicit workflow endpoints (the way you were do
 Stripe plugin: optional. Add it if you want admin-friendly Stripe object sync + a standardized webhook path. Otherwise, your custom Stripe SDK approach is fine.
 
 If you want, paste (or point me to) your old Stripe webhook + checkout session code from main-old, and I’ll tell you exactly what the plugin would replace vs what stays custom, and whether “sync” would actually help your specific membership model.
+```

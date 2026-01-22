@@ -32,10 +32,4 @@ later. Keep it concise and update only when a lesson is repeatable.
 
 ## Test Mode
 
-Test mode is for internal ops testing, not marketing demos.
-
-- **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
-- **Activation:** Append `?mode=test` to a URL.
-- **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
-- **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
-- **Admin UX:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.
+Test mode details live in `docs/DEVELOPMENT.md#test-mode-ops-testing`.

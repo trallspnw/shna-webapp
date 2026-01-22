@@ -1,8 +1,0 @@
-Notable doc drift you should be aware of
-  Your docs currently still describe a “demo mode via schema + subdomain” concept (duplicate schema, demo routing, manual sync of content-only). Since you’ve decided to cut that in favor of Test Mode, you’ll want to update:
-  root README.md
-  docs/DECISIONS.md (it contains the rationale/approach for demo mode)
-  any runbook references to “demo Pages project”
-
-When loading root, I see a brief redirecting.. and then en loads.. I'm not sure I like this afterall. 
-  Perhaps we can load en by default on root and share paths, and redirect if needed.

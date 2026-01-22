@@ -1,37 +1,32 @@
-# SHNA Documentation Index
+# Documentation Index
 
-Use this index to navigate the SHNA-specific documentation. The docs in this
-folder are the canonical source of truth for architecture, workflows, and
-operations.
+This folder contains the authoritative project docs.
 
-## Canonical docs
+## Start here
 
-- `docs/ARCHITECTURE.md` — system design, environments, test mode, localization, email strategy
-- `docs/DEVELOPMENT.md` — local development setup and workflows
-- `docs/RUNBOOK.md` — operational procedures and incident playbooks
-- `docs/DECISIONS.md` — decision log explaining why key choices were made
-- `docs/ROADMAP.md` — phased roadmap and scope boundaries
-- `docs/LESSONS_LEARNED.md` — short notes captured during implementation
-- `docs/DISABLED_FEATURES.md` — features intentionally disabled + how to re-enable
+1. **Project overview**: `../README.md`
+2. **How to run locally**: `DEVELOPMENT.md`
+3. **Architecture**: `ARCHITECTURE.md`
+4. **Operational runbook**: `RUNBOOK.md`
 
-## Reading order
+## Reference
 
-If you are new to the project:
+- **Decisions / rationale**: `DECISIONS.md`
+- **Disabled / deferred features**: `DISABLED_FEATURES.md`
+- **Lessons learned**: `LESSONS_LEARNED.md`
 
-1. `AGENTS.md` (repo guardrails and AI/contributor behavior)
-2. `docs/ARCHITECTURE.md`
-3. `docs/DEVELOPMENT.md`
-4. `docs/RUNBOOK.md`
-5. `docs/DECISIONS.md`
-6. `docs/ROADMAP.md`
-7. `docs/LESSONS_LEARNED.md`
+## Planning & work management
 
-## Test Mode
+- **Roadmap (big blocks)**: `ROADMAP.md`
+- **Tasks (near-term, actionable, AI-delegation)**: `TASKS.md`
+- **TODO log (rolling scratch + cleanup)**: `TODO_LOG.md`
 
-Test mode is for internal ops testing, not marketing demos.
+## Design docs
 
-- **Definition:** Operational records created/handled in the same deployment and DB, flagged with `isTest: true`.
-- **Activation:** Append `?mode=test` to a URL.
-- **Persistence:** Once enabled, test mode remains active for the browsing session and is carried across internal links.
-- **Stripe:** Use Stripe test keys (and test webhook secret when applicable) when test mode is active.
-- **Admin UX:** Provide a **Show test data** filter and a **Delete all test records** action when viewing test data.
+- `design/identity-membership.md`
+
+## Notes (non-authoritative)
+
+- `notes/ai-chat-notes.md`
+
+- `design/erd.mmd`
