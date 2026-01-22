@@ -3,7 +3,8 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { getPreferredLocale, setStoredLocale } from '@shna/shared/utilities/locale'
+import { setStoredLocale } from '@shna/shared/client/storage'
+import { getPreferredLocale } from '@shna/shared/utilities/locale'
 
 type Props = {
   slug?: string
@@ -19,5 +20,5 @@ export function ShareRedirectClient({ slug }: Props) {
     router.replace(path)
   }, [router, slug])
 
-  return <p>Redirecting...</p>
+  return null
 }

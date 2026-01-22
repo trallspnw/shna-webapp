@@ -3,7 +3,8 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { getPreferredLocale, setStoredLocale } from '@shna/shared/utilities/locale'
+import { setStoredLocale } from '@shna/shared/client/storage'
+import { getPreferredLocale } from '@shna/shared/utilities/locale'
 
 export default function ShareRootRedirect() {
   const router = useRouter()
@@ -14,5 +15,5 @@ export default function ShareRootRedirect() {
     router.replace(`/${locale}`)
   }, [router])
 
-  return <p>Redirecting...</p>
+  return null
 }

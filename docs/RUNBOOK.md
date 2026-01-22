@@ -71,6 +71,22 @@ When in doubt: **pause, document, and escalate**.
 Test mode details live in `docs/DEVELOPMENT.md#test-mode-ops-testing`.
 ## Common Operations
 
+### Stripe CLI Webhook Testing
+
+Use these commands to replay webhook flows locally during remediation/testing:
+
+```bash
+# Start webhook forwarding (terminal A)
+pnpm stripe:listen
+
+# Trigger a checkout session completion event (terminal B)
+stripe trigger checkout.session.completed
+```
+
+Notes:
+* Ensure `STRIPE_WEBHOOK_SECRET` matches the secret printed by `stripe:listen`.
+* Use test keys only when validating webhook behavior.
+
 ### Sync Production DB to Local (Destructive)
 
 Use this when you need to reproduce production issues locally. This operation

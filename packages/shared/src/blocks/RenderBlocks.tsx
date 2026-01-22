@@ -2,15 +2,11 @@ import React, { Fragment } from 'react'
 
 import type { Page } from '@shna/shared/payload-types'
 
-import { CallToActionBlock } from '@shna/shared/blocks/CallToAction/Component'
-import { ContentBlock } from '@shna/shared/blocks/Content/Component'
-import { MediaBlock } from '@shna/shared/blocks/MediaBlock/Component'
+import { ContainerBlock } from '@shna/shared/blocks/Container/Component'
 import type { Locale } from '@shna/shared/utilities/locale'
 
-const blockComponents = {
-  content: ContentBlock,
-  cta: CallToActionBlock,
-  mediaBlock: MediaBlock,
+const blockComponents: Record<string, React.FC<any>> = {
+  container: ContainerBlock,
 }
 
 export const RenderBlocks: React.FC<{
@@ -31,12 +27,7 @@ export const RenderBlocks: React.FC<{
             const Block = blockComponents[blockType]
 
             if (Block) {
-              return (
-                <div className="my-16" key={index}>
-                  {/* @ts-expect-error there may be some mismatch between the expected types here */}
-                  <Block {...block} disableInnerContainer locale={locale} />
-                </div>
-              )
+              return <Block {...block} key={index} locale={locale} />
             }
           }
           return null

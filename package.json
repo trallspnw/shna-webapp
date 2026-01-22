@@ -18,14 +18,20 @@
     "start": "dotenv -e ./.env -- pnpm --filter @shna/cms start",
     "codegen": "dotenv -e ./.env -- pnpm --filter @shna/cms codegen",
     "lint": "pnpm --filter @shna/cms lint",
-    "test": "pnpm --filter @shna/cms test",
+    "test": "pnpm test:core",
+    "test:core": "pnpm --filter @shna/cms test:core",
+    "test:future": "pnpm --filter @shna/cms test:future",
+    "test:all": "pnpm --filter @shna/cms test:all",
     "deps:up": "docker compose -f compose.dev.yml up -d",
+    "deps:wait": "bash ./scripts/wait-for-postgres.sh",
     "deps:down": "docker compose -f compose.dev.yml down",
     "deps:restart": "docker compose -f compose.dev.yml down && docker compose -f compose.dev.yml up -d",
     "deps:reset": "docker compose -f compose.dev.yml down -v",
     "deps:logs": "docker compose -f compose.dev.yml logs -f",
     "deps:ps": "docker compose -f compose.dev.yml ps",
-    "db:sync:prod": "dotenv -e ./.env -- bash ./scripts/db-sync-prod.sh"
+    "db:sync:prod": "dotenv -e ./.env -- bash ./scripts/db-sync-prod.sh",
+    "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/stripe/webhooks",
+    "zip": "mkdir -p zip && rm -f zip/shna-webapp.zip && cd .. && zip -r shna-webapp/zip/shna-webapp.zip shna-webapp -x \"**/node_modules/*\" \"**/.git/*\" \"**/.next/*\" \"**/dist/*\" \"**/out/*\" \"**/.turbo/*\" \"**/zip/*\""
   },
   "pnpm": {
     "onlyBuiltDependencies": [

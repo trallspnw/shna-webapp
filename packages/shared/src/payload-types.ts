@@ -70,6 +70,17 @@ export interface Config {
     pages: Page;
     media: Media;
     users: User;
+    contacts: Contact;
+    campaigns: Campaign;
+    subscriptionTopics: SubscriptionTopic;
+    subscriptions: Subscription;
+    membershipPlans: MembershipPlan;
+    memberships: Membership;
+    orders: Order;
+    orderItems: OrderItem;
+    transactions: Transaction;
+    emailTemplates: EmailTemplate;
+    emailSends: EmailSend;
     redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -82,6 +93,17 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    campaigns: CampaignsSelect<false> | CampaignsSelect<true>;
+    subscriptionTopics: SubscriptionTopicsSelect<false> | SubscriptionTopicsSelect<true>;
+    subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
+    membershipPlans: MembershipPlansSelect<false> | MembershipPlansSelect<true>;
+    memberships: MembershipsSelect<false> | MembershipsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    orderItems: OrderItemsSelect<false> | OrderItemsSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    emailTemplates: EmailTemplatesSelect<false> | EmailTemplatesSelect<true>;
+    emailSends: EmailSendsSelect<false> | EmailSendsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -97,11 +119,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     'site-settings': SiteSetting;
+    'donations-settings': DonationsSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'donations-settings': DonationsSettingsSelect<false> | DonationsSettingsSelect<true>;
   };
   locale: 'en' | 'es';
   user: User & {
@@ -181,7 +205,7 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock)[];
+  layout: ContainerBlock[];
   meta?: {
     title?: string | null;
     /**
@@ -297,6 +321,151 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContainerBlock".
+ */
+export interface ContainerBlock {
+  widthMode?: ('content' | 'page') | null;
+  backgroundVariant?: ('none' | 'color' | 'image') | null;
+  backgroundColor?: string | null;
+  backgroundMedia?: (number | null) | Media;
+  backgroundFit?: ('cover' | 'contain') | null;
+  /**
+   * 0-100 (%) opacity applied over the background image.
+   */
+  overlayStrength?: number | null;
+  outerSpacingY?: ('none' | 'sm' | 'md' | 'lg') | null;
+  innerPadding?: ('none' | 'sm' | 'md' | 'lg') | null;
+  columns?:
+    | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        blocks?:
+          | (
+              | RichTextBlock
+              | MediaBlock
+              | CallToActionBlock
+              | {
+                  header?: string | null;
+                  description?: string | null;
+                  suggestedAmounts?:
+                    | {
+                        amount: number;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  /**
+                   * Optional default amount when no suggested values are configured.
+                   */
+                  defaultAmount?: number | null;
+                  buttonLabel?: string | null;
+                  nameLabel?: string | null;
+                  emailLabel?: string | null;
+                  phoneLabel?: string | null;
+                  addressLabel?: string | null;
+                  amountLabel?: string | null;
+                  modalTitle?: string | null;
+                  loadingText?: string | null;
+                  successText?: string | null;
+                  errorText?: string | null;
+                  /**
+                   * Shown in Stripe checkout line items.
+                   */
+                  checkoutName?: string | null;
+                  closeLabel?: string | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'donationBlock';
+                }
+              | {
+                  header?: string | null;
+                  description?: string | null;
+                  buttonLabel?: string | null;
+                  nameLabel?: string | null;
+                  emailLabel?: string | null;
+                  phoneLabel?: string | null;
+                  addressLabel?: string | null;
+                  planLabel?: string | null;
+                  plans: (number | MembershipPlan)[];
+                  defaultPlan?: (number | null) | MembershipPlan;
+                  modalTitle?: string | null;
+                  loadingText?: string | null;
+                  successText?: string | null;
+                  errorText?: string | null;
+                  /**
+                   * Shown in Stripe checkout line items.
+                   */
+                  checkoutName?: string | null;
+                  closeLabel?: string | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'membershipBlock';
+                }
+              | {
+                  header?: string | null;
+                  description?: string | null;
+                  /**
+                   * Advanced: topic slugs used by the subscription API.
+                   */
+                  topics?: string[] | null;
+                  buttonLabel?: string | null;
+                  emailLabel?: string | null;
+                  modalTitle?: string | null;
+                  loadingText?: string | null;
+                  successText?: string | null;
+                  errorText?: string | null;
+                  closeLabel?: string | null;
+                  /**
+                   * Deprecated. Use topics (slugs) instead.
+                   */
+                  topic?: (number | null) | SubscriptionTopic;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'subscriptionBlock';
+                }
+            )[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'container';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  richText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richTextBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  media: number | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CallToActionBlock".
  */
 export interface CallToActionBlock {
@@ -340,58 +509,36 @@ export interface CallToActionBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock".
+ * via the `definition` "membershipPlans".
  */
-export interface ContentBlock {
-  columns?:
-    | {
-        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
-        richText?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?: {
-            relationTo: 'pages';
-            value: number | Page;
-          } | null;
-          url?: string | null;
-          label?: string | null;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'content';
+export interface MembershipPlan {
+  id: number;
+  /**
+   * Stable identifier used in URLs. Set once.
+   */
+  slug: string;
+  name: string;
+  price: number;
+  renewalWindowDays: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
+ * Email list topics
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
+ * via the `definition` "subscriptionTopics".
  */
-export interface MediaBlock {
-  media: number | Media;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
+export interface SubscriptionTopic {
+  id: number;
+  /**
+   * Stable identifier used in URLs. Set once.
+   */
+  slug: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -417,6 +564,197 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+}
+/**
+ * Members of the public who engage with the organization
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: number;
+  email: string;
+  name?: string | null;
+  displayName?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  language?: ('en' | 'es') | null;
+  /**
+   * How this record entered the database.
+   */
+  campaign?: (number | null) | Campaign;
+  /**
+   * Updated on membership purchase, check-ins, and opt-in transactions.
+   */
+  lastEngagedAt?: string | null;
+  /**
+   * Checked if contact was created during a test.
+   */
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Structured attempts to attract engagement
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "campaigns".
+ */
+export interface Campaign {
+  id: number;
+  name: string;
+  /**
+   * Reftag to associate with this campaign. This is included in links.
+   */
+  reftag: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Contacts who are subscribed to email list topics
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: number;
+  key: string;
+  contact: number | Contact;
+  topic: number | SubscriptionTopic;
+  /**
+   * How this record entered the database.
+   */
+  campaign?: (number | null) | Campaign;
+  /**
+   * Checked if contact was created during a test.
+   */
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "memberships".
+ */
+export interface Membership {
+  id: number;
+  contact: number | Contact;
+  plan: number | MembershipPlan;
+  startDay: string;
+  endDay: string;
+  /**
+   * How this record entered the database.
+   */
+  campaign?: (number | null) | Campaign;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  publicId: string;
+  status?: ('created' | 'paid' | 'expired' | 'error') | null;
+  contact: number | Contact;
+  campaign?: (number | null) | Campaign;
+  lang?: string | null;
+  totalUSD: number;
+  /**
+   * Required after session creation; may be empty at initial order creation.
+   */
+  stripeCheckoutSessionId?: string | null;
+  stripePaymentIntentId?: string | null;
+  receiptEmailSendId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  itemType: 'donation' | 'membership' | 'retail';
+  label?: string | null;
+  unitAmountUSD: number;
+  qty: number;
+  totalUSD: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: number;
+  order: number | Order;
+  amountUSD: number;
+  paymentType: 'stripe' | 'cash' | 'check';
+  contact?: (number | null) | Contact;
+  stripeRefId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailTemplates".
+ */
+export interface EmailTemplate {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+  status?: ('active' | 'disabled') | null;
+  subject?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  placeholders?:
+    | {
+        key: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailSends".
+ */
+export interface EmailSend {
+  id: number;
+  template?: (number | null) | EmailTemplate;
+  source?: ('template' | 'inline' | 'unknown') | null;
+  templateSlug?: string | null;
+  contact?: (number | null) | Contact;
+  toEmail: string;
+  lang?: string | null;
+  status?: ('queued' | 'sent' | 'failed') | null;
+  subject?: string | null;
+  providerMessageId?: string | null;
+  errorCode?: ('missing_recipient' | 'template_not_found' | 'missing_placeholders' | 'provider_failed') | null;
+  sentAt?: string | null;
+  error?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -568,6 +906,50 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'contacts';
+        value: number | Contact;
+      } | null)
+    | ({
+        relationTo: 'campaigns';
+        value: number | Campaign;
+      } | null)
+    | ({
+        relationTo: 'subscriptionTopics';
+        value: number | SubscriptionTopic;
+      } | null)
+    | ({
+        relationTo: 'subscriptions';
+        value: number | Subscription;
+      } | null)
+    | ({
+        relationTo: 'membershipPlans';
+        value: number | MembershipPlan;
+      } | null)
+    | ({
+        relationTo: 'memberships';
+        value: number | Membership;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'orderItems';
+        value: number | OrderItem;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: number | Transaction;
+      } | null)
+    | ({
+        relationTo: 'emailTemplates';
+        value: number | EmailTemplate;
+      } | null)
+    | ({
+        relationTo: 'emailSends';
+        value: number | EmailSend;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null);
@@ -644,9 +1026,7 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        cta?: T | CallToActionBlockSelect<T>;
-        content?: T | ContentBlockSelect<T>;
-        mediaBlock?: T | MediaBlockSelect<T>;
+        container?: T | ContainerBlockSelect<T>;
       };
   meta?:
     | T
@@ -661,6 +1041,119 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContainerBlock_select".
+ */
+export interface ContainerBlockSelect<T extends boolean = true> {
+  widthMode?: T;
+  backgroundVariant?: T;
+  backgroundColor?: T;
+  backgroundMedia?: T;
+  backgroundFit?: T;
+  overlayStrength?: T;
+  outerSpacingY?: T;
+  innerPadding?: T;
+  columns?:
+    | T
+    | {
+        size?: T;
+        blocks?:
+          | T
+          | {
+              richTextBlock?: T | RichTextBlockSelect<T>;
+              mediaBlock?: T | MediaBlockSelect<T>;
+              cta?: T | CallToActionBlockSelect<T>;
+              donationBlock?:
+                | T
+                | {
+                    header?: T;
+                    description?: T;
+                    suggestedAmounts?:
+                      | T
+                      | {
+                          amount?: T;
+                          id?: T;
+                        };
+                    defaultAmount?: T;
+                    buttonLabel?: T;
+                    nameLabel?: T;
+                    emailLabel?: T;
+                    phoneLabel?: T;
+                    addressLabel?: T;
+                    amountLabel?: T;
+                    modalTitle?: T;
+                    loadingText?: T;
+                    successText?: T;
+                    errorText?: T;
+                    checkoutName?: T;
+                    closeLabel?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              membershipBlock?:
+                | T
+                | {
+                    header?: T;
+                    description?: T;
+                    buttonLabel?: T;
+                    nameLabel?: T;
+                    emailLabel?: T;
+                    phoneLabel?: T;
+                    addressLabel?: T;
+                    planLabel?: T;
+                    plans?: T;
+                    defaultPlan?: T;
+                    modalTitle?: T;
+                    loadingText?: T;
+                    successText?: T;
+                    errorText?: T;
+                    checkoutName?: T;
+                    closeLabel?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              subscriptionBlock?:
+                | T
+                | {
+                    header?: T;
+                    description?: T;
+                    topics?: T;
+                    buttonLabel?: T;
+                    emailLabel?: T;
+                    modalTitle?: T;
+                    loadingText?: T;
+                    successText?: T;
+                    errorText?: T;
+                    closeLabel?: T;
+                    topic?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock_select".
+ */
+export interface RichTextBlockSelect<T extends boolean = true> {
+  richText?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock_select".
+ */
+export interface MediaBlockSelect<T extends boolean = true> {
+  media?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -683,41 +1176,6 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock_select".
- */
-export interface ContentBlockSelect<T extends boolean = true> {
-  columns?:
-    | T
-    | {
-        size?: T;
-        richText?: T;
-        enableLink?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
-        id?: T;
-      };
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock_select".
- */
-export interface MediaBlockSelect<T extends boolean = true> {
-  media?: T;
   id?: T;
   blockName?: T;
 }
@@ -837,6 +1295,167 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  email?: T;
+  name?: T;
+  displayName?: T;
+  phone?: T;
+  address?: T;
+  language?: T;
+  campaign?: T;
+  lastEngagedAt?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "campaigns_select".
+ */
+export interface CampaignsSelect<T extends boolean = true> {
+  name?: T;
+  reftag?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptionTopics_select".
+ */
+export interface SubscriptionTopicsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions_select".
+ */
+export interface SubscriptionsSelect<T extends boolean = true> {
+  key?: T;
+  contact?: T;
+  topic?: T;
+  campaign?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipPlans_select".
+ */
+export interface MembershipPlansSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  price?: T;
+  renewalWindowDays?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "memberships_select".
+ */
+export interface MembershipsSelect<T extends boolean = true> {
+  contact?: T;
+  plan?: T;
+  startDay?: T;
+  endDay?: T;
+  campaign?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  publicId?: T;
+  status?: T;
+  contact?: T;
+  campaign?: T;
+  lang?: T;
+  totalUSD?: T;
+  stripeCheckoutSessionId?: T;
+  stripePaymentIntentId?: T;
+  receiptEmailSendId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems_select".
+ */
+export interface OrderItemsSelect<T extends boolean = true> {
+  order?: T;
+  itemType?: T;
+  label?: T;
+  unitAmountUSD?: T;
+  qty?: T;
+  totalUSD?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  order?: T;
+  amountUSD?: T;
+  paymentType?: T;
+  contact?: T;
+  stripeRefId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailTemplates_select".
+ */
+export interface EmailTemplatesSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  description?: T;
+  status?: T;
+  subject?: T;
+  body?: T;
+  placeholders?:
+    | T
+    | {
+        key?: T;
+        description?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailSends_select".
+ */
+export interface EmailSendsSelect<T extends boolean = true> {
+  template?: T;
+  source?: T;
+  templateSlug?: T;
+  contact?: T;
+  toEmail?: T;
+  lang?: T;
+  status?: T;
+  subject?: T;
+  providerMessageId?: T;
+  errorCode?: T;
+  sentAt?: T;
+  error?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -991,6 +1610,22 @@ export interface SiteSetting {
    * Optional fallback for older browsers.
    */
   faviconIco?: (number | null) | Media;
+  minPageWidth?: number | null;
+  maxPageWidth?: number | null;
+  contentMaxWidth?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "donations-settings".
+ */
+export interface DonationsSetting {
+  id: number;
+  /**
+   * Prevents mistakes/abuse; can be raised if needed.
+   */
+  maxDonationUSD?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1048,6 +1683,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   allowIndexing?: T;
   faviconSvg?: T;
   faviconIco?: T;
+  minPageWidth?: T;
+  maxPageWidth?: T;
+  contentMaxWidth?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "donations-settings_select".
+ */
+export interface DonationsSettingsSelect<T extends boolean = true> {
+  maxDonationUSD?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

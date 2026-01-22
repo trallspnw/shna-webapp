@@ -10,13 +10,9 @@ import { post1 } from './post-1'
 import { post2 } from './post-2'
 import { post3 } from './post-3'
 
-const baseCollections: CollectionSlug[] = [
-  'media',
-  'pages',
-]
+const baseCollections: CollectionSlug[] = ['media', 'pages']
 
 const globals: GlobalSlug[] = ['header', 'footer', 'site-settings']
-
 
 // Next.js revalidation errors are normal when seeding the database without a server running
 // i.e. running `yarn seed` locally instead of using the admin UI within an active app

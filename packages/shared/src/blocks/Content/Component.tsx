@@ -6,6 +6,7 @@ import type { ContentBlock as ContentBlockProps } from '@shna/shared/payload-typ
 import type { Locale } from '@shna/shared/utilities/locale'
 
 import { CMSLink } from '../../components/Link'
+import { getColumnSpanValue } from '@shna/shared/blocks/columns'
 
 type Props = ContentBlockProps & {
   locale?: Locale
@@ -14,13 +15,6 @@ type Props = ContentBlockProps & {
 export const ContentBlock: React.FC<Props> = (props) => {
   const { columns, locale } = props
 
-  const colsSpanClasses = {
-    full: '12',
-    half: '6',
-    oneThird: '4',
-    twoThirds: '8',
-  }
-
   return (
     <div className="container my-16">
       <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
@@ -28,11 +22,12 @@ export const ContentBlock: React.FC<Props> = (props) => {
           columns.length > 0 &&
           columns.map((col, index) => {
             const { enableLink, link, richText, size } = col
+            const spanValue = getColumnSpanValue(size)
 
             return (
               <div
-                className={cn(`col-span-4 lg:col-span-${colsSpanClasses[size!]}`, {
-                  'md:col-span-2': size !== 'full',
+                className={cn(`col-span-4 lg:col-span-${spanValue}`, {
+                  'md:col-span-2': size ? size !== 'full' : false,
                 })}
                 key={index}
               >

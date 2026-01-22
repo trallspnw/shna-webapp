@@ -119,13 +119,20 @@ erDiagram
     uuid id PK
     string kind "membership|donation|retail|other"
     string paymentMethod "stripe|cash|check|comp|other"
-    string status "pending|paid|failed|refunded"
-    number amountUSD
+    string status "intent|pending|paid|fulfilled|succeeded|failed|refunded"
+    number amountUSD "USD dollars (legacy display)"
+    int amountExpectedUSD "USD (pre-payment)"
+    int amountPaidUSD "USD (post-payment)"
     string currency "USD"
     uuid contactId FK "optional (absent for stayAnon/cash anon)"
+    string email "normalized email (optional redundancy)"
+    string language "en|es|unknown; default unknown"
     boolean stayAnon "true => do not link, do not store email"
-    string pricingBasis "member|non_member|unknown"
+    boolean optInToProfile "true => allow contact linkage"
+    string pricingBasis "general|member|non_member|unknown"
     uuid membershipTermId FK "optional convenience link"
+    uuid membershipAccountId FK "optional (pre-payment membership context)"
+    uuid planId FK "optional (pre-payment membership context)"
     uuid orderId FK "optional convenience link"
     uuid eventId FK "optional"
     uuid campaignId FK "optional"
@@ -135,9 +142,10 @@ erDiagram
     string utmCampaign "optional"
     string utmContent "optional"
     string utmTerm "optional"
-    string stripeCheckoutSessionId "optional"
+    string stripeSessionId "unique; Stripe checkout session id"
     string stripePaymentIntentId "optional"
     datetime occurredAt
+    datetime receiptSentAt "optional; idempotency marker"
     datetime createdAt
     datetime updatedAt
     boolean isTest

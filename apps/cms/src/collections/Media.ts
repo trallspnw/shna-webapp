@@ -6,8 +6,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { publicRead_adminWrite } from '../access/publicRead_adminWrite'
 import {
   clearEmptyLocalizedRichText,
   clearEmptyLocalizedText,
@@ -20,12 +19,7 @@ export const Media: CollectionConfig = {
     description:
       'Media files are shared across locales. For localized imagery, upload a separate Media document and select it per locale.',
   },
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
+  access: publicRead_adminWrite,
   fields: [
     {
       name: 'alt',

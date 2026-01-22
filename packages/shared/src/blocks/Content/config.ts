@@ -1,58 +1,17 @@
 import type { Block, Field } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  HeadingFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-
 import { link } from '@shna/shared/fields/link'
-import { clearEmptyLocalizedRichText } from '@shna/shared/utilities/localizedFieldHooks'
+import { richTextField } from '@shna/shared/blocks/RichTextBlock/richTextField'
+import { columnSizeOptions } from '@shna/shared/blocks/columns'
 
 const columnFields: Field[] = [
   {
     name: 'size',
     type: 'select',
     defaultValue: 'oneThird',
-    options: [
-      {
-        label: 'One Third',
-        value: 'oneThird',
-      },
-      {
-        label: 'Half',
-        value: 'half',
-      },
-      {
-        label: 'Two Thirds',
-        value: 'twoThirds',
-      },
-      {
-        label: 'Full',
-        value: 'full',
-      },
-    ],
+    options: columnSizeOptions.map(({ label, value }) => ({ label, value })),
   },
-  {
-    name: 'richText',
-    type: 'richText',
-    localized: true,
-    hooks: {
-      beforeValidate: [clearEmptyLocalizedRichText],
-    },
-    editor: lexicalEditor({
-      features: ({ rootFeatures }) => {
-        return [
-          ...rootFeatures,
-          HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ]
-      },
-    }),
-    label: false,
-  },
+  richTextField(),
   {
     name: 'enableLink',
     type: 'checkbox',

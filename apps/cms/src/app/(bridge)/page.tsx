@@ -1,18 +1,11 @@
-"use client"
+import HomePage from '../(frontend)/[lang]/page'
+import { RootLocaleRedirector } from './RootLocaleRedirector'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-
-import { getPreferredLocale, setStoredLocale } from '@shna/shared/utilities/locale'
-
-export default function RootRedirect() {
-  const router = useRouter()
-
-  useEffect(() => {
-    const locale = getPreferredLocale()
-    setStoredLocale(locale)
-    router.replace(`/${locale}`)
-  }, [router])
-
-  return <p>Redirecting...</p>
+export default function RootPage() {
+  return (
+    <>
+      <RootLocaleRedirector />
+      <HomePage params={Promise.resolve({ lang: 'en' })} />
+    </>
+  )
 }

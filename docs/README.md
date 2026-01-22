@@ -14,19 +14,18 @@ This folder contains the authoritative project docs.
 - **Decisions / rationale**: `DECISIONS.md`
 - **Disabled / deferred features**: `DISABLED_FEATURES.md`
 - **Lessons learned**: `LESSONS_LEARNED.md`
+- **Testing**: `TESTING.md`
 
 ## Planning & work management
-
 - **Roadmap (big blocks)**: `ROADMAP.md`
 - **Tasks (near-term, actionable, AI-delegation)**: `TASKS.md`
 - **TODO log (rolling scratch + cleanup)**: `TODO_LOG.md`
 
-## Design docs
+## Design docs (Start here for implementation)
 
-- `design/identity-membership.md`
+- **Email System v1**: `design/email-design.md`
+- **ERD**: `design/erd.mmd`
 
 ## Notes (non-authoritative)
 
 - `notes/ai-chat-notes.md`
-
-- `design/erd.mmd`

@@ -7,9 +7,25 @@ import { fileURLToPath } from 'url'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Users } from './collections/Users'
+import { Contacts } from './collections/Contacts'
+import { Campaigns } from './collections/Campaigns'
+import { SubscriptionTopics } from './collections/SubscriptionTopics'
+import { Subscriptions } from './collections/Subscriptions'
+import { MembershipPlans } from './collections/MembershipPlans'
+import { Memberships } from './collections/Memberships'
+import { Orders } from './collections/Orders'
+import { OrderItems } from './collections/OrderItems'
+import { Transactions } from './collections/Transactions'
+import { EmailTemplates } from './collections/EmailTemplates'
+import { EmailSends } from './collections/EmailSends'
+import { subscriptionsHandler } from './endpoints/subscriptions'
+import { donationsSubmitHandler } from './endpoints/donations'
+import { membershipsSubmitHandler } from './endpoints/memberships'
+import { ordersStatusHandler } from './endpoints/orders'
 import { Footer } from '@shna/shared/Footer/config'
 import { Header } from '@shna/shared/Header/config'
 import { SiteSettings } from '@shna/shared/SiteSettings/config'
+import { DonationsSettings } from '@shna/shared/DonationsSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
@@ -17,10 +33,9 @@ import { getServerSideURL } from '@shna/shared/utilities/getURL'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const corsOrigins = [
-  getServerSideURL(),
-  process.env.NEXT_PUBLIC_SITE_URL,
-].filter((origin): origin is string => Boolean(origin))
+const corsOrigins = [getServerSideURL(), process.env.NEXT_PUBLIC_SITE_URL].filter(
+  (origin): origin is string => Boolean(origin),
+)
 
 export default buildConfig({
   admin: {
@@ -74,9 +89,46 @@ export default buildConfig({
     defaultLocale: 'en',
     fallback: true,
   },
-  collections: [Pages, Media, Users],
+  collections: [
+    Pages,
+    Media,
+    Users,
+    Contacts,
+    Campaigns,
+    SubscriptionTopics,
+    Subscriptions,
+    MembershipPlans,
+    Memberships,
+    Orders,
+    OrderItems,
+    Transactions,
+    EmailTemplates,
+    EmailSends,
+  ],
+  endpoints: [
+    {
+      path: '/public/subscriptions/submit',
+      method: 'post',
+      handler: subscriptionsHandler,
+    },
+    {
+      path: '/public/donations/submit',
+      method: 'post',
+      handler: donationsSubmitHandler,
+    },
+    {
+      path: '/public/memberships/submit',
+      method: 'post',
+      handler: membershipsSubmitHandler,
+    },
+    {
+      path: '/public/orders/status',
+      method: 'get',
+      handler: ordersStatusHandler,
+    },
+  ],
   cors: corsOrigins,
-  globals: [Header, Footer, SiteSettings],
+  globals: [Header, Footer, SiteSettings, DonationsSettings],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

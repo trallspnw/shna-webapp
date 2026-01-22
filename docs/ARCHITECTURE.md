@@ -23,7 +23,7 @@
   * Activated via `?mode=test` and persists for the browsing session across internal links
   * Stripe uses **test keys** when active; records from test flows store `isTest: true`
   * Admin UX includes a **Show test data** filter + **Delete all test records** action
-* **Test emails** must include `[TEST]` in the subject.
+* **Test emails** must include `[TEST]` in the subject and still send (prefixing is handled by the provider).
 
 These constraints are enforced intentionally. If something conflicts, stop and consult the docs.
 

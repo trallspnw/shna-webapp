@@ -1,10 +1,8 @@
 import type { CollectionConfig, Field } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
+import { adminOnly } from '../../access/adminOnly'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { CallToAction } from '@shna/shared/blocks/CallToAction/config'
-import { Content } from '@shna/shared/blocks/Content/config'
-import { MediaBlock } from '@shna/shared/blocks/MediaBlock/config'
+import { Container } from '@shna/shared/blocks/Container/config'
 import { hero } from '@shna/shared/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -31,10 +29,10 @@ const withLocalization = <T extends Field>(field: T): T => ({
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: adminOnly.create,
+    delete: adminOnly.delete,
     read: authenticatedOrPublished,
-    update: authenticated,
+    update: adminOnly.update,
   },
   // This config controls what's populated by default when a page is referenced
   // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
@@ -86,7 +84,9 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock],
+              blocks: [
+                Container,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,
@@ -134,7 +134,17 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
-    slugField(),
+    slugField({
+      overrides: (field) => {
+        const slugFieldConfig = field.fields?.[1]
+        if (slugFieldConfig && slugFieldConfig.type === 'text') {
+          if (slugFieldConfig.admin?.components) {
+            delete slugFieldConfig.admin.components
+          }
+        }
+        return field
+      },
+    }),
   ],
   hooks: {
     afterChange: [revalidatePage],

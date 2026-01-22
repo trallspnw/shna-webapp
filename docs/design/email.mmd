@@ -1,0 +1,35 @@
+erDiagram
+  EmailTemplates {
+    string key
+    string category
+    boolean isSystem
+    boolean enabled
+  }
+
+  EmailBroadcasts {
+    string slug
+    string status
+    boolean dryRun
+  }
+
+  EmailSends {
+    string to
+    string status
+    string failureReason
+    string providerMessageId
+    string dedupeKey
+  }
+
+  SubscriptionTopics {
+    string name
+  }
+
+  Contacts {
+    string email
+  }
+
+  EmailTemplates ||--o{ EmailSends : uses
+  EmailTemplates ||--o{ EmailBroadcasts : templates
+  EmailBroadcasts ||--o{ EmailSends : generates
+  SubscriptionTopics ||--o{ EmailBroadcasts : audience
+  Contacts ||--o{ EmailSends : receives

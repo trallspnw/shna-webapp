@@ -1,9 +1,11 @@
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { stripePlugin } from '@payloadcms/plugin-stripe'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
+import { handleCheckoutSessionCompleted, handleCheckoutSessionExpired } from '@/webhooks/stripe'
 
 import type { Page } from '@shna/shared/payload-types'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
@@ -17,13 +19,10 @@ const r2AccessKeyId = getEnv('R2_ACCESS_KEY_ID')
 const r2SecretAccessKey = getEnv('R2_SECRET_ACCESS_KEY')
 const r2Prefix = process.env.R2_PREFIX || 'local'
 
-const hasR2Config =
-  r2Bucket && r2Endpoint && r2AccessKeyId && r2SecretAccessKey
+const hasR2Config = r2Bucket && r2Endpoint && r2AccessKeyId && r2SecretAccessKey
 
 const generateTitle: GenerateTitle<Page> = ({ doc }) => {
-  return doc?.title
-    ? `${doc.title} | Seminary Hill Natural Area`
-    : 'Seminary Hill Natural Area'
+  return doc?.title ? `${doc.title} | Seminary Hill Natural Area` : 'Seminary Hill Natural Area'
 }
 
 const generateURL: GenerateURL<Page> = ({ doc }) => {
@@ -82,5 +81,17 @@ export const plugins: Plugin[] = [
   seoPlugin({
     generateTitle,
     generateURL,
+  }),
+  stripePlugin({
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+    stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET || '',
+    webhooks: {
+      'checkout.session.completed': handleCheckoutSessionCompleted,
+      'checkout.session.expired': handleCheckoutSessionExpired,
+    },
+    // We do NOT want to auto-sync products/prices to Payload collections
+    // as we have our own bespoke schema. We just use the plugin
+    // for standard connection + webhooks + SDK injection.
+    sync: [],
   }),
 ]

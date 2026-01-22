@@ -45,5 +45,23 @@ export const SiteSettings: GlobalConfig = {
         },
       },
     },
+    {
+      name: 'minPageWidth',
+      label: 'Min Page Width (px)',
+      type: 'number',
+      defaultValue: 360,
+    },
+    {
+      name: 'maxPageWidth',
+      label: 'Max Page Width (px)',
+      type: 'number',
+      defaultValue: 1440,
+    },
+    {
+      name: 'contentMaxWidth',
+      label: 'Content Max Width (px)',
+      type: 'number',
+      defaultValue: 1040,
+    },
   ],
 }

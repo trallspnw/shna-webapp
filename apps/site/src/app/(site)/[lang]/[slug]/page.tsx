@@ -89,7 +89,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 const queryPageBySlug = cache(async ({ slug, locale }: { slug: string; locale: string }) => {
   const result = await fetchFromCMS<{ docs: Page[] }>('/api/pages', {
-    depth: 2,
+    depth: 5,
     locale,
     params: {
       'where[slug][equals]': slug,

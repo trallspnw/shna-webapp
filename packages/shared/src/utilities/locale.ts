@@ -1,11 +1,14 @@
 import canUseDOM from './canUseDOM'
+import {
+  getStoredLocale as getStoredLocaleRaw,
+  LOCALE_STORAGE_KEY,
+  setStoredLocale as setStoredLocaleRaw,
+} from '../client/storage'
 
 export const SUPPORTED_LOCALES = ['en', 'es'] as const
 export type Locale = (typeof SUPPORTED_LOCALES)[number]
 
 export const DEFAULT_LOCALE: Locale = 'en'
-export const LOCALE_STORAGE_KEY = 'shna-locale'
-
 export const isSupportedLocale = (value?: string | null): value is Locale => {
   if (!value) return false
   return SUPPORTED_LOCALES.includes(value as Locale)
@@ -17,14 +20,16 @@ export const normalizeLocale = (value?: string | null): Locale | null => {
   return isSupportedLocale(base) ? base : null
 }
 
+export { LOCALE_STORAGE_KEY }
+
 export const getStoredLocale = (): Locale | null => {
   if (!canUseDOM) return null
-  return normalizeLocale(window.localStorage.getItem(LOCALE_STORAGE_KEY))
+  return normalizeLocale(getStoredLocaleRaw() ?? null)
 }
 
 export const setStoredLocale = (locale: Locale) => {
   if (!canUseDOM) return
-  window.localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  setStoredLocaleRaw(locale)
 }
 
 export const getPreferredLocale = (): Locale => {
