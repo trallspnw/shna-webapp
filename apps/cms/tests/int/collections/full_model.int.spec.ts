@@ -11,16 +11,23 @@ describe('Full Core Data Model', () => {
   })
 
   it('Membership: primary contact + terms validation', async () => {
+    const unique = Date.now()
     // 1. Create Contact
     const contact = await payload.create({
       collection: 'contacts',
-      data: { email: 'member@test.com', displayName: 'Member' },
+      data: { email: `member_${unique}@test.com`, displayName: 'Member' },
     })
 
     // 2. Create Plan
     const plan = await payload.create({
       collection: 'membershipPlans',
-      data: { key: 'annual', name: 'Annual', durationMonths: 12, priceUSD: 100, isTest: true },
+      data: {
+        key: `annual-${unique}`,
+        name: 'Annual',
+        durationMonths: 12,
+        priceUSD: 100,
+        isTest: true,
+      },
     })
 
     // 3. Create MembershipAccount
@@ -46,7 +53,7 @@ describe('Full Core Data Model', () => {
         isTest: true,
       },
     })
-    expect(term.planKeySnapshot).toBe('annual')
+    expect(term.planKeySnapshot).toBe(`annual-${unique}`) // Checks dynamic key
 
     // 5. MembershipTerm (Fail: ends before starts)
     await expect(async () => {
@@ -65,12 +72,13 @@ describe('Full Core Data Model', () => {
   })
 
   it('Retail: Order + Items + total calculation', async () => {
+    const unique = Date.now()
     // 1. Create Product
     const product = await payload.create({
       collection: 'products',
       data: {
-        key: 'shirt',
-        slug: 't-shirt',
+        key: `shirt-${unique}`,
+        slug: `t-shirt-${unique}`,
         name: 'T-Shirt',
         nonMemberPriceUSD: 20,
         isTest: true,
@@ -103,11 +111,12 @@ describe('Full Core Data Model', () => {
   })
 
   it('Events: Attendance identity mode constraint', async () => {
+    const unique = Date.now()
     // 1. Create Event
     const event = await payload.create({
       collection: 'events',
       data: {
-        slug: 'picnic-2024',
+        slug: `picnic-${unique}`,
         title: 'Picnic',
         startsAt: new Date().toISOString(),
         isTest: true,
@@ -117,7 +126,7 @@ describe('Full Core Data Model', () => {
     // 2. Create Contact
     const contact = await payload.create({
       collection: 'contacts',
-      data: { email: 'picnic@test.com' },
+      data: { email: `picnic_${unique}@test.com` },
     })
 
     // 3. Success: Contact only
@@ -157,6 +166,7 @@ describe('Full Core Data Model', () => {
   })
 
   it('Transactions: basic creation + anon protection', async () => {
+    const unique = Date.now()
     // 1. Create Transaction (Donation)
     const txn = await payload.create({
       collection: 'transactions',
@@ -167,12 +177,12 @@ describe('Full Core Data Model', () => {
         isTest: true,
       },
     })
-    expect(txn.occurredAt).toBeDefined() // Hook set default
+    expect(txn.occurredAt).toBeDefined()
 
     // 2. Fail: StayAnon + Contact
     const contact = await payload.create({
       collection: 'contacts',
-      data: { email: 'donor@test.com' },
+      data: { email: `donor_${unique}@test.com` },
     })
 
     await expect(async () => {

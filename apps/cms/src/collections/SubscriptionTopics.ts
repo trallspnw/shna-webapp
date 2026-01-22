@@ -21,6 +21,13 @@ export const SubscriptionTopics: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'brevoListId',
+      type: 'number',
+      admin: {
+        description: 'ID of the list in Brevo (e.g. 5)',
+      },
+    },
+    {
       name: 'description',
       type: 'textarea',
     },

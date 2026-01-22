@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { APIError } from 'payload'
+import { syncContactToList } from '@/lib/brevo'
 
 export const Subscriptions: CollectionConfig = {
   slug: 'subscriptions',
@@ -77,13 +78,33 @@ export const Subscriptions: CollectionConfig = {
             if (operation === 'update' && originalDoc?.id === existing.docs[0].id) {
               return data
             }
-            // NOTE: This check might be imperfect for simultaneous requests but covers the basic UI/API case.
-            // Unique index in DB is better but Payload custom indexes are DB-specific.
-            // For now relying on hook error.
             throw new APIError('Subscription already exists for this contact and topic', 400)
           }
         }
         return data
+      },
+    ],
+    afterChange: [
+      async ({ doc, operation, req }) => {
+        // If subscribed, sync to brevo
+        if (doc.status === 'subscribed' && doc.contact && doc.topic) {
+          const topicId = typeof doc.topic === 'object' ? doc.topic.id : doc.topic
+          const contactId = typeof doc.contact === 'object' ? doc.contact.id : doc.contact
+
+          // Fetch full topic to get list ID
+          const topic = await req.payload.findByID({
+            collection: 'subscriptionTopics',
+            id: topicId,
+          })
+
+          if (topic && topic.brevoListId) {
+            const contact = await req.payload.findByID({ collection: 'contacts', id: contactId })
+            if (contact && contact.email) {
+              await syncContactToList(contact.email, topic.brevoListId)
+            }
+          }
+        }
+        return doc
       },
     ],
   },

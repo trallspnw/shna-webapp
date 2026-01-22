@@ -11,35 +11,38 @@ describe('Core Data Model', () => {
   })
 
   it('Contacts: normalizes email to lowercase', async () => {
+    const unique = Date.now()
     const contact = await payload.create({
       collection: 'contacts',
       data: {
-        email: 'Test@CASE.com',
+        email: `Test_${unique}@CASE.com`,
         displayName: 'Test User',
       },
     })
-    expect(contact.email).toBe('test@case.com')
+    expect(contact.email).toBe(`test_${unique}@case.com`)
   })
 
   it('Campaigns: creates a campaign', async () => {
+    const unique = Date.now()
     const campaign = await payload.create({
       collection: 'campaigns',
       data: {
-        key: 'test-campaign-1',
-        slug: 'test-campaign',
+        key: `test-campaign-${unique}`,
+        slug: `test-campaign-${unique}`,
         name: 'Test Campaign',
         isTest: true,
       },
     })
     expect(campaign.id).toBeDefined()
-    expect(campaign.key).toBe('test-campaign-1')
+    expect(campaign.key).toBe(`test-campaign-${unique}`)
   })
 
   it('MembershipPlans: creates a plan', async () => {
+    const unique = Date.now()
     const plan = await payload.create({
       collection: 'membershipPlans',
       data: {
-        key: 'standard-monthly',
+        key: `standard-monthly-${unique}`,
         name: 'Standard Monthly',
         priceUSD: 10,
         durationMonths: 1,
@@ -51,11 +54,12 @@ describe('Core Data Model', () => {
   })
 
   it('Subscriptions: enforces uniqueness for contact + topic', async () => {
+    const unique = Date.now()
     // 1. Create Topic
     const topic = await payload.create({
       collection: 'subscriptionTopics',
       data: {
-        key: 'newsletter',
+        key: `newsletter-${unique}`,
         name: 'Newsletter',
         isTest: true,
       },
@@ -65,7 +69,7 @@ describe('Core Data Model', () => {
     const contact = await payload.create({
       collection: 'contacts',
       data: {
-        email: 'subscriber@example.com',
+        email: `subscriber_${unique}@example.com`,
         isTest: true,
       },
     })

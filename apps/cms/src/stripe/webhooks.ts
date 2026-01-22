@@ -1,16 +1,26 @@
-import type { CheckoutIntent } from '@shna/shared/payload-types'
+import type { CheckoutIntent, Transaction } from '@shna/shared/payload-types'
 import { getActiveMembershipByEmail } from '../lib/email'
+import { generateReceiptEmail, generateMembershipEmail } from '../utilities/emailTemplates'
+import { sendEmail } from '../lib/brevo'
 
 // Type not exported by plugin? We'll define a compatible signature.
 type StripeWebhookHandler = (args: { event: any; payload: any; stripe: any }) => Promise<void>
 
+// Helper to get ID from relationship which might be populated or ID
+const getId = (relation: any): string | number | undefined => {
+  if (!relation) return undefined
+  if (typeof relation === 'object' && 'id' in relation) return relation.id
+  return relation
+}
+
 export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args) => {
-  const { event, payload, stripe } = args
+  const { event, payload } = args
 
   const session = event.data.object as any
   const sessionId = session.id
   const customerEmail = session.customer_details?.email
   const paymentIntentId = session.payment_intent
+  const amountTotal = session.amount_total || 0
 
   // 1. Find the intent
   const intents = await payload.find({
@@ -30,7 +40,8 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
   const isTest = intent.isTest
 
   // 2. Identify Contact (if allowed)
-  let contactId: string | null = null
+  let contactId: string | undefined = undefined
+  let contactDoc: any = undefined
 
   if (customerEmail && !intent.stayAnon) {
     // Normalize
@@ -44,9 +55,10 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
     })
 
     if (existing.docs.length > 0) {
-      contactId = existing.docs[0].id
+      contactDoc = existing.docs[0]
+      contactId = contactDoc.id
     } else {
-      const newContact = await payload.create({
+      contactDoc = await payload.create({
         collection: 'contacts',
         data: {
           email,
@@ -54,7 +66,7 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
           isTest: isTest || false,
         },
       })
-      contactId = newContact.id
+      contactId = contactDoc.id
     }
   }
 
@@ -64,27 +76,24 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
     data: {
       kind: intent.kind,
       status: 'succeeded',
-      amountUSD: (session.amount_total || 0) / 100,
+      amountUSD: amountTotal / 100,
       paymentMethod: 'stripe',
       stripeId: paymentIntentId || sessionId,
       occurredAt: new Date().toISOString(),
-      contact: contactId ? contactId : undefined,
+      contact: contactId, // Explicitly undefined if no contact
       stayAnon: intent.stayAnon || false,
       pricingBasis: intent.pricingBasis,
-      order: typeof intent.order === 'string' ? intent.order : intent.order?.id,
-      event: typeof intent.event === 'string' ? intent.event : intent.event?.id,
+      order: getId(intent.order),
+      event: getId(intent.event),
+      membershipTerm: undefined, // Linked optionally below
       isTest: isTest,
     },
   })
 
   // 4. Specific Logic by Kind
   if (intent.kind === 'membership' && contactId && intent.membershipAccount && intent.plan) {
-    // Create Membership Term
-    const planId = typeof intent.plan === 'object' ? intent.plan.id : intent.plan
-    const accountId =
-      typeof intent.membershipAccount === 'object'
-        ? intent.membershipAccount.id
-        : intent.membershipAccount
+    const planId = getId(intent.plan)
+    const accountId = getId(intent.membershipAccount)
 
     // Look up plan details for duration
     const planDoc = await payload.findByID({ collection: 'membershipPlans', id: planId })
@@ -94,7 +103,6 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
 
     let startsAt = new Date()
     if (activeStatus.isActive && activeStatus.expiresAt) {
-      // If active, start after current expiration
       const existingExpiry = new Date(activeStatus.expiresAt)
       if (existingExpiry > startsAt) {
         startsAt = existingExpiry
@@ -105,7 +113,7 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
     const expiresAt = new Date(startsAt)
     expiresAt.setMonth(expiresAt.getMonth() + durationMonths)
 
-    await payload.create({
+    const term = await payload.create({
       collection: 'membershipTerms',
       data: {
         membershipAccount: accountId,
@@ -114,17 +122,22 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
         startsAt: startsAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
         transaction: transaction.id,
-        pricePaidUSD: (session.amount_total || 0) / 100,
+        pricePaidUSD: amountTotal / 100,
         isTest: isTest,
       },
     })
 
-    // Also link transaction to term? (Transaction has 'membershipTerm' field, we might need to patch it
-    // OR we just rely on term -> transaction link. The ERD has both directions usually or one.
-    // Transactions.ts has relationship to Terms. Let's patch it for completeness if easy,
-    // but Term->Transaction is the critical Audit link.)
+    // Send Membership Email
+    if (contactDoc) {
+      const { subject, html } = generateMembershipEmail(
+        contactDoc,
+        term,
+        planDoc.name || 'Membership',
+      )
+      await sendEmail({ to: customerEmail, subject, html })
+    }
   } else if (intent.kind === 'retail' && intent.order) {
-    const orderId = typeof intent.order === 'string' ? intent.order : intent.order.id
+    const orderId = getId(intent.order)
     await payload.update({
       collection: 'orders',
       id: orderId,
@@ -132,7 +145,16 @@ export const handleCheckoutSessionCompleted: StripeWebhookHandler = async (args)
         status: 'paid',
       },
     })
+  }
 
-    // Link order to transaction (already done in create transaction step above)
+  // Send Receipt (Unified for all payments if amount > 0)
+  // Logic: Send if we have email AND ( !stayAnon OR stayAnon=true is OK for receipt only )
+  if (amountTotal > 0 && customerEmail) {
+    const { subject, html } = generateReceiptEmail({
+      amountUSD: amountTotal / 100,
+      occurredAt: new Date().toISOString(),
+      stripeId: paymentIntentId || sessionId,
+    } as Transaction)
+    await sendEmail({ to: customerEmail, subject, html })
   }
 }

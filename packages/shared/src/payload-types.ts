@@ -488,6 +488,10 @@ export interface SubscriptionTopic {
   key?: string | null;
   slug?: string | null;
   name?: string | null;
+  /**
+   * ID of the list in Brevo (e.g. 5)
+   */
+  brevoListId?: number | null;
   description?: string | null;
   isActive?: boolean | null;
   isTest?: boolean | null;
@@ -1222,6 +1226,7 @@ export interface SubscriptionTopicsSelect<T extends boolean = true> {
   key?: T;
   slug?: T;
   name?: T;
+  brevoListId?: T;
   description?: T;
   isActive?: T;
   isTest?: T;
