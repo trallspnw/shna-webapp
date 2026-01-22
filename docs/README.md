@@ -21,12 +21,11 @@ This folder contains the authoritative project docs.
 - **Tasks (near-term, actionable, AI-delegation)**: `TASKS.md`
 - **TODO log (rolling scratch + cleanup)**: `TODO_LOG.md`
 
-## Design docs
+## Design docs (Start here for implementation)
 
-- `design/identity-membership.md`
+- **Identity & Membership**: `design/identity-membership.md`
+- **ERD**: `design/erd.mmd`
 
 ## Notes (non-authoritative)
 
 - `notes/ai-chat-notes.md`
-
-- `design/erd.mmd`

@@ -7,6 +7,22 @@ import { fileURLToPath } from 'url'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Users } from './collections/Users'
+import { Contacts } from './collections/Contacts'
+import { Campaigns } from './collections/Campaigns'
+import { SubscriptionTopics } from './collections/SubscriptionTopics'
+import { Subscriptions } from './collections/Subscriptions'
+import { MembershipPlans } from './collections/MembershipPlans'
+import { MembershipAccounts } from './collections/MembershipAccounts'
+import { MembershipTerms } from './collections/MembershipTerms'
+import { Products } from './collections/Products'
+import { Orders } from './collections/Orders'
+import { OrderItems } from './collections/OrderItems'
+import { Events } from './collections/Events'
+import { EventAttendances } from './collections/EventAttendances'
+import { Aliases } from './collections/Aliases'
+import { Transactions } from './collections/Transactions'
+import { CheckoutIntents } from './collections/CheckoutIntents'
+import { createCheckoutSession } from './endpoints/createCheckoutSession'
 import { Footer } from '@shna/shared/Footer/config'
 import { Header } from '@shna/shared/Header/config'
 import { SiteSettings } from '@shna/shared/SiteSettings/config'
@@ -17,10 +33,9 @@ import { getServerSideURL } from '@shna/shared/utilities/getURL'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const corsOrigins = [
-  getServerSideURL(),
-  process.env.NEXT_PUBLIC_SITE_URL,
-].filter((origin): origin is string => Boolean(origin))
+const corsOrigins = [getServerSideURL(), process.env.NEXT_PUBLIC_SITE_URL].filter(
+  (origin): origin is string => Boolean(origin),
+)
 
 export default buildConfig({
   admin: {
@@ -74,7 +89,33 @@ export default buildConfig({
     defaultLocale: 'en',
     fallback: true,
   },
-  collections: [Pages, Media, Users],
+  collections: [
+    Pages,
+    Media,
+    Users,
+    Contacts,
+    Campaigns,
+    SubscriptionTopics,
+    Subscriptions,
+    MembershipPlans,
+    MembershipAccounts,
+    MembershipTerms,
+    Products,
+    Orders,
+    OrderItems,
+    Events,
+    EventAttendances,
+    Aliases,
+    Transactions,
+    CheckoutIntents,
+  ],
+  endpoints: [
+    {
+      path: '/checkout-session',
+      method: 'post',
+      handler: createCheckoutSession,
+    },
+  ],
   cors: corsOrigins,
   globals: [Header, Footer, SiteSettings],
   plugins,

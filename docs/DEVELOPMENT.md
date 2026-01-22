@@ -266,3 +266,25 @@ pnpm deps:up
 
 * **Public site remains static-first** — avoid changes that require request-time Node rendering for the public site.
 * **Database is Postgres** (`@payloadcms/db-postgres`). Do not reintroduce Mongo examples.
+
+## Environment Variables Reference
+
+### Stripe (Payload Stripe plugin)
+
+Used by: `apps/cms`
+
+| Variable | Description |
+| text | text |
+| `STRIPE_SECRET_KEY` | Secret key (switches to test key when `?mode=test` logic is implemented? No, Payload usually just uses one key per env, but we might switch keys dynamically or just rely on the key provided. *Correction per architecture:* we use test keys when mode=test. We likely need `STRIPE_SECRET_KEY_TEST` too, or just manual swap for local.) |
+| `STRIPE_WEBHOOK_SECRET` | Webhook secret for verification. |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Public key for frontend elements (if any). |
+
+### Brevo (Transactional email + list sync)
+
+Used by: `apps/cms`
+
+| Variable | Description |
+| text | text |
+| `BREVO_API_KEY` | API key for sending email and managing contacts. |
+| `BREVO_SENDER_EMAIL` | Default 'From' address. |
+| `BREVO_SENDER_NAME` | Default 'From' name. |

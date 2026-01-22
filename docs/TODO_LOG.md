@@ -20,6 +20,20 @@ This is a **running log** of smaller TODOs, notes, and cleanup items that don’
 - [ ] Decide final behavior for root (`/`) language handling:
   - load `en` directly without redirect **or**
   - redirect only when browser preference ≠ default
+  [ ] Look into this:
+  - 2026-01-22T04:15:07Z app[4d89455ea3e098] iad [info]Error: Internal: NoFallbackError
+    2026-01-22T04:15:07Z app[4d89455ea3e098] iad [info]    at l (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1050)
+    2026-01-22T04:15:07Z app[4d89455ea3e098] iad [info]    at responseGenerator (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1849)
+    2026-01-22T04:15:21Z app[4d89455ea3e098] iad [info]Error: Internal: NoFallbackError
+    2026-01-22T04:15:21Z app[4d89455ea3e098] iad [info]    at l (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1050)
+    2026-01-22T04:15:21Z app[4d89455ea3e098] iad [info]    at responseGenerator (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1849)
+    2026-01-22T04:15:24Z app[4d89455ea3e098] iad [info]Error: Internal: NoFallbackError
+    2026-01-22T04:15:24Z app[4d89455ea3e098] iad [info]    at l (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1050)
+    2026-01-22T04:15:24Z app[4d89455ea3e098] iad [info]    at responseGenerator (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1849)
+    2026-01-22T04:34:33Z app[4d89455ea3e098] iad [info]Error: Internal: NoFallbackError
+    2026-01-22T04:34:33Z app[4d89455ea3e098] iad [info]    at l (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1050)
+    2026-01-22T04:34:33Z app[4d89455ea3e098] iad [info]    at responseGenerator (.next/server/app/(frontend)/[lang]/[slug]/page.js:2:1849)
+    2026-01-22T04:34:33Z app[4d89455ea3e098] iad [info] ⨯ The requested resource isn't a valid image for /media/image-hero1-4.webp received null
 
 ---
 

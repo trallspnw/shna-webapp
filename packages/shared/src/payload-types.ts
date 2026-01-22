@@ -70,6 +70,21 @@ export interface Config {
     pages: Page;
     media: Media;
     users: User;
+    contacts: Contact;
+    campaigns: Campaign;
+    subscriptionTopics: SubscriptionTopic;
+    subscriptions: Subscription;
+    membershipPlans: MembershipPlan;
+    membershipAccounts: MembershipAccount;
+    membershipTerms: MembershipTerm;
+    products: Product;
+    orders: Order;
+    orderItems: OrderItem;
+    events: Event;
+    eventAttendances: EventAttendance;
+    aliases: Alias;
+    transactions: Transaction;
+    checkoutIntents: CheckoutIntent;
     redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -82,6 +97,21 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    campaigns: CampaignsSelect<false> | CampaignsSelect<true>;
+    subscriptionTopics: SubscriptionTopicsSelect<false> | SubscriptionTopicsSelect<true>;
+    subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
+    membershipPlans: MembershipPlansSelect<false> | MembershipPlansSelect<true>;
+    membershipAccounts: MembershipAccountsSelect<false> | MembershipAccountsSelect<true>;
+    membershipTerms: MembershipTermsSelect<false> | MembershipTermsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    orderItems: OrderItemsSelect<false> | OrderItemsSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    eventAttendances: EventAttendancesSelect<false> | EventAttendancesSelect<true>;
+    aliases: AliasesSelect<false> | AliasesSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    checkoutIntents: CheckoutIntentsSelect<false> | CheckoutIntentsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -224,7 +254,6 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -420,6 +449,264 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: number;
+  email: string;
+  displayName?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  language?: ('en' | 'es' | 'unknown') | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "campaigns".
+ */
+export interface Campaign {
+  id: number;
+  key: string;
+  slug: string;
+  name: string;
+  channel?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  isActive?: boolean | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptionTopics".
+ */
+export interface SubscriptionTopic {
+  id: number;
+  key?: string | null;
+  slug?: string | null;
+  name?: string | null;
+  description?: string | null;
+  isActive?: boolean | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: number;
+  contact: number | Contact;
+  topic: number | SubscriptionTopic;
+  status?: ('subscribed' | 'unsubscribed' | 'bounced') | null;
+  campaign?: (number | null) | Campaign;
+  refRaw?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipPlans".
+ */
+export interface MembershipPlan {
+  id: number;
+  key: string;
+  slug?: string | null;
+  name?: string | null;
+  priceUSD?: number | null;
+  durationMonths?: number | null;
+  renewalWindowDays?: number | null;
+  isActive?: boolean | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipAccounts".
+ */
+export interface MembershipAccount {
+  id: number;
+  type: 'individual' | 'household';
+  primaryContact: number | Contact;
+  /**
+   * Adult members only. Do not add children here.
+   */
+  secondaryContacts?: (number | Contact)[] | null;
+  anonymousMemberCount?: number | null;
+  campaign?: (number | null) | Campaign;
+  refRaw?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipTerms".
+ */
+export interface MembershipTerm {
+  id: number;
+  membershipAccount: number | MembershipAccount;
+  plan: number | MembershipPlan;
+  planKeySnapshot?: string | null;
+  pricePaidUSD?: number | null;
+  status: 'active' | 'expired' | 'canceled' | 'refunded' | 'comped';
+  startsAt: string;
+  expiresAt: string;
+  renewedFromTerm?: (number | null) | MembershipTerm;
+  transaction?: (number | null) | Transaction;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: number;
+  kind: 'membership' | 'donation' | 'retail';
+  paymentMethod?: ('stripe' | 'cash' | 'check' | 'comp') | null;
+  status?: ('succeeded' | 'pending' | 'failed' | 'refunded') | null;
+  amountUSD: number;
+  stayAnon?: boolean | null;
+  pricingBasis?: ('member' | 'non_member' | 'unknown') | null;
+  contact?: (number | null) | Contact;
+  membershipTerm?: (number | null) | MembershipTerm;
+  order?: (number | null) | Order;
+  event?: (number | null) | Event;
+  stripeId?: string | null;
+  occurredAt?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  orderNumber?: string | null;
+  status?: ('pending' | 'paid' | 'canceled') | null;
+  pricingBasis?: ('member' | 'non_member' | 'unknown') | null;
+  stayAnon?: boolean | null;
+  contact?: (number | null) | Contact;
+  event?: (number | null) | Event;
+  campaign?: (number | null) | Campaign;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  slug: string;
+  title: string;
+  status?: ('draft' | 'published' | 'archived') | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  location?: string | null;
+  checkInEnabled?: boolean | null;
+  /**
+   * Code required for self-check-in URL
+   */
+  checkInCode?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  key?: string | null;
+  slug: string;
+  name: string;
+  description?: string | null;
+  nonMemberPriceUSD?: number | null;
+  memberPriceUSD?: number | null;
+  isActive?: boolean | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  product: number | Product;
+  variant?: string | null;
+  quantity: number;
+  unitPriceUSD: number;
+  totalUSD?: number | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventAttendances".
+ */
+export interface EventAttendance {
+  id: number;
+  event: number | Event;
+  contact?: (number | null) | Contact;
+  alias?: (number | null) | Alias;
+  anonymousCount?: number | null;
+  method?: ('qr_scan' | 'manual') | null;
+  checkedInAt?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aliases".
+ */
+export interface Alias {
+  id: number;
+  key?: string | null;
+  description?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checkoutIntents".
+ */
+export interface CheckoutIntent {
+  id: number;
+  stripeSessionId: string;
+  kind: 'membership' | 'donation' | 'retail';
+  stayAnon?: boolean | null;
+  pricingBasis?: ('member' | 'non_member' | 'unknown') | null;
+  event?: (number | null) | Event;
+  campaign?: (number | null) | Campaign;
+  refRaw?: string | null;
+  order?: (number | null) | Order;
+  plan?: (number | null) | MembershipPlan;
+  membershipAccount?: (number | null) | MembershipAccount;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -566,6 +853,66 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'contacts';
+        value: number | Contact;
+      } | null)
+    | ({
+        relationTo: 'campaigns';
+        value: number | Campaign;
+      } | null)
+    | ({
+        relationTo: 'subscriptionTopics';
+        value: number | SubscriptionTopic;
+      } | null)
+    | ({
+        relationTo: 'subscriptions';
+        value: number | Subscription;
+      } | null)
+    | ({
+        relationTo: 'membershipPlans';
+        value: number | MembershipPlan;
+      } | null)
+    | ({
+        relationTo: 'membershipAccounts';
+        value: number | MembershipAccount;
+      } | null)
+    | ({
+        relationTo: 'membershipTerms';
+        value: number | MembershipTerm;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'orderItems';
+        value: number | OrderItem;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'eventAttendances';
+        value: number | EventAttendance;
+      } | null)
+    | ({
+        relationTo: 'aliases';
+        value: number | Alias;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: number | Transaction;
+      } | null)
+    | ({
+        relationTo: 'checkoutIntents';
+        value: number | CheckoutIntent;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -728,7 +1075,6 @@ export interface MediaBlockSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -837,6 +1183,243 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  email?: T;
+  displayName?: T;
+  phone?: T;
+  address?: T;
+  language?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "campaigns_select".
+ */
+export interface CampaignsSelect<T extends boolean = true> {
+  key?: T;
+  slug?: T;
+  name?: T;
+  channel?: T;
+  startDate?: T;
+  endDate?: T;
+  isActive?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptionTopics_select".
+ */
+export interface SubscriptionTopicsSelect<T extends boolean = true> {
+  key?: T;
+  slug?: T;
+  name?: T;
+  description?: T;
+  isActive?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions_select".
+ */
+export interface SubscriptionsSelect<T extends boolean = true> {
+  contact?: T;
+  topic?: T;
+  status?: T;
+  campaign?: T;
+  refRaw?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipPlans_select".
+ */
+export interface MembershipPlansSelect<T extends boolean = true> {
+  key?: T;
+  slug?: T;
+  name?: T;
+  priceUSD?: T;
+  durationMonths?: T;
+  renewalWindowDays?: T;
+  isActive?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipAccounts_select".
+ */
+export interface MembershipAccountsSelect<T extends boolean = true> {
+  type?: T;
+  primaryContact?: T;
+  secondaryContacts?: T;
+  anonymousMemberCount?: T;
+  campaign?: T;
+  refRaw?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipTerms_select".
+ */
+export interface MembershipTermsSelect<T extends boolean = true> {
+  membershipAccount?: T;
+  plan?: T;
+  planKeySnapshot?: T;
+  pricePaidUSD?: T;
+  status?: T;
+  startsAt?: T;
+  expiresAt?: T;
+  renewedFromTerm?: T;
+  transaction?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  key?: T;
+  slug?: T;
+  name?: T;
+  description?: T;
+  nonMemberPriceUSD?: T;
+  memberPriceUSD?: T;
+  isActive?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  status?: T;
+  pricingBasis?: T;
+  stayAnon?: T;
+  contact?: T;
+  event?: T;
+  campaign?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orderItems_select".
+ */
+export interface OrderItemsSelect<T extends boolean = true> {
+  order?: T;
+  product?: T;
+  variant?: T;
+  quantity?: T;
+  unitPriceUSD?: T;
+  totalUSD?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  status?: T;
+  startsAt?: T;
+  endsAt?: T;
+  location?: T;
+  checkInEnabled?: T;
+  checkInCode?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventAttendances_select".
+ */
+export interface EventAttendancesSelect<T extends boolean = true> {
+  event?: T;
+  contact?: T;
+  alias?: T;
+  anonymousCount?: T;
+  method?: T;
+  checkedInAt?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aliases_select".
+ */
+export interface AliasesSelect<T extends boolean = true> {
+  key?: T;
+  description?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  kind?: T;
+  paymentMethod?: T;
+  status?: T;
+  amountUSD?: T;
+  stayAnon?: T;
+  pricingBasis?: T;
+  contact?: T;
+  membershipTerm?: T;
+  order?: T;
+  event?: T;
+  stripeId?: T;
+  occurredAt?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checkoutIntents_select".
+ */
+export interface CheckoutIntentsSelect<T extends boolean = true> {
+  stripeSessionId?: T;
+  kind?: T;
+  stayAnon?: T;
+  pricingBasis?: T;
+  event?: T;
+  campaign?: T;
+  refRaw?: T;
+  order?: T;
+  plan?: T;
+  membershipAccount?: T;
+  isTest?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
