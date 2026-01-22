@@ -211,7 +211,43 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | {
+        header?: string | null;
+        featuredPlans?: (number | MembershipPlan)[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'membershipBlock';
+      }
+    | {
+        header?: string | null;
+        suggestedAmounts?:
+          | {
+              amount: number;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'donationBlock';
+      }
+    | {
+        event: number | Event;
+        showDescription?: boolean | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'eventCheckoutBlock';
+      }
+    | {
+        instructionText?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'membershipStatusBlock';
+      }
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -424,6 +460,44 @@ export interface MediaBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membershipPlans".
+ */
+export interface MembershipPlan {
+  id: number;
+  key: string;
+  slug?: string | null;
+  name?: string | null;
+  priceUSD?: number | null;
+  durationMonths?: number | null;
+  renewalWindowDays?: number | null;
+  isActive?: boolean | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  slug: string;
+  title: string;
+  status?: ('draft' | 'published' | 'archived') | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  location?: string | null;
+  checkInEnabled?: boolean | null;
+  /**
+   * Code required for self-check-in URL
+   */
+  checkInCode?: string | null;
+  isTest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -515,23 +589,6 @@ export interface Subscription {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "membershipPlans".
- */
-export interface MembershipPlan {
-  id: number;
-  key: string;
-  slug?: string | null;
-  name?: string | null;
-  priceUSD?: number | null;
-  durationMonths?: number | null;
-  renewalWindowDays?: number | null;
-  isActive?: boolean | null;
-  isTest?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "membershipAccounts".
  */
 export interface MembershipAccount {
@@ -603,27 +660,6 @@ export interface Order {
   contact?: (number | null) | Contact;
   event?: (number | null) | Event;
   campaign?: (number | null) | Campaign;
-  isTest?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events".
- */
-export interface Event {
-  id: number;
-  slug: string;
-  title: string;
-  status?: ('draft' | 'published' | 'archived') | null;
-  startsAt?: string | null;
-  endsAt?: string | null;
-  location?: string | null;
-  checkInEnabled?: boolean | null;
-  /**
-   * Code required for self-check-in URL
-   */
-  checkInCode?: string | null;
   isTest?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -998,6 +1034,42 @@ export interface PagesSelect<T extends boolean = true> {
         cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
+        membershipBlock?:
+          | T
+          | {
+              header?: T;
+              featuredPlans?: T;
+              id?: T;
+              blockName?: T;
+            };
+        donationBlock?:
+          | T
+          | {
+              header?: T;
+              suggestedAmounts?:
+                | T
+                | {
+                    amount?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        eventCheckoutBlock?:
+          | T
+          | {
+              event?: T;
+              showDescription?: T;
+              id?: T;
+              blockName?: T;
+            };
+        membershipStatusBlock?:
+          | T
+          | {
+              instructionText?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
   meta?:
     | T

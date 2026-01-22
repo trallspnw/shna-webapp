@@ -5,6 +5,10 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { CallToAction } from '@shna/shared/blocks/CallToAction/config'
 import { Content } from '@shna/shared/blocks/Content/config'
 import { MediaBlock } from '@shna/shared/blocks/MediaBlock/config'
+import { MembershipBlock } from '@shna/shared/blocks/MembershipBlock/config'
+import { DonationBlock } from '@shna/shared/blocks/DonationBlock/config'
+import { EventCheckoutBlock } from '@shna/shared/blocks/EventCheckoutBlock/config'
+import { MembershipStatusBlock } from '@shna/shared/blocks/MembershipStatusBlock/config'
 import { hero } from '@shna/shared/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -86,7 +90,15 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                MembershipBlock,
+                DonationBlock,
+                EventCheckoutBlock,
+                MembershipStatusBlock,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,
