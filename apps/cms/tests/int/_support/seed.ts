@@ -185,6 +185,15 @@ export const resetMembershipsTestState = async (
 ): Promise<void> => {
   const { emails, planSlugs = [], campaignReftags = [], orderPublicIds = [] } = options
 
+  if (emails.length > 0) {
+    await payload.delete({
+      collection: 'emailSends',
+      where: { toEmail: { in: emails } },
+      overrideAccess: true,
+      req,
+    })
+  }
+
   if (orderPublicIds.length > 0) {
     const orders = await payload.find({
       collection: 'orders',

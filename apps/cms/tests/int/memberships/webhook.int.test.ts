@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTestEnv } from '../_support/testEnv'
 import { resetMembershipsTestState } from '../_support/seed'
@@ -20,7 +20,7 @@ vi.mock('@/integrations/brevo/sendEmail', () => {
 })
 
 const email = 'membership-webhook@example.com'
-const PLAN_SLUG = 'family'
+const PLAN_SLUG = 'test-family'
 
 describe('memberships webhook integration', () => {
   const envRef: { current: Awaited<ReturnType<typeof getTestEnv>> | null } = { current: null }
@@ -33,6 +33,13 @@ describe('memberships webhook integration', () => {
     resetFactoryState()
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-02-07T12:00:00Z'))
+    if (!envRef.current) return
+    await resetMembershipsTestState(envRef.current.payload, envRef.current.req, {
+      emails: [email],
+      planSlugs: [PLAN_SLUG],
+    })
+  })
+  afterAll(async () => {
     if (!envRef.current) return
     await resetMembershipsTestState(envRef.current.payload, envRef.current.req, {
       emails: [email],

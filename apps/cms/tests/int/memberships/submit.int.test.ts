@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTestEnv } from '../_support/testEnv'
 import { resetMembershipsTestState } from '../_support/seed'
@@ -13,7 +13,7 @@ vi.mock('@/integrations/stripe/checkout', () => {
 
 const email = 'membership-test@example.com'
 const CAMPAIGN_REFTAG = 'membership-campaign-2026'
-const PLAN_SLUG = 'individual'
+const PLAN_SLUG = 'test-individual'
 
 describe('memberships submit integration', () => {
   const envRef: { current: Awaited<ReturnType<typeof getTestEnv>> | null } = { current: null }
@@ -24,6 +24,14 @@ describe('memberships submit integration', () => {
 
   beforeEach(async () => {
     resetFactoryState()
+    if (!envRef.current) return
+    await resetMembershipsTestState(envRef.current.payload, envRef.current.req, {
+      emails: [email],
+      campaignReftags: [CAMPAIGN_REFTAG],
+      planSlugs: [PLAN_SLUG],
+    })
+  })
+  afterAll(async () => {
     if (!envRef.current) return
     await resetMembershipsTestState(envRef.current.payload, envRef.current.req, {
       emails: [email],

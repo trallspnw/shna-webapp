@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { getTestEnv } from '../_support/testEnv'
 import { resetSubscriptionsTestState } from '../_support/seed'
@@ -23,6 +23,13 @@ describe('subscriptions unsubscribeAll integration', () => {
 
   beforeEach(async () => {
     resetFactoryState()
+    if (!envRef.current) return
+    await resetSubscriptionsTestState(envRef.current.payload, envRef.current.req, {
+      emails: [email],
+      topicSlugs: [TOPIC_SLUG],
+    })
+  })
+  afterAll(async () => {
     if (!envRef.current) return
     await resetSubscriptionsTestState(envRef.current.payload, envRef.current.req, {
       emails: [email],
