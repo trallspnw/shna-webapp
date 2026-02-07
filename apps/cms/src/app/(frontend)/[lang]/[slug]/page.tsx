@@ -3,14 +3,15 @@ import type { Metadata } from 'next'
 import { PayloadRedirects } from '@shna/shared/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload, type PaginatedDocs, type RequiredDataFromCollectionSlug } from 'payload'
-import { draftMode } from 'next/headers'
+import { draftMode, headers } from 'next/headers'
 import React, { cache } from 'react'
 import { homeStatic } from '@/endpoints/seed/home-static'
 
 import { RenderBlocks } from '@shna/shared/blocks/RenderBlocks'
 import { RenderHero } from '@shna/shared/heros/RenderHero'
 import { generateMeta } from '@shna/shared/utilities/generateMeta'
-import type { Page } from '@shna/shared/payload-types'
+import { getCachedGlobal } from '@shna/shared/utilities/getGlobals'
+import type { Config, Page } from '@shna/shared/payload-types'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { getLocaleFromParam, type Locale } from '@shna/shared/utilities/locale'
@@ -76,7 +77,8 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects locale={locale} url={url} />
   }
 
-  const { hero, layout } = page
+  const { hero, layout, contentMode, html } = page
+  const resolvedMode = contentMode ?? 'builder'
 
   return (
     <article className="pt-16 pb-24">
@@ -87,7 +89,11 @@ export default async function Page({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <RenderHero locale={locale} {...hero} />
-      <RenderBlocks blocks={layout} locale={locale} />
+      {resolvedMode === 'html' ? (
+        <div className="container mt-16" dangerouslySetInnerHTML={{ __html: html ?? '' }} />
+      ) : (
+        <RenderBlocks blocks={layout ?? []} locale={locale} />
+      )}
     </article>
   )
 }
@@ -102,7 +108,21 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     locale,
   })
 
-  return generateMeta({ doc: page as unknown as Page, locale })
+  const { isEnabled: draft } = await draftMode()
+  const requestHeaders = await headers()
+  const siteSettings = (await getCachedGlobal(
+    'site-settings',
+    1,
+    draft,
+    requestHeaders,
+    locale,
+  )()) as Config['globals']['site-settings']
+
+  return generateMeta({
+    doc: page as unknown as Page,
+    locale,
+    allowIndexing: siteSettings?.allowIndexing === true,
+  })
 }
 
 const queryPageBySlug = cache(

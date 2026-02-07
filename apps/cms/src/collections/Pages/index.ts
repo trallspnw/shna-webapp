@@ -82,14 +82,50 @@ export const Pages: CollectionConfig<'pages'> = {
         {
           fields: [
             {
+              name: 'contentMode',
+              type: 'select',
+              defaultValue: 'builder',
+              options: [
+                {
+                  label: 'Builder',
+                  value: 'builder',
+                },
+                {
+                  label: 'HTML',
+                  value: 'html',
+                },
+              ],
+            },
+            {
               name: 'layout',
               type: 'blocks',
               blocks: [
                 Container,
               ],
-              required: true,
               admin: {
                 initCollapsed: true,
+                condition: (_, siblingData) => siblingData?.contentMode !== 'html',
+              },
+              validate: (value, { siblingData }) => {
+                if (siblingData?.contentMode === 'html') return true
+                return value && Array.isArray(value) && value.length > 0
+                  ? true
+                  : 'Layout is required when content mode is builder.'
+              },
+            },
+            {
+              name: 'html',
+              type: 'code',
+              localized: true,
+              admin: {
+                condition: (_, siblingData) => siblingData?.contentMode === 'html',
+              },
+              hooks: {
+                beforeValidate: [clearEmptyLocalizedText],
+              },
+              validate: (value, args) => {
+                if (args.siblingData?.contentMode !== 'html') return true
+                return requireDefaultLocale(value, args)
               },
             },
           ],
@@ -115,6 +151,14 @@ export const Pages: CollectionConfig<'pages'> = {
               }) as Field,
             ),
             withLocalization(MetaDescriptionField({}) as Field),
+            {
+              name: 'noIndex',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: {
+                description: 'Hide this page from search engines (noindex)',
+              },
+            },
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,

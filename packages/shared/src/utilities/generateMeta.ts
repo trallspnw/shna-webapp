@@ -23,8 +23,9 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
 export const generateMeta = async (args: {
   doc: Partial<Page> | null
   locale?: Locale
+  allowIndexing?: boolean
 }): Promise<Metadata> => {
-  const { doc, locale } = args
+  const { doc, locale, allowIndexing } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
 
@@ -37,6 +38,12 @@ export const generateMeta = async (args: {
   const slug = Array.isArray(doc?.slug) ? doc?.slug.join('/') : doc?.slug
   const path = slug && slug !== 'home' ? `/${slug}` : ''
   const url = `${siteURL}${prefix}${path}`
+  const robots =
+    allowIndexing === false
+      ? { index: false, follow: false }
+      : doc?.meta?.noIndex === true
+        ? { index: false, follow: true }
+        : undefined
 
   return {
     description: doc?.meta?.description,
@@ -52,6 +59,7 @@ export const generateMeta = async (args: {
       title,
       url,
     }),
+    robots,
     title,
   }
 }

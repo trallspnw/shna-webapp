@@ -205,7 +205,9 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: ContainerBlock[];
+  contentMode?: ('builder' | 'html') | null;
+  layout?: ContainerBlock[] | null;
+  html?: string | null;
   meta?: {
     title?: string | null;
     /**
@@ -213,6 +215,10 @@ export interface Page {
      */
     image?: (number | null) | Media;
     description?: string | null;
+    /**
+     * Hide this page from search engines (noindex)
+     */
+    noIndex?: boolean | null;
   };
   publishedAt?: string | null;
   /**
@@ -1023,17 +1029,20 @@ export interface PagesSelect<T extends boolean = true> {
             };
         media?: T;
       };
+  contentMode?: T;
   layout?:
     | T
     | {
         container?: T | ContainerBlockSelect<T>;
       };
+  html?: T;
   meta?:
     | T
     | {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
       };
   publishedAt?: T;
   generateSlug?: T;

@@ -6,8 +6,9 @@ import React, { cache } from 'react'
 import { RenderBlocks } from '@shna/shared/blocks/RenderBlocks'
 import { RenderHero } from '@shna/shared/heros/RenderHero'
 import { generateMeta } from '@shna/shared/utilities/generateMeta'
+import { getCachedGlobal } from '@shna/shared/utilities/getGlobals'
 import { fetchFromCMS } from '@shna/shared/utilities/payloadAPI'
-import type { Page } from '@shna/shared/payload-types'
+import type { Config, Page } from '@shna/shared/payload-types'
 import PageClient from './page.client'
 import { getLocaleFromParam } from '@shna/shared/utilities/locale'
 
@@ -60,7 +61,8 @@ export default async function Page({ params: paramsPromise }: Args) {
     return <PayloadRedirects locale={locale} url={url} />
   }
 
-  const { hero, layout } = page
+  const { hero, layout, contentMode, html } = page
+  const resolvedMode = contentMode ?? 'builder'
 
   return (
     <article className="pt-16 pb-24">
@@ -69,7 +71,11 @@ export default async function Page({ params: paramsPromise }: Args) {
       <PayloadRedirects disableNotFound locale={locale} url={url} />
 
       <RenderHero locale={locale} {...hero} />
-      <RenderBlocks blocks={layout} locale={locale} />
+      {resolvedMode === 'html' ? (
+        <div className="container mt-16" dangerouslySetInnerHTML={{ __html: html ?? '' }} />
+      ) : (
+        <RenderBlocks blocks={layout ?? []} locale={locale} />
+      )}
     </article>
   )
 }
@@ -84,7 +90,19 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     locale,
   })
 
-  return generateMeta({ doc: page, locale })
+  const siteSettings = (await getCachedGlobal(
+    'site-settings',
+    1,
+    false,
+    undefined,
+    locale,
+  )()) as Config['globals']['site-settings']
+
+  return generateMeta({
+    doc: page,
+    locale,
+    allowIndexing: siteSettings?.allowIndexing === true,
+  })
 }
 
 const queryPageBySlug = cache(async ({ slug, locale }: { slug: string; locale: string }) => {

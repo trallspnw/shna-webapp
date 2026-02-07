@@ -68,9 +68,15 @@ module.exports = {
   },
   additionalPaths: async (config) => {
     const pages = await fetchCollection('pages')
+    const settings = await fetchSiteSettings()
+    const allowIndexing = settings?.allowIndexing === true
 
     const pagePaths = pages.docs
-      .filter((page) => page.slug)
+      .filter((page) => {
+        if (!page.slug) return false
+        if (!allowIndexing) return true
+        return page.meta?.noIndex !== true
+      })
       .flatMap((page) => {
         const slugPath = page.slug === 'home' ? '' : `/${page.slug}`
         return ['en', 'es'].map((locale) => ({
