@@ -748,15 +748,39 @@ export interface EmailTemplate {
 export interface EmailSend {
   id: number;
   template?: (number | null) | EmailTemplate;
+  templateAttempted?: boolean | null;
+  templateUsed?: boolean | null;
   source?: ('template' | 'inline' | 'unknown') | null;
   templateSlug?: string | null;
+  fallbackReason?:
+    | ('template_not_found' | 'template_inactive' | 'missing_placeholders' | 'render_error' | 'skipped_already_sent')
+    | null;
+  missingPlaceholders?: string[] | null;
+  placeholderSnapshot?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   contact?: (number | null) | Contact;
   toEmail: string;
   lang?: string | null;
   status?: ('queued' | 'sent' | 'failed') | null;
   subject?: string | null;
   providerMessageId?: string | null;
-  errorCode?: ('missing_recipient' | 'template_not_found' | 'missing_placeholders' | 'provider_failed') | null;
+  errorCode?:
+    | (
+        | 'missing_recipient'
+        | 'template_not_found'
+        | 'template_inactive'
+        | 'missing_placeholders'
+        | 'render_error'
+        | 'provider_failed'
+      )
+    | null;
   sentAt?: string | null;
   error?: string | null;
   updatedAt: string;
@@ -1452,8 +1476,13 @@ export interface EmailTemplatesSelect<T extends boolean = true> {
  */
 export interface EmailSendsSelect<T extends boolean = true> {
   template?: T;
+  templateAttempted?: T;
+  templateUsed?: T;
   source?: T;
   templateSlug?: T;
+  fallbackReason?: T;
+  missingPlaceholders?: T;
+  placeholderSnapshot?: T;
   contact?: T;
   toEmail?: T;
   lang?: T;

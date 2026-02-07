@@ -100,7 +100,20 @@ const renderRichTextToText = (value: Record<string, unknown> & { root: unknown }
   return blocks.join('\n\n')
 }
 
+const isMissingValue = (value: unknown): boolean => {
+  if (value === null || value === undefined) return true
+  if (typeof value === 'string' && value.trim().length === 0) return true
+  return false
+}
+
 export const getMissingPlaceholders = (
+  template: EmailTemplateDoc,
+  params: Record<string, unknown>,
+): string[] => {
+  return computeMissingPlaceholders(template, params)
+}
+
+export const computeMissingPlaceholders = (
   template: EmailTemplateDoc,
   params: Record<string, unknown>,
 ): string[] => {
@@ -110,7 +123,7 @@ export const getMissingPlaceholders = (
 
   return required.filter((param) => {
     const value = getParamValue(params, param)
-    return value === null || value === undefined || value === ''
+    return isMissingValue(value)
   })
 }
 

@@ -13,7 +13,9 @@ export type SendTemplatedEmailResult = {
   reason?:
     | 'missing_recipient'
     | 'template_not_found'
+    | 'template_inactive'
     | 'missing_placeholders'
+    | 'render_error'
     | 'provider_failed'
   emailSendId?: string | number
 }

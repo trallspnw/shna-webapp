@@ -1,6 +1,10 @@
-import { renderEmail, getMissingPlaceholders } from '@/lib/email/renderEmail'
+import { renderEmail, computeMissingPlaceholders } from '@/lib/email/renderEmail'
 import { sendEmail } from '@/integrations/brevo/sendEmail'
 import type { EmailLanguage, SendTemplatedEmailRequest, SendTemplatedEmailResult } from './types'
+import {
+  redactParamsForDiagnostics,
+  resolveTemplateOrNull,
+} from './diagnostics'
 
 export type EmailServiceCtx = {
   payload: any
@@ -11,33 +15,103 @@ const resolveLocale = (value?: string | null): EmailLanguage => {
   return value === 'es' ? 'es' : 'en'
 }
 
+const buildPlaceholderSnapshot = (params: Record<string, unknown>) =>
+  redactParamsForDiagnostics(params)
+
+const logTemplateFallback = (
+  ctx: EmailServiceCtx,
+  meta: {
+    emailType: string
+    templateSlug: string
+    fallbackReason: string
+    missingPlaceholders?: string[]
+    orderId?: string | number
+    publicOrderId?: string
+    emailSendId?: string | number
+  },
+) => {
+  ctx.logger?.warn?.('[email] template fallback', {
+    emailType: meta.emailType,
+    templateSlug: meta.templateSlug,
+    fallbackReason: meta.fallbackReason,
+    missingPlaceholders: meta.missingPlaceholders ?? [],
+    orderId: meta.orderId,
+    publicOrderId: meta.publicOrderId,
+    emailSendId: meta.emailSendId,
+  })
+}
+
 export const sendTemplatedEmail = async (
   ctx: EmailServiceCtx,
   req: SendTemplatedEmailRequest,
 ): Promise<SendTemplatedEmailResult> => {
-  const templateResult = await ctx.payload.find({
-    collection: 'emailTemplates',
-    where: { slug: { equals: req.templateSlug } },
-    limit: 1,
-    locale: 'all',
-    depth: 0,
-    overrideAccess: true,
-  })
+  const { template, templateId, inactive } = await resolveTemplateOrNull(
+    ctx.payload,
+    req.templateSlug,
+  )
+  const snapshot = buildPlaceholderSnapshot(req.params)
 
-  const template = templateResult.docs[0]
   if (!template) {
-    ctx.logger?.warn?.('Email template not found.', { templateSlug: req.templateSlug })
-    return { ok: false, reason: 'template_not_found' }
+    ctx.logger?.warn?.('[email] template not found', { templateSlug: req.templateSlug })
+    const failed = await ctx.payload.create({
+      collection: 'emailSends',
+      data: {
+        templateSlug: req.templateSlug,
+        templateAttempted: true,
+        templateUsed: false,
+        fallbackReason: 'template_not_found',
+        missingPlaceholders: [],
+        placeholderSnapshot: snapshot,
+        source: 'unknown',
+        toEmail: req.toEmail,
+        status: 'failed',
+        contact: req.contactId ?? undefined,
+        lang: resolveLocale(req.locale),
+        subject: 'Template not found',
+        errorCode: 'template_not_found',
+      },
+      overrideAccess: true,
+    })
+    return { ok: false, reason: 'template_not_found', emailSendId: failed.id }
   }
 
-  const missing = getMissingPlaceholders(template, req.params)
+  if (inactive) {
+    const failed = await ctx.payload.create({
+      collection: 'emailSends',
+      data: {
+        template: templateId ?? undefined,
+        templateSlug: req.templateSlug,
+        templateAttempted: true,
+        templateUsed: false,
+        fallbackReason: 'template_inactive',
+        missingPlaceholders: [],
+        placeholderSnapshot: snapshot,
+        source: 'template',
+        toEmail: req.toEmail,
+        status: 'failed',
+        contact: req.contactId ?? undefined,
+        lang: resolveLocale(req.locale),
+        subject: 'Template inactive',
+        errorCode: 'template_inactive',
+      },
+      overrideAccess: true,
+    })
+    return { ok: false, reason: 'template_inactive', emailSendId: failed.id }
+  }
+
+  const missing = computeMissingPlaceholders(template, req.params)
   if (missing.length > 0) {
     const failed = await ctx.payload.create({
       collection: 'emailSends',
       data: {
-        template: template.id,
+        template: templateId ?? undefined,
         source: 'template',
         templateSlug: req.templateSlug,
+        templateAttempted: true,
+        templateUsed: false,
+        fallbackReason: 'missing_placeholders',
+        missingPlaceholders: missing,
+        placeholderSnapshot: snapshot,
         toEmail: req.toEmail,
         status: 'failed',
         contact: req.contactId ?? undefined,
@@ -55,9 +129,14 @@ export const sendTemplatedEmail = async (
   const sendRecord = await ctx.payload.create({
     collection: 'emailSends',
     data: {
-      template: template.id,
+      template: templateId ?? undefined,
       source: 'template',
       templateSlug: req.templateSlug,
+      templateAttempted: true,
+      templateUsed: true,
+      fallbackReason: null,
+      missingPlaceholders: [],
+      placeholderSnapshot: snapshot,
       toEmail: req.toEmail,
       status: 'queued',
       contact: req.contactId ?? undefined,
@@ -66,11 +145,33 @@ export const sendTemplatedEmail = async (
     overrideAccess: true,
   })
 
-  const { subject, html, text } = await renderEmail({
-    template,
-    locale: resolveLocale(req.locale),
-    params: req.params,
-  })
+  let subject = ''
+  let html = ''
+  let text = ''
+  try {
+    const rendered = await renderEmail({
+      template,
+      locale: resolveLocale(req.locale),
+      params: req.params,
+    })
+    subject = rendered.subject
+    html = rendered.html
+    text = rendered.text
+  } catch (error) {
+    await ctx.payload.update({
+      collection: 'emailSends',
+      id: sendRecord.id,
+      data: {
+        status: 'failed',
+        errorCode: 'render_error',
+        error: 'Template render error.',
+        fallbackReason: 'render_error',
+        templateUsed: false,
+      },
+      overrideAccess: true,
+    })
+    return { ok: false, reason: 'render_error', emailSendId: sendRecord.id }
+  }
 
   const providerResult = await sendEmail({
     to: req.toEmail,
@@ -115,6 +216,14 @@ export const sendDonationReceipt = async (
   const { order, toEmail } = args
 
   if (order.receiptEmailSendId) {
+    logTemplateFallback(ctx, {
+      emailType: 'donation_receipt',
+      templateSlug: 'receipt-donation',
+      fallbackReason: 'skipped_already_sent',
+      orderId: order.id,
+      publicOrderId: order.publicId,
+      emailSendId: order.receiptEmailSendId,
+    })
     return { ok: true, emailSendId: order.receiptEmailSendId }
   }
 
@@ -139,25 +248,25 @@ export const sendDonationReceipt = async (
     text: `Thank you for your donation of ${params.amount} to the Friends of the Seminary Hill Natural Area. We appreciate your support.`,
   }
 
-  const templateLookup = await ctx.payload.find({
-    collection: 'emailTemplates',
-    where: { slug: { equals: 'receipt-donation' } },
-    limit: 1,
-    locale: 'all',
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  const template = templateLookup.docs[0]
+  const { template, templateId, inactive } = await resolveTemplateOrNull(
+    ctx.payload,
+    'receipt-donation',
+  )
   const locale = resolveLocale(order.lang)
+  const snapshot = buildPlaceholderSnapshot(params)
 
   if (!recipient) {
     const failed = await ctx.payload.create({
       collection: 'emailSends',
       data: {
-        template: template?.id,
+        template: templateId ?? undefined,
         source: template ? 'template' : 'unknown',
         templateSlug: 'receipt-donation',
+        templateAttempted: true,
+        templateUsed: false,
+        fallbackReason: null,
+        missingPlaceholders: [],
+        placeholderSnapshot: snapshot,
         toEmail: 'unknown',
         status: 'failed',
         contact: contact?.id,
@@ -186,32 +295,69 @@ export const sendDonationReceipt = async (
   let errorCode:
     | 'missing_placeholders'
     | 'template_not_found'
+    | 'template_inactive'
+    | 'render_error'
     | 'missing_recipient'
     | 'provider_failed'
     | undefined
+  let fallbackReason:
+    | 'template_not_found'
+    | 'template_inactive'
+    | 'missing_placeholders'
+    | 'render_error'
+    | null = null
+  let missingPlaceholders: string[] = []
+  let templateUsed = false
 
-  if (template) {
-    const missing = getMissingPlaceholders(template, params)
-    if (missing.length === 0) {
-      const rendered = await renderEmail({ template, locale, params })
-      subject = rendered.subject
-      html = rendered.html
-      text = rendered.text
-    } else {
-      source = 'inline'
-      errorCode = 'missing_placeholders'
-    }
-  } else {
+  if (!template) {
     source = 'inline'
     errorCode = 'template_not_found'
+    fallbackReason = 'template_not_found'
+  } else if (inactive) {
+    source = 'inline'
+    errorCode = 'template_inactive'
+    fallbackReason = 'template_inactive'
+  } else {
+    const missing = computeMissingPlaceholders(template, params)
+    if (missing.length === 0) {
+      try {
+        const rendered = await renderEmail({ template, locale, params })
+        subject = rendered.subject
+        html = rendered.html
+        text = rendered.text
+        templateUsed = true
+      } catch {
+        source = 'inline'
+        errorCode = 'render_error'
+        fallbackReason = 'render_error'
+      }
+    } else {
+      ctx.logger?.warn?.('[email] membership receipt placeholders missing', {
+        templateSlug: 'receipt-membership',
+        templatePlaceholders: (template.placeholders || [])
+          .map((entry: { key?: string | null }) => entry?.key)
+          .filter(Boolean),
+        paramsKeys: Object.keys(params),
+        missingPlaceholders: missing,
+      })
+      source = 'inline'
+      errorCode = 'missing_placeholders'
+      fallbackReason = 'missing_placeholders'
+      missingPlaceholders = missing
+    }
   }
 
   const sendRecord = await ctx.payload.create({
     collection: 'emailSends',
     data: {
-      template: template?.id,
+      template: templateId ?? undefined,
       source,
       templateSlug: 'receipt-donation',
+      templateAttempted: true,
+      templateUsed,
+      fallbackReason,
+      missingPlaceholders,
+      placeholderSnapshot: snapshot,
       toEmail: recipient,
       status: 'queued',
       contact: contact?.id,
@@ -221,6 +367,18 @@ export const sendDonationReceipt = async (
     },
     overrideAccess: true,
   })
+
+  if (fallbackReason) {
+    logTemplateFallback(ctx, {
+      emailType: 'donation_receipt',
+      templateSlug: 'receipt-donation',
+      fallbackReason,
+      missingPlaceholders,
+      orderId: order.id,
+      publicOrderId: order.publicId,
+      emailSendId: sendRecord.id,
+    })
+  }
 
   const providerResult = await sendEmail({
     to: recipient,
@@ -280,6 +438,14 @@ export const sendMembershipReceipt = async (
   const { order, toEmail, planName, amountUSD, membershipEndDay } = args
 
   if (order.receiptEmailSendId) {
+    logTemplateFallback(ctx, {
+      emailType: 'membership_receipt',
+      templateSlug: 'receipt-membership',
+      fallbackReason: 'skipped_already_sent',
+      orderId: order.id,
+      publicOrderId: order.publicId,
+      emailSendId: order.receiptEmailSendId,
+    })
     return { ok: true, emailSendId: order.receiptEmailSendId }
   }
 
@@ -320,17 +486,12 @@ export const sendMembershipReceipt = async (
     text: `Thank you for your membership purchase of ${amountText} (${planName}) with the Friends of the Seminary Hill Natural Area.`,
   }
 
-  const templateLookup = await ctx.payload.find({
-    collection: 'emailTemplates',
-    where: { slug: { equals: 'receipt-membership' } },
-    limit: 1,
-    locale: 'all',
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  const template = templateLookup.docs[0]
+  const { template, templateId, inactive } = await resolveTemplateOrNull(
+    ctx.payload,
+    'receipt-membership',
+  )
   const locale = resolveLocale(order.lang)
+  const snapshot = buildPlaceholderSnapshot(params)
 
   if (template) {
     const hasPlaceholder = (template.placeholders || []).some(
@@ -355,7 +516,7 @@ export const sendMembershipReceipt = async (
       } catch (error) {
         ctx.logger?.warn?.('[email] failed to append membershipExpiresOn placeholder', {
           error,
-          templateId: template.id,
+          templateId,
         })
       }
     }
@@ -365,9 +526,15 @@ export const sendMembershipReceipt = async (
     const failed = await ctx.payload.create({
       collection: 'emailSends',
       data: {
-        template: template?.id,
+        template: templateId ?? undefined,
+        templateId: templateId ? String(templateId) : undefined,
         source: template ? 'template' : 'unknown',
         templateSlug: 'receipt-membership',
+        templateAttempted: true,
+        templateUsed: false,
+        fallbackReason: null,
+        missingPlaceholders: [],
+        placeholderSnapshot: snapshot,
         toEmail: 'unknown',
         status: 'failed',
         contact: contact?.id,
@@ -396,32 +563,61 @@ export const sendMembershipReceipt = async (
   let errorCode:
     | 'missing_placeholders'
     | 'template_not_found'
+    | 'template_inactive'
+    | 'render_error'
     | 'missing_recipient'
     | 'provider_failed'
     | undefined
+  let fallbackReason:
+    | 'template_not_found'
+    | 'template_inactive'
+    | 'missing_placeholders'
+    | 'render_error'
+    | null = null
+  let missingPlaceholders: string[] = []
+  let templateUsed = false
 
-  if (template) {
-    const missing = getMissingPlaceholders(template, params)
+  if (!template) {
+    source = 'inline'
+    errorCode = 'template_not_found'
+    fallbackReason = 'template_not_found'
+  } else if (inactive) {
+    source = 'inline'
+    errorCode = 'template_inactive'
+    fallbackReason = 'template_inactive'
+  } else {
+    const missing = computeMissingPlaceholders(template, params)
     if (missing.length === 0) {
-      const rendered = await renderEmail({ template, locale, params })
-      subject = rendered.subject
-      html = rendered.html
-      text = rendered.text
+      try {
+        const rendered = await renderEmail({ template, locale, params })
+        subject = rendered.subject
+        html = rendered.html
+        text = rendered.text
+        templateUsed = true
+      } catch {
+        source = 'inline'
+        errorCode = 'render_error'
+        fallbackReason = 'render_error'
+      }
     } else {
       source = 'inline'
       errorCode = 'missing_placeholders'
+      fallbackReason = 'missing_placeholders'
+      missingPlaceholders = missing
     }
-  } else {
-    source = 'inline'
-    errorCode = 'template_not_found'
   }
 
   const sendRecord = await ctx.payload.create({
     collection: 'emailSends',
     data: {
-      template: template?.id,
+      template: templateId ?? undefined,
       source,
       templateSlug: 'receipt-membership',
+      templateAttempted: true,
+      templateUsed,
+      fallbackReason,
+      missingPlaceholders,
+      placeholderSnapshot: snapshot,
       toEmail: recipient,
       status: 'queued',
       contact: contact?.id,
@@ -431,6 +627,18 @@ export const sendMembershipReceipt = async (
     },
     overrideAccess: true,
   })
+
+  if (fallbackReason) {
+    logTemplateFallback(ctx, {
+      emailType: 'membership_receipt',
+      templateSlug: 'receipt-membership',
+      fallbackReason,
+      missingPlaceholders,
+      orderId: order.id,
+      publicOrderId: order.publicId,
+      emailSendId: sendRecord.id,
+    })
+  }
 
   const providerResult = await sendEmail({
     to: recipient,

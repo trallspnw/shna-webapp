@@ -113,6 +113,15 @@ export const handleMembershipCheckoutCompleted = async (
     },
     overrideAccess: true,
   })
+  let membershipEndDay = membership?.endDay ?? null
+  if (!membershipEndDay && membership?.id) {
+    const persisted = await payload.findByID({
+      collection: 'memberships',
+      id: membership.id,
+      overrideAccess: true,
+    })
+    membershipEndDay = persisted?.endDay ?? null
+  }
 
   await payload.update({
     collection: 'orders',
@@ -130,7 +139,7 @@ export const handleMembershipCheckoutCompleted = async (
       toEmail: session.customerEmail ?? undefined,
       planName: plan.name ?? plan.slug ?? 'Membership',
       amountUSD: planPrice,
-      membershipEndDay: membership?.endDay ?? null,
+      membershipEndDay,
     })
   }
 

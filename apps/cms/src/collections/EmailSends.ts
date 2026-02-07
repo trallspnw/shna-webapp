@@ -17,6 +17,16 @@ export const EmailSends: CollectionConfig = {
       relationTo: 'emailTemplates',
     },
     {
+      name: 'templateAttempted',
+      type: 'checkbox',
+      admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
+      name: 'templateUsed',
+      type: 'checkbox',
+      admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
       name: 'source',
       type: 'select',
       defaultValue: 'template',
@@ -29,6 +39,29 @@ export const EmailSends: CollectionConfig = {
     {
       name: 'templateSlug',
       type: 'text',
+    },
+    {
+      name: 'fallbackReason',
+      type: 'select',
+      options: [
+        { label: 'Template not found', value: 'template_not_found' },
+        { label: 'Template inactive', value: 'template_inactive' },
+        { label: 'Missing placeholders', value: 'missing_placeholders' },
+        { label: 'Render error', value: 'render_error' },
+        { label: 'Skipped (already sent)', value: 'skipped_already_sent' },
+      ],
+      admin: { readOnly: true },
+    },
+    {
+      name: 'missingPlaceholders',
+      type: 'text',
+      hasMany: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'placeholderSnapshot',
+      type: 'json',
+      admin: { readOnly: true },
     },
     {
       name: 'contact',
@@ -68,7 +101,9 @@ export const EmailSends: CollectionConfig = {
       options: [
         { label: 'Missing recipient', value: 'missing_recipient' },
         { label: 'Template not found', value: 'template_not_found' },
+        { label: 'Template inactive', value: 'template_inactive' },
         { label: 'Missing placeholders', value: 'missing_placeholders' },
+        { label: 'Render error', value: 'render_error' },
         { label: 'Provider failed', value: 'provider_failed' },
       ],
     },
