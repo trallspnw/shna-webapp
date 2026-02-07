@@ -73,6 +73,12 @@ export const getPublicApiBaseUrl = (options: ResolvePublicApiOptions = {}) => {
   const origin = options.origin ?? (isBrowser ? window.location.origin : undefined)
   const envCMSURL = resolvePublicEnvCMSURL(env)
 
+  // TEMP: hard-coded fallback for production public site while GH Actions env injection is flaky.
+  // TODO: Remove once NEXT_PUBLIC_CMS_URL is reliably inlined during site build.
+  if (isBrowser && hostname && isProductionSiteHostname(hostname)) {
+    return PRODUCTION_CMS_URL
+  }
+
   if (isBrowser && hostname && origin && isCmsHostname(hostname)) {
     return normalizeOrigin(origin)
   }
