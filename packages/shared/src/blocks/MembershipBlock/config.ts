@@ -67,7 +67,7 @@ export const MembershipBlock: Block = {
       name: 'defaultPlan',
       type: 'relationship',
       relationTo: 'membershipPlans',
-      validate: (value, { siblingData }) => {
+      validate: (value: unknown, { siblingData }: { siblingData?: { plans?: unknown } }) => {
         if (!value) return true
         const plans = siblingData?.plans
         if (!Array.isArray(plans) || plans.length === 0) {

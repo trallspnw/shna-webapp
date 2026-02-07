@@ -147,6 +147,8 @@ export const submitMembership = async (
   const checkoutName = sanitizeOptionalText(input.checkoutName, MAX_NAME_LENGTH, 'checkoutName')
 
   const campaignId = await resolveCampaignIdFromRef(ctx.payload, input.ref, ctx.logger)
+  const resolvedCampaignId =
+    typeof campaignId === 'string' ? (Number.isFinite(Number(campaignId)) ? Number(campaignId) : null) : campaignId
 
   const existingContact = await findContactByEmail(ctx.payload, normalizedEmail)
   const latestMembership =
@@ -183,7 +185,7 @@ export const submitMembership = async (
           ...(name ? { name, displayName: name } : {}),
           ...(phone ? { phone } : {}),
           ...(addressText ? { address: addressText } : {}),
-          ...(campaignId ? { campaign: campaignId } : {}),
+          ...(resolvedCampaignId ? { campaign: resolvedCampaignId } : {}),
         },
         overrideAccess: true,
       })
@@ -196,7 +198,7 @@ export const submitMembership = async (
       publicId,
       status: 'created',
       contact: contact.id,
-      ...(campaignId ? { campaign: campaignId } : {}),
+      ...(resolvedCampaignId ? { campaign: resolvedCampaignId } : {}),
       lang: locale,
       totalUSD: planPrice,
     },

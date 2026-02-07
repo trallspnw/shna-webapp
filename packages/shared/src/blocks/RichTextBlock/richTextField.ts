@@ -1,4 +1,4 @@
-import type { Field } from 'payload'
+import type { RichTextField } from 'payload'
 
 import {
   FixedToolbarFeature,
@@ -9,9 +9,9 @@ import {
 
 import { clearEmptyLocalizedRichText } from '@shna/shared/utilities/localizedFieldHooks'
 
-type Overrides = Partial<Field>
+type Overrides = Partial<RichTextField>
 
-export const richTextField = (overrides: Overrides = {}): Field => ({
+export const richTextField = (overrides: Overrides = {}): RichTextField => ({
   name: 'richText',
   type: 'richText',
   localized: true,

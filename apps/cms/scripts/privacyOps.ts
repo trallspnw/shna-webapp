@@ -65,13 +65,6 @@ const run = async () => {
         limit: 500,
       })
     ).docs,
-    eventAttendances: (
-      await payload.find({
-        collection: 'eventAttendances',
-        where: { contact: { equals: contactId } },
-        limit: 500,
-      })
-    ).docs,
   }
 
   if (command === 'export') {
@@ -111,32 +104,19 @@ const run = async () => {
           collection: 'orders',
           id: order.id,
           data: {
-            contact: null,
+            contact: undefined,
           },
         })
       }
     }
 
     for (const txn of related.transactions) {
-      if (txn.stayAnon) continue
       if (!dryRun) {
         await payload.update({
           collection: 'transactions',
           id: txn.id,
           data: {
-            contact: null,
-          },
-        })
-      }
-    }
-
-    for (const attendance of related.eventAttendances) {
-      if (!dryRun) {
-        await payload.update({
-          collection: 'eventAttendances',
-          id: attendance.id,
-          data: {
-            contact: null,
+            contact: undefined,
           },
         })
       }
