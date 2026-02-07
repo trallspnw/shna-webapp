@@ -144,7 +144,10 @@ export const SubscriptionBlock: React.FC<Props> = ({
         <h2 className="text-xl font-semibold mb-2">{header || 'Email subscription'}</h2>
         {description && <p className="text-sm mb-3">{description}</p>}
 
-        <div className="flex flex-col gap-3">
+        <form className="flex flex-col gap-3" onSubmit={(event) => {
+          event.preventDefault()
+          void submit()
+        }}>
           <label className="flex flex-col gap-1 text-sm">
             <span>
               {copy.emailLabel}
@@ -163,8 +166,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
           <div className="flex gap-2">
             <button
               className="border border-border rounded px-3 py-2 text-sm flex items-center gap-2"
-              type="button"
-              onClick={submit}
+              type="submit"
               disabled={isSubmitting}
             >
               {isSubmitting && (
@@ -176,7 +178,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
               <span>{isSubmitting ? copy.loadingText : copy.buttonLabel}</span>
             </button>
           </div>
-        </div>
+        </form>
       </div>
 
       {isModalOpen && (
