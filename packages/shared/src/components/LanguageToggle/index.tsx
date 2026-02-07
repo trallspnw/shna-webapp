@@ -40,7 +40,11 @@ export const LanguageToggle: React.FC<Props> = ({ locale = DEFAULT_LOCALE }) => 
       {SUPPORTED_LOCALES.map((lang, index) => (
         <React.Fragment key={lang}>
           <button
-            className={lang === locale ? 'font-semibold' : 'opacity-70 hover:opacity-100'}
+            className={
+              lang === locale
+                ? 'text-muted-foreground'
+                : 'font-semibold text-foreground hover:text-foreground'
+            }
             onClick={() => handleSelect(lang)}
             type="button"
           >
