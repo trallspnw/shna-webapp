@@ -140,7 +140,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
 
   return (
     <div className="container">
-      <div className="border border-border rounded p-4 max-w-xl">
+      <div className="border border-border rounded p-4 max-w-xl bg-muted">
         <h2 className="text-xl font-semibold mb-2">{header || 'Email subscription'}</h2>
         {description && <p className="text-sm mb-3">{description}</p>}
 
@@ -154,7 +154,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
               <span className="text-red-600 ml-1">*</span>
             </span>
             <input
-              className={`border rounded px-3 py-2 ${formError ? 'border-red-600' : 'border-border'}`}
+              className={`border rounded px-3 py-2 bg-background ${formError ? 'border-red-600' : 'border-border'}`}
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -165,7 +165,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
 
           <div className="flex gap-2">
             <button
-              className="border border-border rounded px-3 py-2 text-sm flex items-center gap-2"
+              className="border border-primary bg-primary text-primary-foreground rounded px-3 py-2 text-sm flex items-center gap-2 hover:bg-primary/90"
               type="submit"
               disabled={isSubmitting}
             >
@@ -191,7 +191,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
             </p>
             <div className="mt-4 flex justify-end">
               <button
-                className="border border-border rounded px-3 py-2 text-sm"
+                className="border border-secondary bg-secondary text-secondary-foreground rounded px-3 py-2 text-sm hover:bg-secondary/90"
                 type="button"
                 onClick={closeModal}
               >

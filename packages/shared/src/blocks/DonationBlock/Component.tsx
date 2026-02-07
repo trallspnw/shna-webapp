@@ -262,7 +262,7 @@ export const DonationBlock: React.FC<Props> = ({
 
   return (
     <div className="container">
-      <div className="border border-border rounded p-4 max-w-xl">
+      <div className="border border-border rounded p-4 max-w-xl bg-muted">
         <h2 className="text-xl font-semibold mb-2">{header || 'Donation checkout'}</h2>
         {description && <p className="text-sm mb-3">{description}</p>}
         <form className="flex flex-col gap-3" onSubmit={onSubmit}>
@@ -272,7 +272,7 @@ export const DonationBlock: React.FC<Props> = ({
               <span className="text-red-600 ml-1">*</span>
             </span>
             <input
-              className="border border-border rounded px-3 py-2"
+              className="border border-border rounded px-3 py-2 bg-background"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -283,7 +283,7 @@ export const DonationBlock: React.FC<Props> = ({
           <label className="flex flex-col gap-1 text-sm">
             {copy.nameLabel}
             <input
-              className="border border-border rounded px-3 py-2"
+              className="border border-border rounded px-3 py-2 bg-background"
               type="text"
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -293,7 +293,7 @@ export const DonationBlock: React.FC<Props> = ({
           <label className="flex flex-col gap-1 text-sm">
             {copy.phoneLabel}
             <input
-              className="border border-border rounded px-3 py-2"
+              className="border border-border rounded px-3 py-2 bg-background"
               type="tel"
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
@@ -303,7 +303,7 @@ export const DonationBlock: React.FC<Props> = ({
           <label className="flex flex-col gap-1 text-sm">
             {copy.addressLabel}
             <textarea
-              className="border border-border rounded px-3 py-2"
+              className="border border-border rounded px-3 py-2 bg-background"
               rows={3}
               value={addressText}
               onChange={(event) => setAddressText(event.target.value)}
@@ -316,7 +316,7 @@ export const DonationBlock: React.FC<Props> = ({
               <span className="text-red-600 ml-1">*</span>
             </span>
             <input
-              className="border border-border rounded px-3 py-2"
+              className="border border-border rounded px-3 py-2 bg-background"
               type="number"
               min={1}
               step={0.01}
@@ -332,7 +332,7 @@ export const DonationBlock: React.FC<Props> = ({
                 <button
                   key={amount}
                   type="button"
-                  className="border border-border rounded px-2 py-1"
+                  className="border border-secondary bg-secondary text-secondary-foreground rounded px-2 py-1 hover:bg-secondary/90"
                   onClick={() => setAmountUSD(String(amount))}
                 >
                   ${amount}
@@ -342,7 +342,7 @@ export const DonationBlock: React.FC<Props> = ({
           )}
 
           <button
-            className="border border-border rounded px-3 py-2 text-sm flex items-center gap-2 w-auto self-start"
+            className="border border-primary bg-primary text-primary-foreground rounded px-3 py-2 text-sm flex items-center gap-2 w-auto self-start hover:bg-primary/90"
             type="submit"
             disabled={isSubmitting}
           >
@@ -369,7 +369,7 @@ export const DonationBlock: React.FC<Props> = ({
             </p>
             <div className="mt-4 flex justify-end">
               <button
-                className="border border-border rounded px-3 py-2 text-sm"
+                className="border border-secondary bg-secondary text-secondary-foreground rounded px-3 py-2 text-sm hover:bg-secondary/90"
                 type="button"
                 onClick={closeModal}
               >

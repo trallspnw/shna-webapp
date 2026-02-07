@@ -69,6 +69,7 @@ export default function RichText(props: Props) {
       converters={jsxConverters}
       className={cn(
         'payload-richtext',
+        'text-foreground',
         {
           container: enableGutter,
           'max-w-none': !enableGutter,

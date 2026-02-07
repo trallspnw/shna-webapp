@@ -16,6 +16,7 @@
   :root {
     --background: 52.3 75.6% 92%;
     --foreground: 96.7 27.3% 12.9%;
+    --text: hsl(var(--foreground));
 
     --card: 240 5% 96%;
     --card-foreground: 222.2 84% 4.9%;
@@ -59,6 +60,7 @@
   [data-theme='dark'] {
     --background: 0 0% 0%;
     --foreground: 210 40% 98%;
+    --text: hsl(var(--foreground));
 
     --card: 0 0% 4%;
     --card-foreground: 210 40% 98%;
