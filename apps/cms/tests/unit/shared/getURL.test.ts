@@ -25,7 +25,7 @@ describe('resolveCMSURL', () => {
     expect(resolved).toBe('https://cms.seminaryhillnaturalarea.org')
   })
 
-  it('[core] falls back to same-origin when resolved base is localhost in browser', () => {
+  it('[core] prefers production CMS URL on public site domain even if env points to localhost', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const resolved = resolveCMSURL({
       isBrowser: true,
@@ -34,8 +34,8 @@ describe('resolveCMSURL', () => {
       env: { NEXT_PUBLIC_CMS_URL: 'http://localhost:3000' },
     })
 
-    expect(resolved).toBe('https://seminaryhillnaturalarea.org')
-    expect(errorSpy).toHaveBeenCalled()
+    expect(resolved).toBe('https://cms.seminaryhillnaturalarea.org')
+    expect(errorSpy).not.toHaveBeenCalled()
     errorSpy.mockRestore()
   })
 })
