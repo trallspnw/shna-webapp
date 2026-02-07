@@ -45,6 +45,21 @@ const innerPaddingClasses: Record<NonNullable<Props['innerPadding']>, string> = 
   lg: 'p-12',
 }
 
+const lgStartClasses: Record<number, string> = {
+  1: 'lg:col-start-1',
+  2: 'lg:col-start-2',
+  3: 'lg:col-start-3',
+  4: 'lg:col-start-4',
+  5: 'lg:col-start-5',
+  6: 'lg:col-start-6',
+  7: 'lg:col-start-7',
+  8: 'lg:col-start-8',
+  9: 'lg:col-start-9',
+  10: 'lg:col-start-10',
+  11: 'lg:col-start-11',
+  12: 'lg:col-start-12',
+}
+
 const resolveMediaUrl = (media?: Media | number | null) => {
   if (!media || typeof media !== 'object') return null
   const prefix = 'prefix' in media ? (media as { prefix?: string | null }).prefix : undefined
@@ -80,6 +95,11 @@ export const ContainerBlock: React.FC<Props> = (props) => {
   const innerWidthClass =
     widthMode === 'page' ? 'max-w-[var(--maxPageWidth)]' : 'max-w-[var(--contentMaxWidth)]'
 
+  const columnSpans = (columns || []).map((column) => Number(getColumnSpanValue(column.size)))
+  const totalSpan = columnSpans.reduce((sum, span) => sum + (Number.isFinite(span) ? span : 0), 0)
+  const lgStart = totalSpan > 0 && totalSpan < 12 ? Math.floor((12 - totalSpan) / 2) + 1 : null
+  const lgStartClass = lgStart ? lgStartClasses[lgStart] : undefined
+
   return (
     <section
       className={cn('w-full relative', outerSpacingClasses[resolvedOuterSpacing])}
@@ -114,6 +134,7 @@ export const ContainerBlock: React.FC<Props> = (props) => {
                 key={columnIndex}
                 className={cn(`col-span-4 lg:col-span-${spanValue}`, {
                   'md:col-span-2': column.size ? column.size !== 'full' : false,
+                  [lgStartClass || '']: columnIndex === 0 && Boolean(lgStartClass),
                 })}
               >
                 <div className="flex flex-col gap-6">
