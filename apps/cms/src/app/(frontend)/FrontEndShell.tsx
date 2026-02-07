@@ -81,11 +81,23 @@ export async function FrontEndShell({ children, locale, localeInitMode = 'force'
             }}
           />
 
-          <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
-            {hasCMSURL && <Header draft={isEnabled} headers={requestHeaders} locale={locale} />}
-            {children}
-            {hasCMSURL && <Footer draft={isEnabled} headers={requestHeaders} locale={locale} />}
-          </div>
+          {hasCMSURL && (
+            <div className="bg-header text-header-foreground">
+              <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
+                <Header draft={isEnabled} headers={requestHeaders} locale={locale} />
+              </div>
+            </div>
+          )}
+          <main className="flex-1">
+            <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">{children}</div>
+          </main>
+          {hasCMSURL && (
+            <div className="bg-header text-header-foreground">
+              <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
+                <Footer draft={isEnabled} headers={requestHeaders} locale={locale} />
+              </div>
+            </div>
+          )}
         </Providers>
       </body>
     </html>

@@ -59,10 +59,18 @@ export async function SiteShell({ children, locale, localeInitMode = 'force' }: 
         <Providers>
           <RefCapture />
           {localeInitMode !== 'off' && <LocaleInit locale={locale} mode={localeInitMode} />}
-          <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
-            <Header locale={locale} />
-            {children}
-            <Footer locale={locale} />
+          <div className="bg-header text-header-foreground">
+            <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
+              <Header locale={locale} />
+            </div>
+          </div>
+          <main className="flex-1">
+            <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">{children}</div>
+          </main>
+          <div className="bg-header text-header-foreground">
+            <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
+              <Footer locale={locale} />
+            </div>
           </div>
         </Providers>
       </body>

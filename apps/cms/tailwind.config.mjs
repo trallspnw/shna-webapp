@@ -26,6 +26,8 @@ const config = {
     'bg-success/30',
     'border-warning',
     'bg-warning/30',
+    'bg-header',
+    'text-header-foreground',
   ],
   theme: {
     container: {
@@ -72,6 +74,10 @@ const config = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
         foreground: 'hsl(var(--foreground))',
+        header: {
+          DEFAULT: 'hsl(var(--header))',
+          foreground: 'hsl(var(--header-foreground))',
+        },
         input: 'hsl(var(--input))',
         muted: {
           DEFAULT: 'hsl(var(--muted))',
