@@ -7,17 +7,14 @@ import { getServerSideURL, getSiteURL } from './getURL'
 import type { Locale } from './locale'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
-  const serverUrl = getServerSideURL()
-
-  let url = serverUrl + '/website-template-OG.webp'
-
-  if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
-
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+  if (!image || typeof image !== 'object' || !('url' in image)) {
+    return undefined
   }
 
-  return url
+  const serverUrl = getServerSideURL()
+  const ogUrl = image.sizes?.og?.url
+
+  return ogUrl ? serverUrl + ogUrl : serverUrl + image.url
 }
 
 export const generateMeta = async (args: {
@@ -28,10 +25,9 @@ export const generateMeta = async (args: {
   const { doc, locale, allowIndexing } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
-
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Payload Website Template'
-    : 'Payload Website Template'
+  const siteTitle = 'Seminary Hill Natural Area'
+  const description = doc?.meta?.description
+  const title = doc?.meta?.title ? `${doc?.meta?.title} | ${siteTitle}` : siteTitle
 
   const siteURL = getSiteURL()
   const prefix = locale ? `/${locale}` : ''
@@ -46,17 +42,21 @@ export const generateMeta = async (args: {
         : undefined
 
   return {
-    description: doc?.meta?.description,
+    description,
     openGraph: mergeOpenGraph({
-      description: doc?.meta?.description || '',
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
+      ...(description ? { description } : {}),
+      ...(ogImage
+        ? {
+            images: [
+              {
+                url: ogImage,
+              },
+            ],
+          }
+        : {}),
+      siteName: siteTitle,
       title,
+      type: 'website',
       url,
     }),
     robots,

@@ -2,7 +2,7 @@
 
 This repository powers the **Friends of Seminary Hill Natural Area** public website and membership/donation system.
 
-It is based on the **Payload Website Template**, with additional constraints and conventions to keep it:
+It is based on the **Payload website template**, with additional constraints and conventions to keep it:
 - low-maintenance
 - safe for non-technical editors
 - **static-first** for the public site
@@ -40,4 +40,4 @@ docs/     # Project documentation
 The upstream template includes extensive documentation and feature references.
 This repo intentionally keeps our docs focused on **what we actually use** and **the constraints we enforce**.
 
-If you need template-level background, start with the official Payload Website Template docs/source.
+If you need template-level background, start with the official Payload website template docs/source.
