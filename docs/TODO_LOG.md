@@ -40,6 +40,8 @@ Guidelines:
 
 ### Language & routing behavior
 
+- [ ] Add logo and replace temporary hard-coded "Home" nav link; re-enable language toggle when translations resume.
+
 - [ ] Decide final behavior for root (`/`) language handling:
   - load `en` directly without redirect **or**
   - redirect only when browser preference ≠ default

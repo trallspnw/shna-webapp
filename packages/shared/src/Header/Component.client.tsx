@@ -31,7 +31,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, locale }) => {
 
   return (
     <header className="container relative z-40" {...(theme ? { 'data-theme': theme } : {})}>
-      <div className="py-8 flex justify-end">
+      <div className="py-8 flex justify-start">
         <HeaderNav data={data} locale={locale} />
       </div>
     </header>
