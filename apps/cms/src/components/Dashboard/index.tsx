@@ -2,25 +2,18 @@ import { Gutter } from '@payloadcms/ui/elements/Gutter'
 import { CollectionCards } from '@payloadcms/ui/rsc'
 import type { AdminViewServerProps } from 'payload'
 import React from 'react'
+import { DashboardClient } from './DashboardClient'
 
 const Dashboard = async ({ initPageResult }: AdminViewServerProps) => {
   const { req } = initPageResult
-  const transactions = await req.payload.find({
-    collection: 'transactions',
-    sort: '-occurredAt',
-    limit: 8,
-    depth: 1,
-  })
-
-  const paidOrders = await req.payload.find({
+  const latestOrders = await req.payload.find({
     collection: 'orders',
-    where: { status: { equals: 'paid' } },
     sort: '-updatedAt',
-    limit: 8,
+    limit: 10,
     depth: 1,
   })
 
-  const orderIds = paidOrders.docs.map((order: any) => order.id)
+  const orderIds = latestOrders.docs.map((order: any) => order.id)
   const itemsByOrder = new Map<string, any[]>()
 
   if (orderIds.length > 0) {
@@ -39,61 +32,56 @@ const Dashboard = async ({ initPageResult }: AdminViewServerProps) => {
     }
   }
 
+  const activeMembers = await req.payload.find({
+    collection: 'memberships',
+    where: {
+      and: [
+        { startDay: { less_than_equal: new Date().toISOString() } },
+        { endDay: { greater_than_equal: new Date().toISOString() } },
+      ],
+    },
+    sort: 'endDay',
+    limit: 2000,
+    depth: 1,
+  })
+
+  const initialOrders = latestOrders.docs.map((order: any) => {
+    const contact = typeof order.contact === 'object' ? order.contact : null
+    const itemTypes = (itemsByOrder.get(String(order.id)) || [])
+      .map((item: any) => item.itemType)
+      .filter(Boolean)
+    return {
+      id: String(order.id),
+      status: order.status ?? null,
+      totalUSD: order.totalUSD ?? null,
+      updatedAt: order.updatedAt ?? null,
+      contact: {
+        name: contact?.name ?? null,
+        email: contact?.email ?? null,
+      },
+      itemTypes: Array.from(new Set(itemTypes)),
+    }
+  })
+
+  const initialMembers = activeMembers.docs.map((membership: any) => {
+    const contact = typeof membership.contact === 'object' ? membership.contact : null
+    const plan = typeof membership.plan === 'object' ? membership.plan : null
+    return {
+      id: String(membership.id),
+      contact: {
+        name: contact?.name ?? null,
+        email: contact?.email ?? null,
+      },
+      planName: plan?.name ?? null,
+      endDay: membership.endDay ?? null,
+    }
+  })
+
   return (
     <Gutter left right className="dashboard__content">
-      <CollectionCards req={req} widgetSlug="collections" />
+      <DashboardClient initialOrders={initialOrders} initialMembers={initialMembers} />
       <div style={{ marginTop: 24 }}>
-        <h3>Paid Orders (Pickup Queue)</h3>
-        {paidOrders.docs.length === 0 ? (
-          <p>No paid orders yet.</p>
-        ) : (
-          <ul>
-            {paidOrders.docs.map((order: any) => {
-              const eventTitle =
-                typeof order.event === 'object' ? order.event?.title : order.event
-              const items = itemsByOrder.get(String(order.id)) || []
-              return (
-                <li key={order.id}>
-                  <strong>{order.orderNumber || order.id}</strong> —{' '}
-                  {eventTitle ? `Event: ${eventTitle} — ` : ''}
-                  Pricing: {order.pricingBasis || 'unknown'}
-                  {items.length > 0 && (
-                    <div>
-                      Items:{' '}
-                      {items
-                        .map((item: any) => {
-                          const name =
-                            typeof item.product === 'object' ? item.product?.name : item.product
-                          return `${item.quantity} × ${name}`
-                        })
-                        .join(', ')}
-                    </div>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </div>
-      <div style={{ marginTop: 24 }}>
-        <h3>Latest Transactions</h3>
-        {transactions.docs.length === 0 ? (
-          <p>No transactions yet.</p>
-        ) : (
-          <ul>
-            {transactions.docs.map((txn: any) => {
-              const contactEmail =
-                typeof txn.contact === 'object' ? txn.contact?.email : txn.contact
-              const eventTitle = typeof txn.event === 'object' ? txn.event?.title : txn.event
-              return (
-                <li key={txn.id}>
-                  {txn.kind} — ${txn.amountUSD} — {txn.status}
-                  {contactEmail ? ` — ${contactEmail}` : ''} {eventTitle ? ` — ${eventTitle}` : ''}
-                </li>
-              )
-            })}
-          </ul>
-        )}
+        <CollectionCards req={req} widgetSlug="collections" />
       </div>
     </Gutter>
   )
