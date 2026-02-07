@@ -27,6 +27,22 @@ export type SubmitDonationResult = {
   publicOrderId: string
 }
 
+export type ManualPaymentMethod = 'cash' | 'check'
+
+export type SubmitDonationManualInput = {
+  email: string
+  amountUSD: string | number
+  paymentMethod: ManualPaymentMethod
+  name?: string | null
+  locale?: string | null
+}
+
+export type SubmitDonationManualResult = {
+  ok: true
+  publicOrderId: string
+  orderId: string
+}
+
 export type OrderStatusInput = {
   publicOrderId: string
 }

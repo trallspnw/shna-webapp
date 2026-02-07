@@ -1,12 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { submitDonation, getOrderStatus } from '@/services/donations/service'
+import { submitDonation, submitDonationManual, getOrderStatus } from '@/services/donations/service'
 import { ValidationError } from '@/services/donations/types'
 import { createCheckoutSession } from '@/integrations/stripe/checkout'
+import { sendDonationReceipt } from '@/services/email/service'
 
 vi.mock('@/integrations/stripe/checkout', () => {
   return {
     createCheckoutSession: vi.fn(async () => ({ id: 'cs_test', url: 'https://stripe.test/checkout' })),
+  }
+})
+
+vi.mock('@/services/email/service', () => {
+  return {
+    sendDonationReceipt: vi.fn(async () => ({ ok: true, emailSendId: 'email1' })),
   }
 })
 
@@ -88,6 +95,63 @@ describe('donations service', () => {
         name: 'Support SHNA',
       }),
     )
+  })
+
+  it('[core] submitDonationManual creates paid order, item, and transaction', async () => {
+    const payload = mockPayload()
+
+    const result = await submitDonationManual(
+      { payload },
+      {
+        email: 'donor@example.com',
+        name: 'Donor Name',
+        amountUSD: '25.00',
+        paymentMethod: 'cash',
+        locale: 'en',
+      },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'orders',
+        data: expect.objectContaining({
+          status: 'paid',
+          totalUSD: 25,
+          lang: 'en',
+        }),
+        overrideAccess: true,
+      }),
+    )
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'orderItems',
+        data: expect.objectContaining({
+          itemType: 'donation',
+          qty: 1,
+          unitAmountUSD: 25,
+          totalUSD: 25,
+        }),
+        overrideAccess: true,
+      }),
+    )
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'transactions',
+        data: expect.objectContaining({
+          paymentType: 'cash',
+          amountUSD: 25,
+        }),
+        overrideAccess: true,
+      }),
+    )
+    expect(sendDonationReceipt).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        toEmail: 'donor@example.com',
+      }),
+    )
+    expect(createCheckoutSession).not.toHaveBeenCalled()
   })
 
   it('[core] submitDonation rejects invalid amount', async () => {

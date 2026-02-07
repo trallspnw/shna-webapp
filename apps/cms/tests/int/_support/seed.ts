@@ -126,6 +126,12 @@ export const resetDonationsTestState = async (
       .filter((id): id is string | number => Boolean(id))
 
     if (contactIds.length > 0) {
+      await payload.db.deleteMany({
+        collection: 'memberships',
+        where: { contact: { in: contactIds } },
+        req,
+      })
+
       const orders = await payload.find({
         collection: 'orders',
         where: { contact: { in: contactIds } },
@@ -288,6 +294,26 @@ export const resetMembershipsTestState = async (
   }
 
   if (planSlugs.length > 0) {
+    const plans = await payload.find({
+      collection: 'membershipPlans',
+      where: { slug: { in: planSlugs } },
+      limit: planSlugs.length,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    const planIds = (plans.docs ?? [])
+      .map((doc) => (doc as { id?: string | number }).id)
+      .filter((id): id is string | number => Boolean(id))
+
+    if (planIds.length > 0) {
+      await payload.db.deleteMany({
+        collection: 'memberships',
+        where: { plan: { in: planIds } },
+        req,
+      })
+    }
+
     await payload.db.deleteMany({
       collection: 'membershipPlans',
       where: { slug: { in: planSlugs } },

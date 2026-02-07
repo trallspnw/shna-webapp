@@ -3,8 +3,18 @@ import { randomUUID } from 'crypto'
 import { normalizeEmail } from '@/lib/email/normalizeEmail'
 import { resolveCampaignIdFromRef } from '@/services/campaigns/resolveCampaign'
 import { createCheckoutSession } from '@/integrations/stripe/checkout'
+import { sendDonationReceipt } from '@/services/email/service'
 
-import type { ServiceCtx, SubmitDonationInput, SubmitDonationResult, OrderStatusInput, OrderStatusResult } from './types'
+import type {
+  ServiceCtx,
+  SubmitDonationInput,
+  SubmitDonationResult,
+  OrderStatusInput,
+  OrderStatusResult,
+  SubmitDonationManualInput,
+  SubmitDonationManualResult,
+  ManualPaymentMethod,
+} from './types'
 import { ValidationError } from './types'
 import { parseAmountUSD, enforceMaxDonationUSD } from './amount'
 
@@ -34,6 +44,11 @@ const sanitizeOptionalText = (
 
 const resolveLocale = (value: string): 'en' | 'es' => {
   return value === 'es' ? 'es' : 'en'
+}
+
+const resolvePaymentMethod = (value: unknown): ManualPaymentMethod => {
+  if (value === 'cash' || value === 'check') return value
+  throw new ValidationError('Invalid payment method.', { field: 'paymentMethod' })
 }
 
 const requireNonEmptyString = (value: unknown, field: string): string => {
@@ -221,6 +236,98 @@ export const submitDonation = async (
     ok: true,
     url: session.url,
     publicOrderId: publicId,
+  }
+}
+
+export const submitDonationManual = async (
+  ctx: ServiceCtx,
+  input: SubmitDonationManualInput,
+): Promise<SubmitDonationManualResult> => {
+  const normalizedEmail = normalizeEmail(input.email)
+  if (!normalizedEmail) {
+    throw new ValidationError('Email is required.', { field: 'email' })
+  }
+
+  const locale = resolveLocale(input.locale || 'en')
+  const paymentMethod = resolvePaymentMethod(input.paymentMethod)
+
+  const parsed = parseAmountUSD(input.amountUSD)
+  const maxDonationUSD = await getMaxDonationUSD(ctx.payload)
+  enforceMaxDonationUSD(parsed.amountUSD, maxDonationUSD)
+
+  const name = sanitizeOptionalText(input.name, MAX_NAME_LENGTH, 'name')
+  const now = new Date().toISOString()
+  const existingContact = await findContactByEmail(ctx.payload, normalizedEmail)
+
+  const contact = existingContact
+    ? await ctx.payload.update({
+        collection: 'contacts',
+        id: existingContact.id,
+        data: {
+          lastEngagedAt: now,
+          language: locale,
+          ...(name ? { name, displayName: name } : {}),
+        },
+        overrideAccess: true,
+      })
+    : await ctx.payload.create({
+        collection: 'contacts',
+        data: {
+          email: normalizedEmail,
+          language: locale,
+          lastEngagedAt: now,
+          ...(name ? { name, displayName: name } : {}),
+        },
+        overrideAccess: true,
+      })
+
+  const publicId = randomUUID()
+
+  const order = await ctx.payload.create({
+    collection: 'orders',
+    data: {
+      publicId,
+      status: 'paid',
+      contact: contact.id,
+      lang: locale,
+      totalUSD: parsed.amountUSD,
+    },
+    overrideAccess: true,
+  })
+
+  await ctx.payload.create({
+    collection: 'orderItems',
+    data: {
+      order: order.id,
+      itemType: 'donation',
+      label: 'Donation',
+      qty: 1,
+      unitAmountUSD: parsed.amountUSD,
+      totalUSD: parsed.amountUSD,
+    },
+    overrideAccess: true,
+  })
+
+  await ctx.payload.create({
+    collection: 'transactions',
+    data: {
+      order: order.id,
+      contact: contact.id,
+      amountUSD: parsed.amountUSD,
+      paymentType: paymentMethod,
+    },
+    overrideAccess: true,
+  })
+
+  await sendDonationReceipt(ctx, {
+    order,
+    toEmail: normalizedEmail,
+  })
+
+  return {
+    ok: true,
+    publicOrderId: publicId,
+    orderId: String(order.id),
   }
 }
 

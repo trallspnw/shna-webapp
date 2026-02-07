@@ -1,12 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { submitMembership } from '@/services/memberships/service'
+import { submitMembership, submitMembershipManual } from '@/services/memberships/service'
 import { ValidationError } from '@/services/memberships/types'
 import { calculateMembershipTermDates } from '@/services/memberships/terms'
+import { sendMembershipReceipt } from '@/services/email/service'
 
 vi.mock('@/integrations/stripe/checkout', () => {
   return {
     createCheckoutSession: vi.fn(async () => ({ id: 'cs_test', url: 'https://stripe.test/checkout' })),
+  }
+})
+
+vi.mock('@/services/email/service', () => {
+  return {
+    sendMembershipReceipt: vi.fn(async () => ({ ok: true, emailSendId: 'email1' })),
   }
 })
 
@@ -32,6 +39,8 @@ const buildPayload = (overrides: Partial<any> = {}) => {
       if (args.collection === 'contacts') return { id: 'contact1', ...args.data }
       if (args.collection === 'orders') return { id: 'order1', ...args.data }
       if (args.collection === 'orderItems') return { id: 'item1', ...args.data }
+      if (args.collection === 'memberships') return { id: 'membership1', ...args.data }
+      if (args.collection === 'transactions') return { id: 'transaction1', ...args.data }
       return { id: 'x', ...args.data }
     }),
     update: vi.fn(async (args: any) => ({ id: args.id, ...args.data })),
@@ -89,6 +98,60 @@ describe('memberships service', () => {
           totalUSD: 10,
         }),
         overrideAccess: true,
+      }),
+    )
+  })
+
+  it('[core] submitMembershipManual creates paid order, term, and receipt', async () => {
+    const payload = buildPayload()
+
+    const result = await submitMembershipManual(
+      { payload },
+      {
+        email: 'member@example.com',
+        name: 'Member Name',
+        planSlug: 'individual',
+        paymentMethod: 'check',
+        locale: 'en',
+      },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'orders',
+        data: expect.objectContaining({
+          status: 'paid',
+          totalUSD: 10,
+          lang: 'en',
+        }),
+        overrideAccess: true,
+      }),
+    )
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'memberships',
+        data: expect.objectContaining({
+          plan: 'plan1',
+        }),
+        overrideAccess: true,
+      }),
+    )
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'transactions',
+        data: expect.objectContaining({
+          paymentType: 'check',
+          amountUSD: 10,
+        }),
+        overrideAccess: true,
+      }),
+    )
+    expect(sendMembershipReceipt).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        toEmail: 'member@example.com',
+        membershipEndDay: expect.any(String),
       }),
     )
   })

@@ -3,6 +3,7 @@ import { CollectionCards } from '@payloadcms/ui/rsc'
 import type { AdminViewServerProps } from 'payload'
 import React from 'react'
 import { DashboardClient } from './DashboardClient'
+import { ManualEntry } from './ManualEntry.client'
 
 const Dashboard = async ({ initPageResult }: AdminViewServerProps) => {
   const { req } = initPageResult
@@ -80,6 +81,9 @@ const Dashboard = async ({ initPageResult }: AdminViewServerProps) => {
   return (
     <Gutter left right className="dashboard__content">
       <DashboardClient initialOrders={initialOrders} initialMembers={initialMembers} />
+      <div style={{ marginTop: 24 }}>
+        <ManualEntry />
+      </div>
       <div style={{ marginTop: 24 }}>
         <CollectionCards req={req} widgetSlug="collections" />
       </div>

@@ -227,10 +227,12 @@ export const sendDonationReceipt = async (
     return { ok: true, emailSendId: order.receiptEmailSendId }
   }
 
-  const contact = order.contact
+  const contactId =
+    order.contact && typeof order.contact === 'object' ? order.contact.id : order.contact
+  const contact = contactId
     ? await ctx.payload.findByID({
         collection: 'contacts',
-        id: order.contact,
+        id: contactId,
         overrideAccess: true,
       })
     : null
@@ -332,14 +334,6 @@ export const sendDonationReceipt = async (
         fallbackReason = 'render_error'
       }
     } else {
-      ctx.logger?.warn?.('[email] membership receipt placeholders missing', {
-        templateSlug: 'receipt-membership',
-        templatePlaceholders: (template.placeholders || [])
-          .map((entry: { key?: string | null }) => entry?.key)
-          .filter(Boolean),
-        paramsKeys: Object.keys(params),
-        missingPlaceholders: missing,
-      })
       source = 'inline'
       errorCode = 'missing_placeholders'
       fallbackReason = 'missing_placeholders'
@@ -411,12 +405,21 @@ export const sendDonationReceipt = async (
     })
   }
 
-  await ctx.payload.update({
-    collection: 'orders',
-    id: order.id,
-    data: { receiptEmailSendId: String(sendRecord.id) },
-    overrideAccess: true,
-  })
+  if (order?.id) {
+    try {
+      await ctx.payload.update({
+        collection: 'orders',
+        id: order.id,
+        data: { receiptEmailSendId: String(sendRecord.id) },
+        overrideAccess: true,
+      })
+    } catch (error) {
+      ctx.logger?.warn?.('[email] failed to update order receiptEmailSendId', {
+        orderId: order?.id,
+        error: error instanceof Error ? error.message : String(error),
+      })
+    }
+  }
 
   return {
     ok: providerResult.ok,
@@ -449,10 +452,12 @@ export const sendMembershipReceipt = async (
     return { ok: true, emailSendId: order.receiptEmailSendId }
   }
 
-  const contact = order.contact
+  const contactId =
+    order.contact && typeof order.contact === 'object' ? order.contact.id : order.contact
+  const contact = contactId
     ? await ctx.payload.findByID({
         collection: 'contacts',
-        id: order.contact,
+        id: contactId,
         overrideAccess: true,
       })
     : null
@@ -600,6 +605,14 @@ export const sendMembershipReceipt = async (
         fallbackReason = 'render_error'
       }
     } else {
+      ctx.logger?.warn?.('[email] membership receipt placeholders missing', {
+        templateSlug: 'receipt-membership',
+        templatePlaceholders: (template.placeholders || [])
+          .map((entry: { key?: string | null }) => entry?.key)
+          .filter(Boolean),
+        paramsKeys: Object.keys(params),
+        missingPlaceholders: missing,
+      })
       source = 'inline'
       errorCode = 'missing_placeholders'
       fallbackReason = 'missing_placeholders'

@@ -113,11 +113,16 @@ export const applyPaymentEvent = async (
     const items = itemsResult.docs ?? []
     const hasDonationItem = items.some((item: any) => item?.itemType === 'donation')
     const hasMembershipItem = items.some((item: any) => item?.itemType === 'membership')
+    const isMembershipSession =
+      typeof evt.session.metadata?.planSlug === 'string' ||
+      typeof evt.session.metadata?.planId === 'string' ||
+      typeof evt.session.metadata?.planId === 'number'
+    const shouldHandleMembership = hasMembershipItem || isMembershipSession
 
     if (order.status === 'paid') {
       logger?.info?.('[stripe] Order already paid; skipping.', { orderId: order.id })
     } else {
-      if (hasMembershipItem) {
+      if (shouldHandleMembership) {
         await handleMembershipCheckoutCompleted(ctx, { order, session: evt.session })
       } else {
         await payload.update({

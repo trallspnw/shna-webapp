@@ -29,6 +29,23 @@ export type SubmitMembershipResult = {
   publicOrderId: string
 }
 
+export type ManualPaymentMethod = 'cash' | 'check'
+
+export type SubmitMembershipManualInput = {
+  email: string
+  name: string
+  planSlug: string
+  paymentMethod: ManualPaymentMethod
+  locale?: string | null
+}
+
+export type SubmitMembershipManualResult = {
+  ok: true
+  publicOrderId: string
+  orderId: string
+  membershipId?: string
+}
+
 export class ValidationError extends Error {
   details?: Record<string, unknown>
 

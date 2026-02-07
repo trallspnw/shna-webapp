@@ -21,6 +21,8 @@ import { EmailSends } from './collections/EmailSends'
 import { subscriptionsHandler } from './endpoints/subscriptions'
 import { donationsSubmitHandler } from './endpoints/donations'
 import { membershipsSubmitHandler } from './endpoints/memberships'
+import { adminDonationsSubmitHandler } from './endpoints/admin/donations'
+import { adminMembershipsSubmitHandler } from './endpoints/admin/memberships'
 import { ordersStatusHandler } from './endpoints/orders'
 import { Footer } from '@shna/shared/Footer/config'
 import { Header } from '@shna/shared/Header/config'
@@ -126,6 +128,16 @@ export default buildConfig({
       path: '/public/orders/status',
       method: 'get',
       handler: ordersStatusHandler,
+    },
+    {
+      path: '/admin/donations/submit',
+      method: 'post',
+      handler: adminDonationsSubmitHandler,
+    },
+    {
+      path: '/admin/memberships/submit',
+      method: 'post',
+      handler: adminMembershipsSubmitHandler,
     },
   ],
   cors: corsOrigins,
