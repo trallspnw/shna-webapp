@@ -269,9 +269,15 @@ export const sendDonationReceipt = async (
 
 export const sendMembershipReceipt = async (
   ctx: EmailServiceCtx,
-  args: { order: any; toEmail?: string | null; planName: string; amountUSD: number },
+  args: {
+    order: any
+    toEmail?: string | null
+    planName: string
+    amountUSD: number
+    membershipEndDay?: string | null
+  },
 ): Promise<SendTemplatedEmailResult> => {
-  const { order, toEmail, planName, amountUSD } = args
+  const { order, toEmail, planName, amountUSD, membershipEndDay } = args
 
   if (order.receiptEmailSendId) {
     return { ok: true, emailSendId: order.receiptEmailSendId }
@@ -287,12 +293,25 @@ export const sendMembershipReceipt = async (
 
   const recipient = toEmail || contact?.email
   const amountText = `$${Number(amountUSD || 0).toFixed(2)}`
+  const contactLocale = resolveLocale(contact?.language)
+  const expirationText = (() => {
+    if (!membershipEndDay) return ''
+    const date = new Date(membershipEndDay)
+    if (Number.isNaN(date.getTime())) return ''
+    const formatLocale = contactLocale === 'es' ? 'es-US' : 'en-US'
+    try {
+      return new Intl.DateTimeFormat(formatLocale, { dateStyle: 'long' }).format(date)
+    } catch {
+      return date.toISOString().slice(0, 10)
+    }
+  })()
   const params = {
     name: contact?.displayName || 'Friend',
     amount: amountText,
     planName,
     emailAddress: recipient ?? '',
     publicOrderId: order.publicId,
+    membershipExpiresOn: expirationText,
   }
 
   const fallback = {
@@ -312,6 +331,35 @@ export const sendMembershipReceipt = async (
 
   const template = templateLookup.docs[0]
   const locale = resolveLocale(order.lang)
+
+  if (template) {
+    const hasPlaceholder = (template.placeholders || []).some(
+      (entry: { key?: string | null }) => entry?.key === 'membershipExpiresOn',
+    )
+    if (!hasPlaceholder) {
+      try {
+        await ctx.payload.update({
+          collection: 'emailTemplates',
+          id: template.id,
+          data: {
+            placeholders: [
+              ...(template.placeholders || []),
+              {
+                key: 'membershipExpiresOn',
+                description: 'Membership expiration date (formatted)',
+              },
+            ],
+          },
+          overrideAccess: true,
+        })
+      } catch (error) {
+        ctx.logger?.warn?.('[email] failed to append membershipExpiresOn placeholder', {
+          error,
+          templateId: template.id,
+        })
+      }
+    }
+  }
 
   if (!recipient) {
     const failed = await ctx.payload.create({

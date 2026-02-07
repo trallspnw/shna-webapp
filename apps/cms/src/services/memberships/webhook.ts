@@ -102,7 +102,7 @@ export const handleMembershipCheckoutCompleted = async (
   const now = new Date()
   const { startISO, endISO } = calculateMembershipTermDates(now, latestMembership, renewalWindowDays)
 
-  await payload.create({
+  const membership = await payload.create({
     collection: 'memberships',
     data: {
       contact: order.contact,
@@ -130,6 +130,7 @@ export const handleMembershipCheckoutCompleted = async (
       toEmail: session.customerEmail ?? undefined,
       planName: plan.name ?? plan.slug ?? 'Membership',
       amountUSD: planPrice,
+      membershipEndDay: membership?.endDay ?? null,
     })
   }
 
