@@ -26,5 +26,5 @@ primary_region = "iad"
   min_machines_running = 1
 
 [[vm]]
-  memory = "512mb"
+  memory = "1024mb"
   cpus = 1
