@@ -501,7 +501,7 @@ export const sendMembershipReceipt = async (
       try {
         await ctx.payload.update({
           collection: 'emailTemplates',
-          id: template.id,
+          id: templateId,
           data: {
             placeholders: [
               ...(template.placeholders || []),
