@@ -755,7 +755,15 @@ export interface EmailSend {
   fallbackReason?:
     | ('template_not_found' | 'template_inactive' | 'missing_placeholders' | 'render_error' | 'skipped_already_sent')
     | null;
-  missingPlaceholders?: string[] | null;
+  missingPlaceholders?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   placeholderSnapshot?:
     | {
         [k: string]: unknown;

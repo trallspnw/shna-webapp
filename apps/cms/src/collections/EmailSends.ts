@@ -54,8 +54,7 @@ export const EmailSends: CollectionConfig = {
     },
     {
       name: 'missingPlaceholders',
-      type: 'text',
-      hasMany: true,
+      type: 'json',
       admin: { readOnly: true },
     },
     {
