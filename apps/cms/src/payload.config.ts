@@ -29,13 +29,14 @@ import { DonationsSettings } from '@shna/shared/DonationsSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from '@shna/shared/utilities/getURL'
+import { buildCorsOrigins } from './utilities/cors'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const corsOrigins = [getServerSideURL(), process.env.NEXT_PUBLIC_SITE_URL].filter(
-  (origin): origin is string => Boolean(origin),
-)
+const corsOrigins = buildCorsOrigins()
+
+console.info(`[cors] allowed origins: ${corsOrigins.join(', ')}`)
 
 export default buildConfig({
   admin: {

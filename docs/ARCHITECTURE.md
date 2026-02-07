@@ -81,6 +81,16 @@ operational records as `isTest: true` inside the same deployment and database.
 
 > There is **no staging environment**.
 
+### CORS Environment Vars (Prod)
+
+Payload's public submit endpoints rely on CORS allowlisting. Production should set:
+
+* `NEXT_PUBLIC_SITE_URL` (e.g. `https://seminaryhillnaturalarea.org`)
+* `NEXT_PUBLIC_CMS_URL` or `CMS_PUBLIC_URL` (e.g. `https://cms.seminaryhillnaturalarea.org`)
+* Optional: `CORS_ORIGINS` (comma-separated extra origins)
+
+`https://www.seminaryhillnaturalarea.org` is also allowlisted for the public site.
+
 ---
 
 ## 5) Database Strategy (Supabase)
