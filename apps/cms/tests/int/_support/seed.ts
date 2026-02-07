@@ -160,10 +160,10 @@ export const resetDonationsTestState = async (
       }
     }
 
-    await payload.delete({
+    // Use direct DB delete to avoid preferences cleanup in drifted schemas.
+    await payload.db.deleteMany({
       collection: 'contacts',
       where: { email: { in: emails } },
-      overrideAccess: true,
       req,
     })
   }
