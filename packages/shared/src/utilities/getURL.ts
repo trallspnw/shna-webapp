@@ -1,5 +1,46 @@
 import canUseDOM from './canUseDOM'
 
+type ResolveCMSURLOptions = {
+  env?: Record<string, string | undefined>
+  isBrowser?: boolean
+  hostname?: string
+  origin?: string
+}
+
+const normalizeOrigin = (url: string) => url.replace(/\/+$/, '')
+
+const isCmsHostname = (hostname: string) =>
+  hostname === 'cms.seminaryhillnaturalarea.org' || hostname.endsWith('.seminaryhillnaturalarea.org')
+
+export const resolveCMSURL = (options: ResolveCMSURLOptions = {}) => {
+  const env = options.env ?? process.env
+  const isBrowser = options.isBrowser ?? canUseDOM
+  const hostname = options.hostname ?? (isBrowser ? window.location.hostname : undefined)
+  const origin = options.origin ?? (isBrowser ? window.location.origin : undefined)
+
+  if (!isBrowser && env.CMS_INTERNAL_URL) {
+    return normalizeOrigin(env.CMS_INTERNAL_URL)
+  }
+
+  if (isBrowser && hostname && origin && isCmsHostname(hostname)) {
+    return normalizeOrigin(origin)
+  }
+
+  let resolved =
+    env.NEXT_PUBLIC_CMS_URL ||
+    env.CMS_PUBLIC_URL ||
+    (env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : origin || 'http://localhost:3000')
+
+  if (isBrowser && /localhost|127\.0\.0\.1/.test(resolved)) {
+    console.error('[cms-url] resolved to localhost in browser; falling back to same-origin.')
+    resolved = origin || resolved
+  }
+
+  return normalizeOrigin(resolved)
+}
+
 export const getServerSideURL = () => {
   return (
     process.env.NEXT_PUBLIC_CMS_URL ||
@@ -15,17 +56,7 @@ export const getSiteURL = () => {
 }
 
 export const getCMSURL = () => {
-  if (!canUseDOM && process.env.CMS_INTERNAL_URL) {
-    return process.env.CMS_INTERNAL_URL
-  }
-
-  return (
-    process.env.NEXT_PUBLIC_CMS_URL ||
-    process.env.CMS_PUBLIC_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : 'http://localhost:3000')
-  )
+  return resolveCMSURL()
 }
 
 export const getClientSideURL = () => {
