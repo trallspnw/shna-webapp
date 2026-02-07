@@ -67,6 +67,8 @@ pnpm dev:site
 
 * The static site runs at `http://localhost:3001`
 * It reads content from `NEXT_PUBLIC_CMS_URL`
+* For Cloudflare Pages builds, `NEXT_PUBLIC_CMS_URL` must be set to the CMS origin
+  (e.g. `https://cms.seminaryhillnaturalarea.org`) so public forms post to the CMS API.
 
 Note: workspace scripts load the repo-root `.env` via `dotenv-cli`, so you do not need per-app `.env` files under `apps/cms` or `apps/site`.
 

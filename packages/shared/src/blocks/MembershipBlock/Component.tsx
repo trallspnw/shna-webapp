@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { ContainerBlock, MembershipPlan } from '@shna/shared/payload-types'
 import type { Locale } from '@shna/shared/utilities/locale'
 import { DEFAULT_LOCALE, getStoredLocale } from '@shna/shared/utilities/locale'
-import { getCMSURL } from '@shna/shared/utilities/getURL'
+import { getPublicApiBaseUrl } from '@shna/shared/utilities/getURL'
 import { ensureStoredLocale, getSessionRef } from '@shna/shared/client/storage'
 
 type MembershipBlockType = Extract<
@@ -167,7 +167,7 @@ export const MembershipBlock: React.FC<Props> = ({
   }
 
   const pollOrderStatus = async (publicOrderId: string) => {
-    const baseUrl = getCMSURL()
+    const baseUrl = getPublicApiBaseUrl()
     const startedAt = Date.now()
 
     const run = async (delayMs: number) => {
@@ -277,7 +277,7 @@ export const MembershipBlock: React.FC<Props> = ({
     setIsSubmitting(true)
 
     try {
-      const baseUrl = getCMSURL()
+      const baseUrl = getPublicApiBaseUrl()
       const entryUrl = window.location.href
 
       const payload = buildMembershipPayload({

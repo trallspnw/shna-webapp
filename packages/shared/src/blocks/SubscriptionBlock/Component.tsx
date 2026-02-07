@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import type { ContainerBlock } from '@shna/shared/payload-types'
 import type { Locale } from '@shna/shared/utilities/locale'
 import { DEFAULT_LOCALE, getStoredLocale } from '@shna/shared/utilities/locale'
-import { getCMSURL } from '@shna/shared/utilities/getURL'
+import { getPublicApiBaseUrl } from '@shna/shared/utilities/getURL'
 import { ensureStoredLocale, getSessionRef } from '@shna/shared/client/storage'
 
 type SubscriptionBlockType = Extract<
@@ -110,7 +110,7 @@ export const SubscriptionBlock: React.FC<Props> = ({
     setIsSubmitting(true)
 
     try {
-      const baseUrl = getCMSURL()
+      const baseUrl = getPublicApiBaseUrl()
       const payload = buildSubscriptionPayload({
         email: trimmedEmail,
         topics: effectiveTopics,
