@@ -107,7 +107,11 @@ export const Pages: CollectionConfig<'pages'> = {
                 condition: (_, siblingData) => siblingData?.contentMode !== 'html',
               },
               validate: (value, { siblingData }) => {
-                if (siblingData?.contentMode === 'html') return true
+                const mode =
+                  siblingData && typeof siblingData === 'object'
+                    ? (siblingData as { contentMode?: string }).contentMode
+                    : undefined
+                if (mode === 'html') return true
                 return value && Array.isArray(value) && value.length > 0
                   ? true
                   : 'Layout is required when content mode is builder.'
@@ -124,7 +128,11 @@ export const Pages: CollectionConfig<'pages'> = {
                 beforeValidate: [clearEmptyLocalizedText],
               },
               validate: (value, args) => {
-                if (args.siblingData?.contentMode !== 'html') return true
+                const mode =
+                  args.siblingData && typeof args.siblingData === 'object'
+                    ? (args.siblingData as { contentMode?: string }).contentMode
+                    : undefined
+                if (mode !== 'html') return true
                 return requireDefaultLocale(value, args)
               },
             },
