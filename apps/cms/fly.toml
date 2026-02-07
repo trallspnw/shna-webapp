@@ -10,7 +10,7 @@ primary_region = "iad"
   NEXT_PUBLIC_SITE_URL = "https://seminaryhillnaturalarea.org"
 
 [deploy]
-  release_command = "pnpm --filter @shna/cms payload migrate"
+  release_command = "pnpm --filter @shna/cms db:ensure-media-prefix && pnpm --filter @shna/cms payload migrate"
 
 [env]
   NODE_ENV = "production"
