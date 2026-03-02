@@ -1,0 +1,11 @@
+name: Scheduled Site Deploy (Mon/Thu)
+
+on:
+  schedule:
+    - cron: '0 8 * * 1,4'  # 08:00 UTC — Monday and Thursday
+  workflow_dispatch:
+
+jobs:
+  site:
+    uses: ./.github/workflows/deploy-site.yml
+    secrets: inherit
