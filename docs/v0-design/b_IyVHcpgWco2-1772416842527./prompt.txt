@@ -1,0 +1,97 @@
+Build a single-page React website for Seminary Hill Natural Area, a small Pacific Northwest nonprofit nature preserve in Centralia, WA. This is a design prototype — text and links are hardcoded placeholders; in production they'll be driven by a headless CMS.
+
+Brand & Palette
+Background:        #faf6db  (warm parchment)
+Header/Footer bg:  #364b24  (deep forest green)
+Primary button:    #933f13  (burnt sienna/rust — white text)
+Secondary accent:  #db9921  (golden amber)
+Body text:         #1f2a18  (near-black green)
+Muted text:        #4a5a3f  (sage)
+Vibe: Earthy, organic, grounded. Think Pacific Northwest nature preserve meets community nonprofit — not a slick startup, not kitschy rustic. Quiet confidence.
+Typography: Use a humanist serif (e.g. Lora, Playfair Display, or similar via Google Fonts) for headings. Clean readable sans-serif (e.g. Inter or Source Sans) for body and UI. Pairing should feel like a well-designed interpretive trail sign.
+
+Layout Structure
+1. Navigation Bar
+
+Sticky top, background #364b24
+Left: site name/logo text — "Seminary Hill Natural Area" in serif, light/white
+Center (desktop): nav links — Trails, About, Get Involved, Contact (mock hrefs, these will be CMS-configured later)
+Right: Language selector pill — a small rounded toggle/pill showing EN | ES, visible and distinct but not dominant. Switching is a no-op in this prototype.
+On mobile: center/right links collapse into a hamburger menu. Language pill stays visible in the top bar beside the hamburger. Hamburger opens a fullscreen or slide-in drawer showing nav links + language toggle.
+
+2. Hero Section
+
+Full-bleed image, 90–100vh
+Placeholder: a lush Pacific Northwest forest trail — dense second-growth fir, sword ferns, mossy ground, dappled light. Use an Unsplash URL or CSS gradient as fallback.
+Overlay: subtle dark-to-transparent gradient from bottom so text reads cleanly
+Hero text (bottom-left or centered, your call):
+
+Heading: "A Place to Return To"
+Subheading: "Protecting Seminary Hill for Centralia's community — season after season."
+
+
+One CTA button: "Get Involved" → scrolls to forms section. Style with #933f13 bg, white text, rounded.
+
+3. Welcome / Intro Block
+
+Background #faf6db, generous padding
+Centered, max-width ~700px
+H2: "Welcome"
+Two paragraphs of placeholder copy about the preserve and the Friends nonprofit. Keep the existing site copy.
+A subtle amber (#db9921) horizontal rule or decorative element to separate from hero.
+
+4. Forms Section — 3 side-by-side cards on desktop, stacked on mobile
+Each form is a self-contained component (named SubscribeForm, MembershipForm, DonationForm) — designed to be portable to their own pages later.
+Each card:
+
+White or slightly warm card bg, soft shadow, rounded corners
+A small icon or illustrated header area (leaf, hands, heart — simple SVG or emoji as placeholder)
+Card title in serif heading
+Form fields match the current live site exactly:
+
+SubscribeForm
+
+Email (required)
+Submit button: "Subscribe"
+
+MembershipForm
+
+Email (required)
+Name (required)
+Phone
+Address
+Plan — select dropdown: Individual — $10.00, Family — $20.00
+Submit button: "Join"
+
+DonationForm
+
+Email (required)
+Name
+Phone
+Address
+Amount in USD (required)
+Submit button: "Donate"
+
+All buttons use #933f13 primary style. Form inputs should feel warm and organic — slightly rounded, not cold/clinical. On submit, show a simple inline success state (no real API call).
+5. Footer
+
+Background #364b24, light text
+Three columns (stacked on mobile):
+
+Col 1: Org name + short tagline. "Friends of Seminary Hill Natural Area — Volunteer-led. Community-rooted."
+Col 2: Quick links — Trails, About, Membership, Donate, Contact (mock hrefs, CMS-configurable later)
+Col 3: Social icons — Facebook, Instagram (mock hrefs). Label: "Follow the Hill"
+
+
+Bottom bar: copyright line, "Seminary Hill Natural Area © 2025"
+
+
+Technical Notes
+
+React with Tailwind CSS
+Use CSS custom properties for the color tokens so they're easy to swap
+Components: Navbar, Hero, IntroBlock, FormsSection (containing the 3 form cards), Footer
+SubscribeForm, MembershipForm, DonationForm should be importable standalone
+Mobile-first responsive
+No real form submission logic needed — console.log or inline success message on submit
+Accessibility: proper label associations, focus states, aria where needed

@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Users } from 'lucide-react'
 
 import type { ContainerBlock, MembershipPlan } from '@shna/shared/payload-types'
 import type { Locale } from '@shna/shared/utilities/locale'
@@ -317,118 +318,121 @@ export const MembershipBlock: React.FC<Props> = ({
   }
 
   return (
-    <div className="container">
-      <div className="border border-border rounded p-4 max-w-xl bg-muted">
-        <h2 className="text-xl font-semibold mb-2">{header || 'Membership checkout'}</h2>
-        {description && <p className="text-sm mb-3">{description}</p>}
-
-        <form className="flex flex-col gap-3" onSubmit={onSubmit}>
-          <label className="flex flex-col gap-1 text-sm">
-            <span>
-              {copy.emailLabel}
-              <span className="text-red-600 ml-1">*</span>
-            </span>
-            <input
-              className={`border rounded px-3 py-2 bg-background ${formError ? 'border-red-600' : 'border-border'}`}
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span>
-              {copy.nameLabel}
-              <span className="text-red-600 ml-1">*</span>
-            </span>
-            <input
-              className={`border rounded px-3 py-2 bg-background ${formError ? 'border-red-600' : 'border-border'}`}
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            {copy.phoneLabel}
-            <input
-              className="border border-border rounded px-3 py-2 bg-background"
-              type="tel"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            {copy.addressLabel}
-            <textarea
-              className="border border-border rounded px-3 py-2 bg-background"
-              rows={3}
-              value={address}
-              onChange={(event) => setAddress(event.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span>
-              {copy.planLabel}
-              <span className="text-red-600 ml-1">*</span>
-            </span>
-            <select
-              className="border border-border rounded px-3 py-2 bg-background"
-              value={planSlug}
-              onChange={(event) => setPlanSlug(event.target.value)}
-              disabled={planOptions.length === 0}
-              required
-            >
-              {planOptions.length === 0 ? (
-                <option value="">
-                  No plans available
-                </option>
-              ) : (
-                planOptions.map((plan) => (
-                  <option key={plan.slug} value={plan.slug}>
-                    {plan.label}
-                  </option>
-                ))
-              )}
-            </select>
-          </label>
-
-          {formError && <p className="text-sm text-red-600">{formError}</p>}
-
-          <div className="flex gap-2">
-            <button
-              className="border border-primary bg-primary text-primary-foreground rounded px-3 py-2 text-sm flex items-center gap-2 hover:bg-primary/90"
-              type="submit"
-              disabled={isSubmitting || planOptions.length === 0}
-            >
-              {isSubmitting && (
-                <span
-                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-transparent"
-                  aria-hidden="true"
-                />
-              )}
-              <span>{isSubmitting ? copy.loadingText : copy.buttonLabel}</span>
-            </button>
-          </div>
-        </form>
+    <div className="flex h-full flex-col rounded-xl bg-card p-6 shadow-md ring-1 ring-border">
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-header/15">
+        <Users className="h-6 w-6 text-header" aria-hidden="true" />
       </div>
+      <h2 className="font-serif text-xl font-semibold text-card-foreground">
+        {header || 'Membership checkout'}
+      </h2>
+      {description && (
+        <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">{description}</p>
+      )}
+
+      <form className="mt-6 flex flex-1 flex-col gap-4" onSubmit={onSubmit}>
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">
+            {copy.emailLabel}
+            <span className="text-primary ml-1" aria-hidden="true">*</span>
+          </span>
+          <input
+            className={`rounded-lg border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none ${formError ? 'border-destructive' : 'border-border'}`}
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">
+            {copy.nameLabel}
+            <span className="text-primary ml-1" aria-hidden="true">*</span>
+          </span>
+          <input
+            className={`rounded-lg border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none ${formError ? 'border-destructive' : 'border-border'}`}
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">{copy.phoneLabel}</span>
+          <input
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            type="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">{copy.addressLabel}</span>
+          <textarea
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            rows={2}
+            value={address}
+            onChange={(event) => setAddress(event.target.value)}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">
+            {copy.planLabel}
+            <span className="text-primary ml-1" aria-hidden="true">*</span>
+          </span>
+          <select
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            value={planSlug}
+            onChange={(event) => setPlanSlug(event.target.value)}
+            disabled={planOptions.length === 0}
+            required
+          >
+            {planOptions.length === 0 ? (
+              <option value="">No plans available</option>
+            ) : (
+              planOptions.map((plan) => (
+                <option key={plan.slug} value={plan.slug}>
+                  {plan.label}
+                </option>
+              ))
+            )}
+          </select>
+        </label>
+
+        {formError && <p className="text-sm text-destructive">{formError}</p>}
+
+        <div className="mt-auto pt-2">
+          <button
+            className="w-full rounded-lg bg-primary px-5 py-2.5 font-sans text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center gap-2 disabled:opacity-60"
+            type="submit"
+            disabled={isSubmitting || planOptions.length === 0}
+          >
+            {isSubmitting && (
+              <span
+                className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
+                aria-hidden="true"
+              />
+            )}
+            <span>{isSubmitting ? copy.loadingText : copy.buttonLabel}</span>
+          </button>
+        </div>
+      </form>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded bg-white p-6 shadow-lg">
-            <div className="text-lg font-semibold mb-2">{copy.modalTitle}</div>
-            <p className="text-sm">
+          <div className="w-full max-w-md rounded-xl bg-card p-6 shadow-lg">
+            <div className="font-serif text-lg font-semibold mb-2">{copy.modalTitle}</div>
+            <p className="font-sans text-sm">
               {modalState === 'loading' && copy.loadingText}
               {modalState === 'success' && copy.successText}
               {modalState === 'error' && copy.errorText}
             </p>
             <div className="mt-4 flex justify-end">
               <button
-                className="border border-secondary bg-secondary text-secondary-foreground rounded px-3 py-2 text-sm hover:bg-secondary/90"
+                className="rounded-lg border border-border bg-background px-4 py-2 font-sans text-sm hover:bg-muted/50"
                 type="button"
                 onClick={closeModal}
               >

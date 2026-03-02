@@ -164,6 +164,16 @@ Test mode is **not a separate environment** — it uses the same production depl
 | `R2_PUBLIC_URL` / `NEXT_PUBLIC_MEDIA_ORIGIN` | Media CDN |
 | `R2_PREFIX` | Local dev media isolation |
 
+## Design system
+
+Brand tokens are set as CSS variables in both `globals.css` files (`--header`, `--primary`, `--background`, etc.) and wired into Tailwind via `tailwind.config.mjs`. Key palette values:
+- `--header` (forest green `#364b24`) — nav bar, footer background
+- `--primary` (rust `#933f13`) — primary buttons, CTA
+- `--background` (parchment `#faf6db`) — page background
+- `--secondary` (amber `#db9921`) — accent
+
+Lora (Google Fonts serif) is loaded in `FrontEndShell`/`SiteShell` via `next/font/google` and applied to all headings via `globals.css`. Geist Sans/Mono remain for body/UI text.
+
 ## Non-negotiable constraints
 
 - Public site must be statically exportable — no request-time rendering for public pages.

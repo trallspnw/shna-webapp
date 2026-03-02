@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Heart } from 'lucide-react'
 
 import type { ContainerBlock } from '@shna/shared/payload-types'
 import type { Locale } from '@shna/shared/utilities/locale'
@@ -261,62 +262,73 @@ export const DonationBlock: React.FC<Props> = ({
   }, [])
 
   return (
-    <div className="container">
-      <div className="border border-border rounded p-4 max-w-xl bg-muted">
-        <h2 className="text-xl font-semibold mb-2">{header || 'Donation checkout'}</h2>
-        {description && <p className="text-sm mb-3">{description}</p>}
-        <form className="flex flex-col gap-3" onSubmit={onSubmit}>
-          <label className="flex flex-col gap-1 text-sm">
-            <span>
-              {copy.emailLabel}
-              <span className="text-red-600 ml-1">*</span>
+    <div className="flex h-full flex-col rounded-xl bg-card p-6 shadow-md ring-1 ring-border">
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/15">
+        <Heart className="h-6 w-6 text-primary" aria-hidden="true" />
+      </div>
+      <h2 className="font-serif text-xl font-semibold text-card-foreground">
+        {header || 'Donation checkout'}
+      </h2>
+      {description && (
+        <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">{description}</p>
+      )}
+
+      <form className="mt-6 flex flex-1 flex-col gap-4" onSubmit={onSubmit}>
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">
+            {copy.emailLabel}
+            <span className="text-primary ml-1" aria-hidden="true">*</span>
+          </span>
+          <input
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">{copy.nameLabel}</span>
+          <input
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">{copy.phoneLabel}</span>
+          <input
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            type="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">{copy.addressLabel}</span>
+          <textarea
+            className="rounded-lg border border-border px-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            rows={2}
+            value={addressText}
+            onChange={(event) => setAddressText(event.target.value)}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="font-sans text-sm font-medium text-card-foreground">
+            {copy.amountLabel}
+            <span className="text-primary ml-1" aria-hidden="true">*</span>
+          </span>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-sans text-sm text-muted-foreground">
+              $
             </span>
             <input
-              className="border border-border rounded px-3 py-2 bg-background"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            {copy.nameLabel}
-            <input
-              className="border border-border rounded px-3 py-2 bg-background"
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            {copy.phoneLabel}
-            <input
-              className="border border-border rounded px-3 py-2 bg-background"
-              type="tel"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            {copy.addressLabel}
-            <textarea
-              className="border border-border rounded px-3 py-2 bg-background"
-              rows={3}
-              value={addressText}
-              onChange={(event) => setAddressText(event.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span>
-              {copy.amountLabel}
-              <span className="text-red-600 ml-1">*</span>
-            </span>
-            <input
-              className="border border-border rounded px-3 py-2 bg-background"
+              className="w-full rounded-lg border border-border pl-7 pr-3 py-2.5 font-sans text-sm bg-background transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
               type="number"
               min={1}
               step={0.01}
@@ -324,52 +336,55 @@ export const DonationBlock: React.FC<Props> = ({
               onChange={(event) => setAmountUSD(event.target.value)}
               required
             />
-          </label>
+          </div>
+        </label>
 
-          {suggested.length > 0 && (
-            <div className="flex flex-wrap gap-2 text-sm">
-              {suggested.map((amount) => (
-                <button
-                  key={amount}
-                  type="button"
-                  className="border border-secondary bg-secondary text-secondary-foreground rounded px-2 py-1 hover:bg-secondary/90"
-                  onClick={() => setAmountUSD(String(amount))}
-                >
-                  ${amount}
-                </button>
-              ))}
-            </div>
-          )}
+        {suggested.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {suggested.map((amount) => (
+              <button
+                key={amount}
+                type="button"
+                className="rounded-lg border border-secondary bg-secondary/10 px-3 py-1.5 font-sans text-sm text-secondary-foreground transition-colors hover:bg-secondary/20"
+                onClick={() => setAmountUSD(String(amount))}
+              >
+                ${amount}
+              </button>
+            ))}
+          </div>
+        )}
 
+        {formError && <p className="text-sm text-destructive">{formError}</p>}
+
+        <div className="mt-auto pt-2">
           <button
-            className="border border-primary bg-primary text-primary-foreground rounded px-3 py-2 text-sm flex items-center gap-2 w-auto self-start hover:bg-primary/90"
+            className="w-full rounded-lg bg-primary px-5 py-2.5 font-sans text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center gap-2 disabled:opacity-60"
             type="submit"
             disabled={isSubmitting}
           >
             {isSubmitting && (
               <span
-                className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-transparent"
+                className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
                 aria-hidden="true"
               />
             )}
             <span>{isSubmitting ? copy.loadingText : copy.buttonLabel}</span>
           </button>
-        </form>
-        {formError && <p className="text-sm mt-2 text-red-600">{formError}</p>}
-      </div>
+        </div>
+      </form>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded bg-white p-6 shadow-lg">
-            <div className="text-lg font-semibold mb-2">{copy.modalTitle}</div>
-            <p className="text-sm">
+          <div className="w-full max-w-md rounded-xl bg-card p-6 shadow-lg">
+            <div className="font-serif text-lg font-semibold mb-2">{copy.modalTitle}</div>
+            <p className="font-sans text-sm">
               {modalState === 'loading' && copy.loadingText}
               {modalState === 'success' && copy.successText}
               {modalState === 'error' && copy.errorText}
             </p>
             <div className="mt-4 flex justify-end">
               <button
-                className="border border-secondary bg-secondary text-secondary-foreground rounded px-3 py-2 text-sm hover:bg-secondary/90"
+                className="rounded-lg border border-border bg-background px-4 py-2 font-sans text-sm hover:bg-muted/50"
                 type="button"
                 onClick={closeModal}
               >

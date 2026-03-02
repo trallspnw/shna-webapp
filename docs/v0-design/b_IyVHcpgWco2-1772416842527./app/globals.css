@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Seminary Hill Brand Palette */
+  --background: #faf6db;
+  --foreground: #1f2a18;
+  --card: #fdf9e8;
+  --card-foreground: #1f2a18;
+  --popover: #fdf9e8;
+  --popover-foreground: #1f2a18;
+  --primary: #933f13;
+  --primary-foreground: #ffffff;
+  --secondary: #364b24;
+  --secondary-foreground: #f5f0d0;
+  --muted: #e8e2c0;
+  --muted-foreground: #4a5a3f;
+  --accent: #db9921;
+  --accent-foreground: #1f2a18;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --border: #c8c2a0;
+  --input: #e8e2c0;
+  --ring: #933f13;
+  --chart-1: #933f13;
+  --chart-2: #364b24;
+  --chart-3: #db9921;
+  --chart-4: #4a5a3f;
+  --chart-5: #1f2a18;
+  --radius: 0.5rem;
+
+  /* Seminary Hill custom tokens */
+  --forest: #364b24;
+  --forest-foreground: #f5f0d0;
+  --parchment: #faf6db;
+  --rust: #933f13;
+  --amber: #db9921;
+  --sage: #4a5a3f;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), 'Inter', sans-serif;
+  --font-serif: var(--font-lora), 'Lora', serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-forest: var(--forest);
+  --color-forest-foreground: var(--forest-foreground);
+  --color-parchment: var(--parchment);
+  --color-rust: var(--rust);
+  --color-amber: var(--amber);
+  --color-sage: var(--sage);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

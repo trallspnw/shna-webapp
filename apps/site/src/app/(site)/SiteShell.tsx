@@ -12,6 +12,9 @@ import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMe
 import { cn } from '@shna/shared/utilities/ui'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
+import { Lora } from 'next/font/google'
+
+const lora = Lora({ subsets: ['latin'], variable: '--font-lora' })
 
 type SiteSettings = Config['globals']['site-settings']
 
@@ -29,7 +32,12 @@ const resolveFaviconUrl = (media?: Media | number | null): string | null => {
 }
 
 export async function SiteShell({ children, locale, localeInitMode = 'force' }: Props) {
-  const siteSettings = (await getCachedGlobal('site-settings', 1, false, undefined, locale)()) as SiteSettings
+  let siteSettings: SiteSettings | null = null
+  try {
+    siteSettings = (await getCachedGlobal('site-settings', 1, false, undefined, locale)()) as SiteSettings
+  } catch {
+    // CMS temporarily unreachable; render with defaults
+  }
   const allowIndexing = siteSettings?.allowIndexing === true
   const faviconSvgUrl = resolveFaviconUrl(siteSettings?.faviconSvg)
   const faviconIcoUrl = resolveFaviconUrl(siteSettings?.faviconIco)
@@ -39,7 +47,7 @@ export async function SiteShell({ children, locale, localeInitMode = 'force' }: 
 
   return (
     <html
-      className={cn(GeistSans.variable, GeistMono.variable)}
+      className={cn(GeistSans.variable, GeistMono.variable, lora.variable)}
       lang={locale}
       suppressHydrationWarning
       data-theme="light"
@@ -59,19 +67,11 @@ export async function SiteShell({ children, locale, localeInitMode = 'force' }: 
         <Providers>
           <RefCapture />
           {localeInitMode !== 'off' && <LocaleInit locale={locale} mode={localeInitMode} />}
-          <div className="bg-header text-header-foreground">
-            <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
-              <Header locale={locale} />
-            </div>
-          </div>
+          <Header locale={locale} />
           <main className="flex-1">
             <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">{children}</div>
           </main>
-          <div className="bg-header text-header-foreground">
-            <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
-              <Footer locale={locale} />
-            </div>
-          </div>
+          <Footer locale={locale} />
         </Providers>
       </body>
     </html>

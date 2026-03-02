@@ -1,8 +1,3 @@
-import { cn } from '@shna/shared/utilities/ui'
-import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
-import React from 'react'
-
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@shna/shared/Footer/Component'
 import { Header } from '@shna/shared/Header/Component'
@@ -11,11 +6,18 @@ import { RefCapture } from '@shna/shared/components/attribution/RefCapture'
 import { LocaleInit } from '@shna/shared/components/locale/LocaleInit'
 import type { Config, Media } from '@shna/shared/payload-types'
 import type { Locale } from '@shna/shared/utilities/locale'
-import { draftMode, headers } from 'next/headers'
+import { cn } from '@shna/shared/utilities/ui'
 import { getCachedGlobal } from '@shna/shared/utilities/getGlobals'
 import { getMediaUrl, getMediaUrlFromPrefix } from '@shna/shared/utilities/getMediaUrl'
+import { GeistMono } from 'geist/font/mono'
+import { GeistSans } from 'geist/font/sans'
+import { Lora } from 'next/font/google'
+import { draftMode, headers } from 'next/headers'
+import React from 'react'
 
 import './globals.css'
+
+const lora = Lora({ subsets: ['latin'], variable: '--font-lora' })
 
 type SiteSettings = Config['globals']['site-settings']
 
@@ -41,13 +43,18 @@ export async function FrontEndShell({ children, locale, localeInitMode = 'force'
       process.env.VERCEL_PROJECT_PRODUCTION_URL,
   )
 
-  const siteSettings = (await getCachedGlobal(
-    'site-settings',
-    1,
-    isEnabled,
-    requestHeaders,
-    locale,
-  )()) as SiteSettings
+  let siteSettings: SiteSettings | null = null
+  try {
+    siteSettings = (await getCachedGlobal(
+      'site-settings',
+      1,
+      isEnabled,
+      requestHeaders,
+      locale,
+    )()) as SiteSettings
+  } catch {
+    // CMS temporarily unreachable (e.g. dev server hot-reload); render with defaults
+  }
   const faviconSvgUrl = resolveFaviconUrl(siteSettings?.faviconSvg)
   const faviconIcoUrl = resolveFaviconUrl(siteSettings?.faviconIco)
   const minPageWidth = siteSettings?.minPageWidth ?? 360
@@ -56,7 +63,7 @@ export async function FrontEndShell({ children, locale, localeInitMode = 'force'
 
   return (
     <html
-      className={cn(GeistSans.variable, GeistMono.variable)}
+      className={cn(GeistSans.variable, GeistMono.variable, lora.variable)}
       lang={locale}
       suppressHydrationWarning
       data-theme="light"
@@ -82,21 +89,13 @@ export async function FrontEndShell({ children, locale, localeInitMode = 'force'
           />
 
           {hasCMSURL && (
-            <div className="bg-header text-header-foreground">
-              <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
-                <Header draft={isEnabled} headers={requestHeaders} locale={locale} />
-              </div>
-            </div>
+            <Header draft={isEnabled} headers={requestHeaders} locale={locale} />
           )}
           <main className="flex-1">
             <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">{children}</div>
           </main>
           {hasCMSURL && (
-            <div className="bg-header text-header-foreground">
-              <div className="mx-auto w-full max-w-[var(--maxPageWidth)]">
-                <Footer draft={isEnabled} headers={requestHeaders} locale={locale} />
-              </div>
-            </div>
+            <Footer draft={isEnabled} headers={requestHeaders} locale={locale} />
           )}
         </Providers>
       </body>

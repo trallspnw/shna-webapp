@@ -35,7 +35,7 @@ const outerSpacingClasses: Record<NonNullable<Props['outerSpacingY']>, string> =
   none: 'py-0',
   sm: 'py-6',
   md: 'py-12',
-  lg: 'py-20',
+  lg: 'py-20 lg:py-28',
 }
 
 const innerPaddingClasses: Record<NonNullable<Props['innerPadding']>, string> = {
@@ -124,7 +124,7 @@ export const ContainerBlock: React.FC<Props> = (props) => {
       )}
 
       <div className={cn('relative w-full mx-auto', innerWidthClass, innerPaddingClasses[resolvedInnerPadding])}>
-        <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
+        <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-6 lg:gap-x-8">
           {(columns || []).map((column, columnIndex) => {
             const spanValue = getColumnSpanValue(column.size)
             const columnBlocks = column.blocks || []
@@ -137,7 +137,7 @@ export const ContainerBlock: React.FC<Props> = (props) => {
                   [lgStartClass || '']: columnIndex === 0 && Boolean(lgStartClass),
                 })}
               >
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 h-full">
                   {columnBlocks.map((block: ColumnBlock, blockIndex: number) => {
                     if (!block || !('blockType' in block)) return null
                     const Block = blockComponents[block.blockType]

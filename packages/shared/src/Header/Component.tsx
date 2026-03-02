@@ -12,7 +12,12 @@ type Props = {
 }
 
 export async function Header({ draft = false, headers, locale }: Props = {}) {
-  const headerData: Header = await getCachedGlobal('header', 1, draft, headers, locale)()
+  let headerData: Header | null = null
+  try {
+    headerData = await getCachedGlobal('header', 1, draft, headers, locale)()
+  } catch {
+    // CMS temporarily unreachable; render with defaults
+  }
 
-  return <HeaderClient data={headerData} locale={locale} />
+  return <HeaderClient data={headerData ?? ({} as Header)} locale={locale} />
 }

@@ -10,6 +10,14 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'siteName',
+      type: 'text',
+      admin: {
+        placeholder: 'Seminary Hill Natural Area',
+        description: 'Displayed in the top-left of the navigation bar.',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [

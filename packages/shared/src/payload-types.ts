@@ -1596,6 +1596,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: number;
+  /**
+   * Displayed in the top-left of the navigation bar.
+   */
+  siteName?: string | null;
   navItems?:
     | {
         link?: {
@@ -1620,6 +1624,14 @@ export interface Header {
  */
 export interface Footer {
   id: number;
+  /**
+   * Organization name shown as the heading in the footer.
+   */
+  orgName?: string | null;
+  /**
+   * Short tagline shown under the org name in the footer.
+   */
+  tagline?: string | null;
   navItems?:
     | {
         link?: {
@@ -1635,6 +1647,28 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Heading for the quick links column in the footer.
+   */
+  quickLinksLabel?: string | null;
+  /**
+   * Icons are automatically chosen based on the selected platform.
+   */
+  socialLinks?:
+    | {
+        platform: 'facebook' | 'instagram' | 'twitter' | 'youtube' | 'linkedin';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Heading for the social links column in the footer.
+   */
+  socialLinksLabel?: string | null;
+  /**
+   * Copyright line shown at the bottom of the footer.
+   */
+  copyright?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1680,6 +1714,7 @@ export interface DonationsSetting {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  siteName?: T;
   navItems?:
     | T
     | {
@@ -1703,6 +1738,8 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
+  orgName?: T;
+  tagline?: T;
   navItems?:
     | T
     | {
@@ -1717,6 +1754,16 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  quickLinksLabel?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  socialLinksLabel?: T;
+  copyright?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

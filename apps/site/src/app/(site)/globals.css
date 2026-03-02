@@ -9,6 +9,7 @@
   h4,
   h5,
   h6 {
+    font-family: var(--font-lora, Georgia, serif);
     font-size: unset;
     font-weight: unset;
   }
@@ -101,6 +102,30 @@
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
     min-width: var(--minPageWidth);
   }
+}
+
+/* Amber divider: insert an <hr> in rich text to get "─── ✦ ───" */
+.prose hr {
+  border: none;
+  height: 1px;
+  background-color: hsl(var(--secondary) / 0.4);
+  position: relative;
+  margin: 2.5rem auto;
+  max-width: 44rem;
+  overflow: visible;
+}
+
+.prose hr::after {
+  content: '✦';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: hsl(var(--background));
+  padding: 0 0.75rem;
+  color: hsl(var(--secondary));
+  font-size: 1rem;
+  line-height: 1;
 }
 
 html {

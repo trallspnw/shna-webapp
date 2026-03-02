@@ -101,6 +101,7 @@ const config = {
       fontFamily: {
         mono: ['var(--font-geist-mono)'],
         sans: ['var(--font-geist-sans)'],
+        serif: ['var(--font-lora)', 'Georgia', 'serif'],
       },
       keyframes: {
         'accordion-down': {
